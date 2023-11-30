@@ -17,11 +17,7 @@ def get_fans(page, uid='30620472'):
         # 使用 requests 库下载 JSON 数据
         response = requests.get(
             f"https://api.bilibili.com/x/relation/followers?vmid={uid}&pn={page}",
-            headers=header,
-            proxies={
-                'http': 'http://127.0.0.1:7890',
-                'https': 'http://127.0.0.1:7890'
-            }
+            headers=header
         )
         response.raise_for_status()  # 检查是否成功获取数据
 
