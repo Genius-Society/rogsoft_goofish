@@ -71,8 +71,6 @@ def upd_fans(fans_json='fans.json'):
 
     unfollows = []
     new_fans = get_folowers()
-    # with open('test.json', 'r', encoding='utf-8') as file:
-    #     new_fans = json.load(file)
 
     for fan in old_fans.keys():
         if fan not in new_fans:
@@ -90,7 +88,6 @@ def upd_fans(fans_json='fans.json'):
         for user in unfollows:
             nickname = user['uname']
             url = "https://space.bilibili.com/" + user['uid']
-            # whisper = "https://message.bilibili.com/#/whisper/mid" + user['uid']
             content += f'<br><a href="{url}" target="_blank">{nickname}</a><br>'
 
         if content:

@@ -3,14 +3,15 @@ from email.header import Header
 from email.mime.text import MIMEText
 
 
-def send_email(content=''):
+def send_email(content):
     # 邮件内容
-    subject = '为下述罪人们降下终末'
+    subject = '按罪人名单降下终末'
     body = f'''
     <html>
-    <body>
-        {content}
-    </body>
+        <body>
+            <h1>白嫖完再取关？什么人啊？拉黑了</h1><br>
+            {content}
+        </body>
     </html>
     '''
 
