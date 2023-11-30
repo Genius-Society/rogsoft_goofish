@@ -1,5 +1,5 @@
 @echo off
-call conda activate cnn
+call conda activate base
 pip install -r requirements.txt
 python clock.py
 pause
