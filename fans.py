@@ -51,16 +51,28 @@ def get_fans(page, uid='30620472'):
     return (None, 0)
 
 
-def get_folowers():
+def get_folowers(max_try=100):
+    trytime = 0
     fans, pages = get_fans(page=1)
     while not fans:
+        trytime += 1
+        if trytime > max_try:
+            send_email('Tried so many times at page 1')
+            return None
+
         time.sleep(random.uniform(0.5, 1))
         fans, pages = get_fans(page=1)
 
     for i in tqdm(range(2, pages + 1), desc="Updating fans..."):
         time.sleep(random.uniform(0.5, 1))
         followers, _ = get_fans(page=i)
+        trytime = 0
         while not followers:
+            trytime += 1
+            if trytime > max_try:
+                send_email(f'Tried so many times at page {i}')
+                return None
+
             time.sleep(random.uniform(1, 2))
             followers, _ = get_fans(page=i)
 
@@ -81,6 +93,9 @@ def upd_fans(fans_json='fans.json'):
 
     unfollows = []
     new_fans = get_folowers()
+    if not new_fans:
+        print('Failed to upd fans.')
+        return
 
     for fan in old_fans.keys():
         if fan not in new_fans:

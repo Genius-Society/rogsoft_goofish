@@ -19,5 +19,13 @@ def cyc_monitor(period=1):
         time.sleep(1)
 
 
+def hour_monitor(min='00'):
+    print(f'监控开启中...每整点{min}分触发一次')
+    schedule.every().hour.at(f":{min}").do(upd_fans)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
 if __name__ == "__main__":
-    cyc_monitor()
+    hour_monitor('00')
