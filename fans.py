@@ -7,10 +7,24 @@ from tqdm import tqdm
 from smtp import send_email
 
 
+def read_txt(file_path='cookie.txt'):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        return content
+
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    except Exception as e:
+        print(f"Error reading file: {str(e)}")
+
+    return ''
+
+
 def get_fans(page, uid='30620472'):
     header = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0",
-        'Cookie': "buvid3=324500E7-4F52-5EA3-F628-1994160741D036790infoc; b_nut=1700736136; CURRENT_FNVAL=4048; _uuid=E72310C8B-3DBD-A361-FDAA-45E105E1518A1036335infoc; buvid4=E7B6EE73-CD40-FAAC-1C53-1357D6E72F0238098-023112310-; buvid_fp=b4fa4c3909839e6a0222f3bd9eee8039; rpdid=|(k|))~uu)Jl0J'u~||~JYuJ); DedeUserID=3546574294616302; DedeUserID__ckMd5=7b698ed75104cc36; enable_web_push=DISABLE; header_theme_version=CLOSE; fingerprint=b4fa4c3909839e6a0222f3bd9eee8039; LIVE_BUVID=AUTO1917009940004703; SESSDATA=e0f7c9fd%2C1716875228%2C49e9d%2Ab1CjBRctTyjev616Kmpb8b_uzbh9IsYHfTCA9VsIke1hhEXVnGh2YL2wwrQ4OfM2kSswYSVjl2SjBsMHk4QWctVW5YV1NOakM5aGpDbHVwcFFXMUlmMkw4WHJ6bHBVMnl3RldYaGk1YmpaSTQwNFByS0k3ckRxdjEwLTVkeW92a1pKRkY0MGJkakdBIIEC; bili_jct=5665cb41eb521465973fae773f57dc27; home_feed_column=4; b_lsid=10AFD1F7F_18C1F2FA52C; sid=6zw8zu6c; bp_video_offset_3546574294616302=869695976567209991; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE1OTEzNDMsImlhdCI6MTcwMTMzMjA4MywicGx0IjotMX0.x5mUJhaBtCDnq3suz3wZkMq7zXagsyDR7NTy-L1G_Qg; bili_ticket_expires=1701591283; innersign=0; PVID=4; browser_resolution=890-331; bsource=search_bing"
+        'Cookie': read_txt()
     }
 
     try:

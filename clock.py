@@ -11,5 +11,13 @@ def monitor(trigger_time="12:50"):
         time.sleep(1)
 
 
+def cyc_monitor(period=1):
+    print(f'监控开启中...每{period}小时触发一次')
+    schedule.every(period).hours.do(upd_fans)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
 if __name__ == "__main__":
-    monitor()
+    cyc_monitor()
