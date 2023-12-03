@@ -67,7 +67,7 @@ def get_folowers(max_try=3):
         time.sleep(random.uniform(0.5, 1))
         fans, pages = get_fans(page=1)
 
-    for i in tqdm(range(2, pages + 1), desc="Updating fans..."):
+    for i in tqdm(range(2, pages + 1), desc="Scanning followers..."):
         time.sleep(random.uniform(0.5, 1))
         followers, _ = get_fans(page=i)
         trytime = 0
@@ -123,3 +123,7 @@ def upd_fans(fans_json='fans.json'):
 
     else:
         print('No unfollower found.')
+
+
+if __name__ == "__main__":
+    upd_fans()
