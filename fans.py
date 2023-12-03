@@ -21,6 +21,10 @@ def read_txt(file_path='cookie.txt'):
     return ''
 
 
+def upd_cookie():
+    print('Cookie needs upd.')
+
+
 def get_fans(page, uid='30620472'):
     header = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0",
@@ -51,13 +55,13 @@ def get_fans(page, uid='30620472'):
     return (None, 0)
 
 
-def get_folowers(max_try=100):
+def get_folowers(max_try=3):
     trytime = 0
     fans, pages = get_fans(page=1)
     while not fans:
         trytime += 1
         if trytime > max_try:
-            send_email('Tried so many times at page 1')
+            upd_cookie()
             return None
 
         time.sleep(random.uniform(0.5, 1))
@@ -70,7 +74,7 @@ def get_folowers(max_try=100):
         while not followers:
             trytime += 1
             if trytime > max_try:
-                send_email(f'Tried so many times at page {i}')
+                upd_cookie()
                 return None
 
             time.sleep(random.uniform(1, 2))
@@ -111,9 +115,8 @@ def upd_fans(fans_json='fans.json'):
     if unfollows:
         content = ''
         for user in unfollows:
-            nickname = user['uname']
-            url = "https://space.bilibili.com/" + user['uid']
-            content += f'<br><a href="{url}" target="_blank">{nickname}</a><br>'
+            url = f'https://space.bilibili.com/{user["uid"]}'
+            content += f'<br><a href="{url}" target="_blank">{user["uname"]}</a><br>'
 
         if content:
             send_email(content)
