@@ -1,4 +1,6 @@
 # bilibili-fans-monitor
+[![Python application](https://github.com/monet-joe/bilibili-fans-monitor/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/monet-joe/bilibili-fans-monitor/actions/workflows/python-app.yml)
+
 白嫖取关死妈
 
 ## 获取 cookie 方法
