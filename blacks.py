@@ -70,6 +70,7 @@ def filter_deleted(bads: dict):
         if bads[key] == '账号已注销':
             deleted_blacks.append(key)
 
+    print(f'Filtered blacklist: [ {len(deleted_blacks)} / {len(bads)} ]')
     return deleted_blacks
 
 
