@@ -1,9 +1,5 @@
 import os
-import time
 import json
-import random
-import requests
-from tqdm import tqdm
 from smtp import send_email
 from utils import *
 

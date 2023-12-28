@@ -161,3 +161,4 @@ cython_debug/
 test.py
 *.json
 cookie.txt
+blacks.js
