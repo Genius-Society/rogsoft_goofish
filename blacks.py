@@ -1,4 +1,3 @@
-import requests
 from utils import *
 
 
@@ -24,7 +23,7 @@ def get_blacks(page):
             for fan in fan_list:
                 blacks[str(fan['mid'])] = fan['uname']
 
-            return (blacks, int(json_data['data']['total'] / 50))
+            return (blacks, math.ceil(json_data['data']['total'] / 50))
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")

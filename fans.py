@@ -30,7 +30,7 @@ def get_fans(page, uid='30620472'):
             for fan in fan_list:
                 fans[str(fan['mid'])] = fan['uname']
 
-            return (fans, int(json_data['data']['total'] / 50))
+            return (fans, math.ceil(json_data['data']['total'] / 50))
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
