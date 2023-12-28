@@ -4,10 +4,6 @@ from smtp import send_email
 from utils import *
 
 
-def upd_cookie():
-    print('Cookie needs upd.')
-
-
 def get_fans(page, uid='30620472'):
     header = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0",
@@ -33,41 +29,19 @@ def get_fans(page, uid='30620472'):
             return (fans, math.ceil(json_data['data']['total'] / 50))
 
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}, retrying...")
+        return get_fans(page, uid)
 
     return (None, 0)
 
 
-def get_folowers(max_try=3):
-    trytime = 0
+def get_folowers():
     fans, pages = get_fans(page=1)
-    while not fans:
-        trytime += 1
-        if trytime > max_try:
-            upd_cookie()
-            return None
-
-        time.sleep(random.uniform(0.5, 1))
-        fans, pages = get_fans(page=1)
-
     for i in tqdm(range(2, pages + 1), desc="Scanning followers..."):
         time.sleep(random.uniform(0.5, 1))
         followers, _ = get_fans(page=i)
-        trytime = 0
-        while not followers:
-            trytime += 1
-            if trytime > max_try:
-                upd_cookie()
-                return None
-
-            time.sleep(random.uniform(1, 2))
-            followers, _ = get_fans(page=i)
-
-        count = len(followers)
-        if count == 0:
-            break
-
-        fans.update(followers)
+        if followers:
+            fans.update(followers)
 
     return fans
 
