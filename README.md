@@ -4,7 +4,7 @@
 白嫖取关死妈
 
 ## 获取 cookie 方法
-浏览器登陆B站小号，在登陆状态下访问：
+浏览器登陆B站待监控账号，在登陆状态下访问：
 
 <https://api.bilibili.com/x/relation/followers?vmid=1>
 
@@ -13,7 +13,7 @@
 将 SESSDATA=直到分号之前的内容复制(包括SESSDATA=本身) 粘贴到 cookie.txt 中
 
 ## 使用
-```
+```bash
 git clone git@gitee.com:MuGeminorum/bilibili-fans-monitor.git
 cd bilibili-fans-monitor
 ```
