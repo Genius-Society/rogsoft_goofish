@@ -28,4 +28,4 @@ def hour_monitor(min='00'):
 
 
 if __name__ == "__main__":
-    hour_monitor()
+    monitor(trigger_time="12:42:30")

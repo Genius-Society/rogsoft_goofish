@@ -3,13 +3,12 @@ from email.header import Header
 from email.mime.text import MIMEText
 
 
-def send_email(content):
+def send_email(content, subject='按罪人名单降下终末', title='白嫖完再取关？什么人啊？拉黑了'):
     # 邮件内容
-    subject = '按罪人名单降下终末'
     body = f'''
     <html>
         <body>
-            <h1>白嫖完再取关？什么人啊？拉黑了</h1><br>
+            <h1>{title}</h1><br>
             {content}
         </body>
     </html>

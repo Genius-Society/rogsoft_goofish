@@ -56,7 +56,12 @@ def upd_fans(fans_json='fans.json'):
     new_fans = get_folowers()
     if not new_fans:
         print('Failed to upd fans.')
-        return
+        send_email(
+            '请手动更新cookies',
+            subject='更新粉丝列表失败',
+            title='可能是由于cookies失效导致的'
+        )
+        exit()
 
     for fan in old_fans.keys():
         if fan not in new_fans:
