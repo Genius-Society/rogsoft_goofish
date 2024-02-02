@@ -1,3 +1,3 @@
 #!/bin/sh
 
-nohup python3 ./clock.py > /dev/null 2>&1 &
+nohup python3 /opt/bilibili-relation-monitor/clock.py > /dev/null 2>&1 &
