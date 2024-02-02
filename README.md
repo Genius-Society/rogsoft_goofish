@@ -15,6 +15,7 @@
 ## 使用
 ```bash
 git clone git@gitee.com:MuGeminorum/bilibili-relation-monitor.git
+cd bilibili-relation-monitor
 ```
 
 创建一个 start.bat 的快捷方式移至启动文件夹并双击打开
