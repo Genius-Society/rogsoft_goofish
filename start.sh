@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python clock.py
+python /opt/bilibili-relation-monitor/clock.py
