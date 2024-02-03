@@ -25,7 +25,7 @@ def min_monitor(period=2):
         time.sleep(1)
 
 
-def hour_monitor(min='00'):
+def hour_monitor(min='39'):
     print(f'监控开启中...每整点{min}分触发一次')
     schedule.every().hour.at(f":{min}").do(upd)
     while True:
@@ -34,5 +34,4 @@ def hour_monitor(min='00'):
 
 
 if __name__ == "__main__":
-    # monitor(trigger_time="12:42:30")
     hour_monitor()

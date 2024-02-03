@@ -160,6 +160,6 @@ cython_debug/
 #.idea/
 test.py
 *.json
-cookie.txt
+*.txt
 blacks.js
 rename.sh

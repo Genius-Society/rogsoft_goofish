@@ -3,6 +3,7 @@ import time
 import math
 import random
 import requests
+from smtp import send_email
 from utils import read_txt
 from tqdm import tqdm
 
@@ -208,6 +209,11 @@ def clean_blackfollows():
     cookie = read_txt()
     if not cookie:
         print('请输入cookie')
+        send_email(
+            '请输入cookie',
+            subject='更新关系列表失败',
+            title='可能是由于cookies缺失导致的'
+        )
         exit()
 
     blacklist = filter_deleted(get_badlist(cookie))
