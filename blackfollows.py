@@ -193,7 +193,9 @@ def batch_modify(uid: str, cookie_str: str, action=6):
         cookies=cookies_str
     )
 
-    return json.loads(response.content)['code']
+    jsonstr = json.loads(response.content)
+    print(jsonstr['message'])
+    return jsonstr['code']
 
 
 def parse_cookie(cookie_str: str):

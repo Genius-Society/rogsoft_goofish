@@ -1,14 +1,16 @@
 import os
 import json
+from blackfollows import parse_cookie
 from smtp import send_email
 from utils import *
 
 
-def get_fans(page, uid='30620472'):
+def get_fans(page):
     header = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         'Cookie': read_txt()
     }
+    uid, _, _ = parse_cookie(header['Cookie'])
 
     try:
         # 使用 requests 库下载 JSON 数据
@@ -28,11 +30,19 @@ def get_fans(page, uid='30620472'):
 
             return (fans, math.ceil(json_data['data']['total'] / 50))
 
+        else:
+            msg = json_data['message']
+            print(msg)
+            send_email(
+                msg,
+                subject='更新粉丝列表失败',
+                title=f"错误代码：{json_data['code']}"
+            )
+            exit()
+
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}, retrying...")
         return get_fans(page, uid)
-
-    return (None, 0)
 
 
 def get_folowers():
@@ -59,7 +69,7 @@ def upd_fans(fans_json='fans.json'):
         send_email(
             '请手动更新cookies',
             subject='更新粉丝列表失败',
-            title='可能是由于cookies失效导致的'
+            title='可能是由于cookies失效或无粉丝导致的'
         )
         exit()
 
