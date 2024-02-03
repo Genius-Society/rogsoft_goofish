@@ -206,7 +206,7 @@ def clean_blackfollows(cookie=global_cookie):
         send_email(
             '请输入cookie',
             subject='更新关系列表失败',
-            title='可能是由于cookies缺失导致的'
+            title='可能是由cookies缺失导致的'
         )
         exit()
 
