@@ -1,16 +1,9 @@
-import json
-import time
-import math
-import random
-import requests
-from smtp import send_email
-from utils import read_txt
-from tqdm import tqdm
+from utils import *
 
 
 def get_list(page, cookie, api_url='https://api.bilibili.com/x/relation/blacks?'):
     header = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0",
+        "User-Agent": userAgent,
         'Cookie': cookie
     }
 
@@ -40,7 +33,7 @@ def get_list(page, cookie, api_url='https://api.bilibili.com/x/relation/blacks?'
 
 def get_whist(page, cookie, api_url='https://api.bilibili.com/x/relation/whispers?'):
     header = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0",
+        "User-Agent": userAgent,
         'Cookie': cookie
     }
 
@@ -182,7 +175,7 @@ def batch_modify(uid: str, cookie_str: str, action=6):
 
     headers = {
         "Referer": "https://www.bilibili.com/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "User-Agent": userAgent,
         "Origin": "https://www.bilibili.com/"
     }
 
@@ -207,8 +200,7 @@ def parse_cookie(cookie_str: str):
     return myuid, csrf, cookies
 
 
-def clean_blackfollows():
-    cookie = read_txt()
+def clean_blackfollows(cookie=global_cookie):
     if not cookie:
         print('请输入cookie')
         send_email(

@@ -1,16 +1,14 @@
 import os
-import json
 from blackfollows import parse_cookie
-from smtp import send_email
 from utils import *
 
 
 def get_fans(page):
     header = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        'Cookie': read_txt()
+        "User-Agent": userAgent,
+        'Cookie': global_cookie
     }
-    uid, _, _ = parse_cookie(header['Cookie'])
+    uid, _, _ = parse_cookie(global_cookie)
 
     try:
         # 使用 requests 库下载 JSON 数据
