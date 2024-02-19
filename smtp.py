@@ -24,7 +24,7 @@ def send_email(content, subject='按罪人名单降下终末', title='白嫖完�
     smtp_server = 'smtp.qq.com'
     smtp_port = 587
     sender_email = 'bilibili-message@foxmail.com'
-    password = 'plwetxfprimmdjbf'
+    password = 'kwexvnekjiryecbg'
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
@@ -36,3 +36,7 @@ def send_email(content, subject='按罪人名单降下终末', title='白嫖完�
 
     except smtplib.SMTPException as e:
         print('邮件发送失败:', str(e))
+
+
+if __name__ == "__main__":
+    send_email('test smtp', subject='测试SMTP', title='测试邮件')
