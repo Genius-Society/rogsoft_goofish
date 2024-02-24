@@ -1,29 +1,23 @@
 from utils import *
 
 
-def get_list(page, cookie, api_url='https://api.bilibili.com/x/relation/blacks?'):
-    header = {
-        "User-Agent": userAgent,
-        'Cookie': cookie
-    }
+def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"):
+    header = {"User-Agent": userAgent, "Cookie": cookie}
 
     try:
         # 使用 requests 库下载 JSON 数据
-        response = requests.get(
-            f"{api_url}&pn={page}",
-            headers=header
-        )
+        response = requests.get(f"{api_url}&pn={page}", headers=header)
         response.raise_for_status()  # 检查是否成功获取数据
 
         # 使用 json 库解析 JSON 数据
         json_data = response.json()
-        if json_data['code'] == 0:
+        if json_data["code"] == 0:
             users = {}
-            user_list = json_data['data']['list']
+            user_list = json_data["data"]["list"]
             for user in user_list:
-                users[str(user['mid'])] = user['uname']
+                users[str(user["mid"])] = user["uname"]
 
-            return (users, math.ceil(json_data['data']['total'] / 50))
+            return (users, math.ceil(json_data["data"]["total"] / 50))
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -31,27 +25,21 @@ def get_list(page, cookie, api_url='https://api.bilibili.com/x/relation/blacks?'
     return (None, 0)
 
 
-def get_whist(page, cookie, api_url='https://api.bilibili.com/x/relation/whispers?'):
-    header = {
-        "User-Agent": userAgent,
-        'Cookie': cookie
-    }
+def get_whist(page, cookie, api_url="https://api.bilibili.com/x/relation/whispers?"):
+    header = {"User-Agent": userAgent, "Cookie": cookie}
 
     try:
         # 使用 requests 库下载 JSON 数据
-        response = requests.get(
-            f"{api_url}&pn={page}",
-            headers=header
-        )
+        response = requests.get(f"{api_url}&pn={page}", headers=header)
         response.raise_for_status()  # 检查是否成功获取数据
 
         # 使用 json 库解析 JSON 数据
         json_data = response.json()
-        if json_data['code'] == 0:
+        if json_data["code"] == 0:
             whispers = {}
-            whist = json_data['data']['list']
+            whist = json_data["data"]["list"]
             for whisper in whist:
-                whispers[str(whisper['mid'])] = whisper['uname']
+                whispers[str(whisper["mid"])] = whisper["uname"]
 
             return whispers
 
@@ -97,23 +85,15 @@ def get_follist(cookies, max_try=3):
     # get followings
     trytime = 0
     myuid, _, _ = parse_cookie(cookies)
-    followings_api = f'https://api.bilibili.com/x/relation/followings?vmid={myuid}'
-    followings, pages = get_list(
-        page=1,
-        cookie=cookies,
-        api_url=followings_api
-    )
+    followings_api = f"https://api.bilibili.com/x/relation/followings?vmid={myuid}"
+    followings, pages = get_list(page=1, cookie=cookies, api_url=followings_api)
     while not followings:
         trytime += 1
         if trytime > max_try:
             return None
 
         time.sleep(random.uniform(0.5, 1))
-        followings, pages = get_list(
-            page=1,
-            cookie=cookies,
-            api_url=followings_api
-        )
+        followings, pages = get_list(page=1, cookie=cookies, api_url=followings_api)
 
     for i in tqdm(range(2, pages + 1), desc="Scanning followings..."):
         time.sleep(random.uniform(0.5, 1))
@@ -125,11 +105,7 @@ def get_follist(cookies, max_try=3):
                 return None
 
             time.sleep(random.uniform(1, 2))
-            followee, _ = get_list(
-                page=i,
-                cookie=cookies,
-                api_url=followings_api
-            )
+            followee, _ = get_list(page=i, cookie=cookies, api_url=followings_api)
 
         count = len(followee)
         if count == 0:
@@ -154,10 +130,10 @@ def filter_deleted(userlist: dict):
     deleted_users = []
     if userlist:
         for key in userlist:
-            if userlist[key] == '账号已注销':
+            if userlist[key] == "账号已注销":
                 deleted_users.append(key)
 
-        print(f'Filtered list: [ {len(deleted_users)} / {len(userlist)} ]')
+        print(f"Filtered list: [ {len(deleted_users)} / {len(userlist)} ]")
 
     return deleted_users
 
@@ -170,25 +146,20 @@ def batch_modify(uid: str, cookie_str: str, action=6):
         "act": action,  # 1是关注, 2是取关, 5是拉黑, 6是取消拉黑
         "re_src": 11,
         "jsonp": "jsonp",
-        "csrf": csrf
+        "csrf": csrf,
     }
 
     headers = {
         "Referer": "https://www.bilibili.com/",
         "User-Agent": userAgent,
-        "Origin": "https://www.bilibili.com/"
+        "Origin": "https://www.bilibili.com/",
     }
 
-    response = requests.post(
-        url,
-        data=data,
-        headers=headers,
-        cookies=cookies_str
-    )
+    response = requests.post(url, data=data, headers=headers, cookies=cookies_str)
 
     jsonstr = json.loads(response.content)
-    print(jsonstr['message'])
-    return jsonstr['code']
+    print(jsonstr["message"])
+    return jsonstr["code"]
 
 
 def parse_cookie(cookie_str: str):
@@ -202,17 +173,17 @@ def parse_cookie(cookie_str: str):
 
 def clean_blackfollows(cookie=global_cookie):
     if not cookie:
-        print('请输入cookie')
+        print("请输入cookie")
         send_email(
-            '请输入cookie',
-            subject='更新关系列表失败',
-            title='可能是由cookies缺失导致的'
+            "请输入cookie",
+            subject="更新关系列表失败",
+            title="可能是由cookies缺失导致的",
         )
         exit()
 
     blacklist = filter_deleted(get_badlist(cookie))
     bad_outputs = []
-    for uid in tqdm(blacklist, desc='清理黑名单...'):
+    for uid in tqdm(blacklist, desc="清理黑名单..."):
         trytime = 0
         retcode = batch_modify(uid, cookie)
         while retcode != 0 and trytime < 3:
@@ -220,13 +191,13 @@ def clean_blackfollows(cookie=global_cookie):
             retcode = batch_modify(uid, cookie)
 
         if trytime > 2:
-            bad_outputs.append({'uid': f'清理 {uid} 失败！'})
+            bad_outputs.append({"uid": f"清理 {uid} 失败！"})
         else:
-            bad_outputs.append({'uid': uid})
+            bad_outputs.append({"uid": uid})
 
     follist = filter_deleted(get_follist(cookie))
     follow_outputs = []
-    for uid in tqdm(follist, desc='清理关注列表...'):
+    for uid in tqdm(follist, desc="清理关注列表..."):
         trytime = 0
         retcode = batch_modify(uid, cookie, action=2)
         while retcode != 0 and trytime < 3:
@@ -234,12 +205,19 @@ def clean_blackfollows(cookie=global_cookie):
             retcode = batch_modify(uid, cookie, action=2)
 
         if trytime > 2:
-            follow_outputs.append({'uid': f'清理 {uid} 失败！'})
+            follow_outputs.append({"uid": f"清理 {uid} 失败！"})
         else:
-            follow_outputs.append({'uid': uid})
+            follow_outputs.append({"uid": uid})
 
-    print(f'Cleaned blacklist: {bad_outputs}')
-    print(f'Cleaned follow list: {follow_outputs}')
+    if bad_outputs:
+        send_email(
+            f"{bad_outputs}已被清理",
+            subject="恭喜！黑名单空出新位置啦",
+            title=f"黑名单已腾出{len(bad_outputs)}个空位",
+        )
+
+    print(f"Cleaned blacklist: {bad_outputs}")
+    print(f"Cleaned follow list: {follow_outputs}")
 
 
 if __name__ == "__main__":
