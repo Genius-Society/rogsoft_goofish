@@ -32,7 +32,7 @@ def min_monitor(period=2):
 
 def hour_monitor(period=3, min="30"):
     print(f"监控开启中...每{period}小时{min}分触发一次")
-    schedule.every(period).hour.at(f":{min}").do(upd)
+    schedule.every(period).hours.at(f":{min}").do(upd)
     while True:
         schedule.run_pending()
         time.sleep(1)
