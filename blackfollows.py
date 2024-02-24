@@ -172,6 +172,16 @@ def parse_cookie(cookie_str: str):
     return myuid, csrf, cookies
 
 
+def extract_uids(data: list):
+    uids = ""
+    for item in data:
+        uid = item["uid"]
+        if uid:
+            uids += str(uid) + " "
+
+    return uids, len(data)
+
+
 def clean_blackfollows(cookie=global_cookie):
     if not cookie:
         print("请输入cookie")
@@ -211,9 +221,10 @@ def clean_blackfollows(cookie=global_cookie):
             follow_outputs.append({"uid": uid})
 
     if bad_outputs:
+        uids, count = extract_uids(bad_outputs)
         send_email(
-            f"{bad_outputs}已被清理",
-            subject=f"恭喜！黑名单又腾出{len(bad_outputs)}个空位",
+            f"{uids}已被清理",
+            subject=f"恭喜！黑名单又腾出{count}个空位",
             title=f"当前共{1000 - blackcount}个空位",
         )
 
