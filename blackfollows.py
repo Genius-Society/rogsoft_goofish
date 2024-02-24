@@ -128,14 +128,15 @@ def get_follist(cookies, max_try=3):
 
 def filter_deleted(userlist: dict):
     deleted_users = []
+    blackcount = len(userlist)
     if userlist:
         for key in userlist:
             if userlist[key] == "账号已注销":
                 deleted_users.append(key)
 
-        print(f"Filtered list: [ {len(deleted_users)} / {len(userlist)} ]")
+        print(f"Filtered list: [ {len(deleted_users)} / {blackcount} ]")
 
-    return deleted_users
+    return deleted_users, blackcount
 
 
 def batch_modify(uid: str, cookie_str: str, action=6):
@@ -181,7 +182,7 @@ def clean_blackfollows(cookie=global_cookie):
         )
         exit()
 
-    blacklist = filter_deleted(get_badlist(cookie))
+    blacklist, blackcount = filter_deleted(get_badlist(cookie))
     bad_outputs = []
     for uid in tqdm(blacklist, desc="清理黑名单..."):
         trytime = 0
@@ -212,8 +213,8 @@ def clean_blackfollows(cookie=global_cookie):
     if bad_outputs:
         send_email(
             f"{bad_outputs}已被清理",
-            subject="恭喜！黑名单空出新位置啦",
-            title=f"黑名单已腾出{len(bad_outputs)}个空位",
+            subject=f"恭喜！黑名单又腾出{len(bad_outputs)}个空位",
+            title=f"当前共{1000 - blackcount}个空位",
         )
 
     print(f"Cleaned blacklist: {bad_outputs}")
