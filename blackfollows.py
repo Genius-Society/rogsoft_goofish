@@ -206,7 +206,7 @@ def clean_blackfollows(cookie=global_cookie):
         else:
             bad_outputs.append({"uid": uid})
 
-    follist = filter_deleted(get_follist(cookie))
+    follist, _ = filter_deleted(get_follist(cookie))
     follow_outputs = []
     for uid in tqdm(follist, desc="清理关注列表..."):
         trytime = 0
