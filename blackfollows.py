@@ -19,6 +19,14 @@ def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"
 
             return (users, math.ceil(json_data["data"]["total"] / 50))
 
+        else:
+            msg = json_data["message"]
+            print(msg)
+            send_email(
+                msg, subject="更新用户列表失败", title=f"错误代码：{json_data['code']}"
+            )
+            exit()
+
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
 
@@ -42,6 +50,16 @@ def get_whist(page, cookie, api_url="https://api.bilibili.com/x/relation/whisper
                 whispers[str(whisper["mid"])] = whisper["uname"]
 
             return whispers
+
+        else:
+            msg = json_data["message"]
+            print(msg)
+            send_email(
+                msg,
+                subject="更新悄悄关注列表失败",
+                title=f"错误代码：{json_data['code']}",
+            )
+            exit()
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -192,7 +210,8 @@ def clean_blackfollows(cookie=global_cookie):
         )
         exit()
 
-    blacklist, blackcount = filter_deleted(get_badlist(cookie))
+    badlist = get_badlist(cookie)
+    blacklist, blackcount = filter_deleted(badlist)
     bad_outputs = []
     for uid in tqdm(blacklist, desc="清理黑名单..."):
         trytime = 0
@@ -206,7 +225,8 @@ def clean_blackfollows(cookie=global_cookie):
         else:
             bad_outputs.append({"uid": uid})
 
-    follist, _ = filter_deleted(get_follist(cookie))
+    idols = get_follist(cookie)
+    follist, _ = filter_deleted(idols)
     follow_outputs = []
     for uid in tqdm(follist, desc="清理关注列表..."):
         trytime = 0
