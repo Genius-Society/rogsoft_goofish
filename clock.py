@@ -1,6 +1,6 @@
 import time
 import schedule
-from fans import upd_fans
+from fans import upd_fans, refresh_cookie
 from blackfollows import clean_blackfollows
 from datetime import datetime
 
@@ -11,6 +11,7 @@ def upd():
         clean_blackfollows()
         upd_fans()
     else:
+        refresh_cookie()
         print("当前处于免打扰时间段")
 
 

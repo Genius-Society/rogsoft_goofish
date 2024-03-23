@@ -3,6 +3,20 @@ from blackfollows import parse_cookie
 from utils import *
 
 
+def refresh_cookie():
+    header = {"User-Agent": userAgent, "Cookie": global_cookie}
+    uid, _, _ = parse_cookie(global_cookie)
+    try:
+        response = requests.get(
+            f"https://api.bilibili.com/x/relation/followers?vmid={uid}",
+            headers=header,
+        )
+        response.raise_for_status()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}...")
+
+
 def get_fans(page):
     header = {"User-Agent": userAgent, "Cookie": global_cookie}
     uid, _, _ = parse_cookie(global_cookie)

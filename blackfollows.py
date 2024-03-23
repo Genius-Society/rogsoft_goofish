@@ -1,5 +1,7 @@
 from utils import *
 
+MAX_BLACK = 1000
+
 
 def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"):
     header = {"User-Agent": userAgent, "Cookie": cookie}
@@ -154,7 +156,7 @@ def filter_deleted(userlist: dict):
 
         print(f"Filtered list: [ {len(deleted_users)} / {blackcount} ]")
 
-    return deleted_users, blackcount
+    return deleted_users, blackcount - len(deleted_users)
 
 
 def batch_modify(uid: str, cookie_str: str, action=6):
@@ -175,9 +177,9 @@ def batch_modify(uid: str, cookie_str: str, action=6):
     }
 
     response = requests.post(url, data=data, headers=headers, cookies=cookies_str)
-
     jsonstr = json.loads(response.content)
     print(jsonstr["message"])
+
     return jsonstr["code"]
 
 
@@ -245,7 +247,7 @@ def clean_blackfollows(cookie=global_cookie):
         send_email(
             f"{uids}已被清理",
             subject=f"恭喜！黑名单又腾出{count}个空位",
-            title=f"当前共{1000 - blackcount}个空位",
+            title=f"当前共{MAX_BLACK - blackcount}个空位",
         )
 
     print(f"Cleaned blacklist: {bad_outputs}")
