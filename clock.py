@@ -31,7 +31,7 @@ def min_monitor(period=2):
         time.sleep(1)
 
 
-def hour_monitor(period=3):
+def hour_monitor(period=2):
     print(f"监控开启中...每{period}小时触发一次")
     schedule.every(period).hours.do(upd)
     while True:
