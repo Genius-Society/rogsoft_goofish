@@ -184,12 +184,22 @@ def batch_modify(uid: str, cookie_str: str, action=6):
 
 
 def parse_cookie(cookie_str: str):
-    myuid = cookie_str.split("DedeUserID=")[1].split(";")[0]
-    csrf = cookie_str.split("bili_jct=")[1].split(";")[0]
-    cookies = {
-        cookie.split("=")[0]: cookie.split("=")[1] for cookie in cookie_str.split("; ")
-    }
-    return myuid, csrf, cookies
+    try:
+        myuid = cookie_str.split("DedeUserID=")[1].split(";")[0]
+        csrf = cookie_str.split("bili_jct=")[1].split(";")[0]
+        cookies = {
+            cookie.split("=")[0]: cookie.split("=")[1]
+            for cookie in cookie_str.split("; ")
+        }
+        return myuid, csrf, cookies
+
+    except Exception:
+        send_email(
+            "请确保cookie.txt存在且内容有效",
+            subject="cookie文件缺失或内容无效",
+            title=f"cookie解析异常",
+        )
+        exit()
 
 
 def extract_uids(data: list):
