@@ -1,5 +1,5 @@
 import os
-from blackfollows import parse_cookie
+from blackfollows import parse_cookie, clean_blackfollows
 from utils import *
 
 
@@ -106,3 +106,4 @@ def upd_fans(fans_json="fans.json"):
 
 if __name__ == "__main__":
     upd_fans()
+    clean_blackfollows()
