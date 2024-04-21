@@ -3,7 +3,7 @@
 
 白嫖取关4🐎
 
-## 获取 cookie 方法
+## 手动获取 cookie 方法
 浏览器登陆B站待监控账号，在登陆状态下访问：
 
 <https://api.bilibili.com/x/relation/followers?vmid=1>
@@ -19,3 +19,9 @@ cd bilibili-relation-monitor
 ```
 
 创建一个 start.bat 的快捷方式移至启动文件夹并双击打开
+
+## 获取登录状态的方法
+1. 用 `VSCode` 打开工程，选中 `./bmonitor/cookie.py`;
+2. 在 `cookie.py` 的 `line 40` 处打个断点;
+3. 按 `F5` 运行 `.py` 文件，弹出 `BiliBili` 登录页面;
+4. 用手机 `APP` 扫码登录后按 `F5` 使其运行完毕，再释放断点;
