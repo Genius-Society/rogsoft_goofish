@@ -1,4 +1,5 @@
 import os
+from cookie import upd_cookie
 from blackfollows import parse_cookie, clean_blackfollows
 from utils import *
 
@@ -42,10 +43,12 @@ def get_fans(page):
         else:
             msg = json_data["message"]
             print(msg)
-            send_email(
-                msg, subject="更新粉丝列表失败", title=f"错误代码：{json_data['code']}"
-            )
-            exit()
+            # send_email(
+            #     msg, subject="更新粉丝列表失败", title=f"错误代码：{json_data['code']}"
+            # )
+            # exit()
+            upd_cookie()
+            get_fans(page)
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}, retrying...")
@@ -72,13 +75,15 @@ def upd_fans(fans_json="fans.json"):
     unfollows = []
     new_fans = get_folowers()
     if not new_fans:
-        print("Failed to upd fans.")
-        send_email(
-            "请手动更新cookies",
-            subject="更新粉丝列表失败",
-            title="可能是由于cookies失效或无粉丝导致的",
-        )
-        exit()
+        # print("Failed to upd fans.")
+        # send_email(
+        #     "请手动更新cookies",
+        #     subject="更新粉丝列表失败",
+        #     title="可能是由于cookies失效或无粉丝导致的",
+        # )
+        # exit()
+        upd_cookie()
+        upd_fans(fans_json)
 
     for fan in old_fans.keys():
         if fan not in new_fans:

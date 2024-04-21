@@ -19,14 +19,14 @@ def send_email(
     # 构建邮件
     msg = MIMEText(body, "html", "utf-8")
     msg["Subject"] = Header(subject, "utf-8")
-    msg["From"] = "bilibili-message@foxmail.com"
+    msg["From"] = "MuGeminorum@foxmail.com"
     msg["To"] = "MuGeminorum@foxmail.com"
 
     # 发送邮件
     smtp_server = "smtp.qq.com"
     smtp_port = 587
-    sender_email = "bilibili-message@foxmail.com"
-    password = "kwexvnekjiryecbg"
+    sender_email = "MuGeminorum@foxmail.com"
+    password = "hstpwvmtntitbeee"
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:

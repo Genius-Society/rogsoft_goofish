@@ -1,3 +1,4 @@
+from cookie import upd_cookie
 from utils import *
 
 MAX_BLACK = 1000
@@ -24,10 +25,12 @@ def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"
         else:
             msg = json_data["message"]
             print(msg)
-            send_email(
-                msg, subject="更新用户列表失败", title=f"错误代码：{json_data['code']}"
-            )
-            exit()
+            # send_email(
+            #     msg, subject="更新用户列表失败", title=f"错误代码：{json_data['code']}"
+            # )
+            # exit()
+            upd_cookie()
+            return get_list(page, cookie, api_url)
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -56,12 +59,14 @@ def get_whist(page, cookie, api_url="https://api.bilibili.com/x/relation/whisper
         else:
             msg = json_data["message"]
             print(msg)
-            send_email(
-                msg,
-                subject="更新悄悄关注列表失败",
-                title=f"错误代码：{json_data['code']}",
-            )
-            exit()
+            # send_email(
+            #     msg,
+            #     subject="更新悄悄关注列表失败",
+            #     title=f"错误代码：{json_data['code']}",
+            # )
+            # exit()
+            upd_cookie()
+            return get_whist(page, cookie, api_url)
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -106,14 +111,16 @@ def get_follist(cookies, max_try=3):
     trytime = 0
     myuid, _, _ = parse_cookie(cookies)
     followings_api = f"https://api.bilibili.com/x/relation/followings?vmid={myuid}"
-    followings, pages = get_list(page=1, cookie=cookies, api_url=followings_api)
+    followings, pages = get_list(
+        page=1, cookie=cookies, api_url=followings_api)
     while not followings:
         trytime += 1
         if trytime > max_try:
             return None
 
         time.sleep(random.uniform(0.5, 1))
-        followings, pages = get_list(page=1, cookie=cookies, api_url=followings_api)
+        followings, pages = get_list(
+            page=1, cookie=cookies, api_url=followings_api)
 
     for i in tqdm(range(2, pages + 1), desc="Scanning followings..."):
         time.sleep(random.uniform(0.5, 1))
@@ -125,7 +132,8 @@ def get_follist(cookies, max_try=3):
                 return None
 
             time.sleep(random.uniform(1, 2))
-            followee, _ = get_list(page=i, cookie=cookies, api_url=followings_api)
+            followee, _ = get_list(
+                page=i, cookie=cookies, api_url=followings_api)
 
         count = len(followee)
         if count == 0:
@@ -176,7 +184,8 @@ def batch_modify(uid: str, cookie_str: str, action=6):
         "Origin": "https://www.bilibili.com/",
     }
 
-    response = requests.post(url, data=data, headers=headers, cookies=cookies_str)
+    response = requests.post(
+        url, data=data, headers=headers, cookies=cookies_str)
     jsonstr = json.loads(response.content)
     print(jsonstr["message"])
 
@@ -194,12 +203,14 @@ def parse_cookie(cookie_str: str):
         return myuid, csrf, cookies
 
     except Exception:
-        send_email(
-            "请确保cookie.txt存在且内容有效",
-            subject="cookie文件缺失或内容无效",
-            title=f"cookie解析异常",
-        )
-        exit()
+        # send_email(
+        #     "请确保cookie.txt存在且内容有效",
+        #     subject="cookie文件缺失或内容无效",
+        #     title=f"cookie解析异常",
+        # )
+        # exit()
+        upd_cookie()
+        parse_cookie(cookie_str)
 
 
 def extract_uids(data: list):
@@ -214,13 +225,15 @@ def extract_uids(data: list):
 
 def clean_blackfollows(cookie=global_cookie):
     if not cookie:
-        print("请输入cookie")
-        send_email(
-            "请输入cookie",
-            subject="更新关系列表失败",
-            title="可能是由cookies缺失导致的",
-        )
-        exit()
+        # print("请输入cookie")
+        # send_email(
+        #     "请输入cookie",
+        #     subject="更新关系列表失败",
+        #     title="可能是由cookies缺失导致的",
+        # )
+        # exit()
+        upd_cookie()
+        clean_blackfollows(cookie)
 
     badlist = get_badlist(cookie)
     blacklist, blackcount = filter_deleted(badlist)

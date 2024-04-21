@@ -1,6 +1,8 @@
 import os
+from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from smtp import send_email
 
 userData = "user_data"
 
@@ -25,18 +27,25 @@ def init_chrome(vision=False, keep_alive=False):
 
 def list2str(cookies):
     cookie_list = []
-    for cookie in cookies:
+    for cookie in tqdm(cookies, desc="parsing cookies..."):
         cookie_list.append(cookie["name"] + "=" + cookie["value"])
 
     return "; ".join(cookie_list)
 
 
 def upd_cookie(manual=False):
-    driver = init_chrome(vision=manual)
-    driver.get("https://space.bilibili.com")
-    cookies = list2str(driver.get_cookies())
-    with open("cookie.txt", "w", encoding="utf-8") as file:
-        file.write(cookies)
+    try:
+        driver = init_chrome(vision=manual)
+        driver.get("https://space.bilibili.com")
+        cookies = list2str(driver.get_cookies())
+        with open("cookie.txt", "w", encoding="utf-8") as file:
+            file.write(cookies)
+
+    except Exception as e:
+        send_email(
+            "可能是登录状态失效造成的", subject="更新cookie失败", title=f"错误信息：{e}"
+        )
+        exit()
 
 
 if __name__ == "__main__":
