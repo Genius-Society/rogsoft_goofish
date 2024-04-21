@@ -13,12 +13,18 @@
 将 Cookie 中的内容整体粘贴到 cookie.txt 中
 
 ## 使用
+在安装了 chrome 浏览器的 windows 10 x64 系统下运行：
+```bash
+pip install -r requirements.txt
+```
+
+之后下载项目工程：
 ```bash
 git clone git@gitee.com:MuGeminorum/bilibili-relation-monitor.git
 cd bilibili-relation-monitor
 ```
 
-创建一个 start.bat 的快捷方式移至启动文件夹并双击打开
+获取登录状态后，创建一个 start.bat 的快捷方式移至启动文件夹并双击打开
 
 ## 获取登录状态的方法
 1. 用 `VSCode` 打开工程，选中 `./bmonitor/cookie.py`;
