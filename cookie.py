@@ -23,10 +23,21 @@ def init_chrome(vision=False, keep_alive=False):
     return driver
 
 
-driver = init_chrome(vision=True)
-driver.get("https://space.bilibili.com/30620472")
-cookies = driver.get_cookies()
-# for cookie in cookies:
-#     print(cookie["name"] + ": " + cookie["value"])
-with open("cookie.txt", "w", encoding="utf-8") as file:
-    file.write(cookies)
+def list2str(cookies):
+    cookie_list = []
+    for cookie in cookies:
+        cookie_list.append(cookie["name"] + "=" + cookie["value"])
+
+    return "; ".join(cookie_list)
+
+
+def upd_cookie(manual=False):
+    driver = init_chrome(vision=manual)
+    driver.get("https://space.bilibili.com")
+    cookies = list2str(driver.get_cookies())
+    with open("cookie.txt", "w", encoding="utf-8") as file:
+        file.write(cookies)
+
+
+if __name__ == "__main__":
+    upd_cookie(manual=True)
