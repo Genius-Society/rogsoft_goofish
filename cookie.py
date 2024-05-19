@@ -1,4 +1,5 @@
 import os
+import shutil
 from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -42,6 +43,9 @@ def upd_cookie(manual=False):
             file.write(cookies)
 
     except Exception as e:
+        if os.path.exists(userData):
+            shutil.rmtree(userData)
+
         send_email(
             "可能是登录状态失效造成的", subject="更新cookie失败", title=f"错误信息：{e}"
         )
