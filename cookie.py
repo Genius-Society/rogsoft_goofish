@@ -22,8 +22,7 @@ def init_chrome(vision=False, keep_alive=False):
     if keep_alive:
         chrome_options.add_experimental_option("detach", True)
 
-    driver = webdriver.Chrome(options=chrome_options)
-    return driver
+    return webdriver.Chrome(options=chrome_options)
 
 
 def list2str(cookies):
@@ -47,7 +46,9 @@ def upd_cookie(manual=False):
             shutil.rmtree(userData)
 
         send_email(
-            "可能是登录状态失效造成的", subject="更新cookie失败", title=f"错误信息：{e}"
+            "可能是登录状态失效或 chromedriver 版本不匹配造成的",
+            subject="更新cookie失败",
+            title=f"错误信息：{e}",
         )
         exit()
 
