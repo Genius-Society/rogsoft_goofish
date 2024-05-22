@@ -3,6 +3,7 @@ import shutil
 from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from utils import download_file, unzip_file
 from smtp import send_email
 
 userData = "user_data"
@@ -13,7 +14,17 @@ def init_chrome(vision=False, keep_alive=False):
     if not os.path.exists(user_dir_name):
         os.makedirs(user_dir_name)
 
+    if not os.path.exists("./chrome-win64.zip") and not os.path.exists(
+        "./chrome-win64"
+    ):
+        download_file(
+            "https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/win64/chrome-win64.zip"
+        )
+
+        unzip_file("./chrome-win64.zip")
+
     chrome_options = Options()
+    chrome_options.binary_location = "./chrome-win64/chrome.exe"
     if not vision:
         chrome_options.add_argument("--headless")
 

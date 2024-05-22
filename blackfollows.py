@@ -1,5 +1,12 @@
+import math
+import time
+import json
+import random
+import requests
+from tqdm import tqdm
+from smtp import send_email
 from cookie import upd_cookie
-from utils import *
+from utils import userAgent, global_cookie
 
 MAX_BLACK = 1000
 
@@ -111,16 +118,14 @@ def get_follist(cookies, max_try=3):
     trytime = 0
     myuid, _, _ = parse_cookie(cookies)
     followings_api = f"https://api.bilibili.com/x/relation/followings?vmid={myuid}"
-    followings, pages = get_list(
-        page=1, cookie=cookies, api_url=followings_api)
+    followings, pages = get_list(page=1, cookie=cookies, api_url=followings_api)
     while not followings:
         trytime += 1
         if trytime > max_try:
             return None
 
         time.sleep(random.uniform(0.5, 1))
-        followings, pages = get_list(
-            page=1, cookie=cookies, api_url=followings_api)
+        followings, pages = get_list(page=1, cookie=cookies, api_url=followings_api)
 
     for i in tqdm(range(2, pages + 1), desc="Scanning followings..."):
         time.sleep(random.uniform(0.5, 1))
@@ -132,8 +137,7 @@ def get_follist(cookies, max_try=3):
                 return None
 
             time.sleep(random.uniform(1, 2))
-            followee, _ = get_list(
-                page=i, cookie=cookies, api_url=followings_api)
+            followee, _ = get_list(page=i, cookie=cookies, api_url=followings_api)
 
         count = len(followee)
         if count == 0:
@@ -184,8 +188,7 @@ def batch_modify(uid: str, cookie_str: str, action=6):
         "Origin": "https://www.bilibili.com/",
     }
 
-    response = requests.post(
-        url, data=data, headers=headers, cookies=cookies_str)
+    response = requests.post(url, data=data, headers=headers, cookies=cookies_str)
     jsonstr = json.loads(response.content)
     print(jsonstr["message"])
 

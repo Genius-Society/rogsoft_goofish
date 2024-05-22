@@ -1,7 +1,14 @@
 import os
+import math
+import time
+import json
+import random
+import requests
+from tqdm import tqdm
+from smtp import send_email
 from cookie import upd_cookie
 from blackfollows import parse_cookie, clean_blackfollows
-from utils import *
+from utils import save_traitors, userAgent, global_cookie
 
 
 def refresh_cookie():

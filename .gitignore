@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 user_data/*
 *.exe
+chrome-win64/*
 
 # C extensions
 *.so
