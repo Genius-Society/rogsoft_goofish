@@ -6,13 +6,13 @@ from selenium.webdriver.chrome.options import Options
 from utils import download_file, unzip_file
 from smtp import send_email
 
-userData = "user_data"
+USER_DATA = "user_data"
 CHROME = "chrome-win64"
 CHROME_URL = f"https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/win64/{CHROME}.zip"
 
 
 def init_chrome(vision=False, keep_alive=False):
-    user_dir_name = f"{os.path.dirname(os.path.abspath(__file__))}/{userData}"
+    user_dir_name = f"{os.path.dirname(os.path.abspath(__file__))}/{USER_DATA}"
     if not os.path.exists(user_dir_name):
         os.makedirs(user_dir_name)
 
@@ -50,8 +50,8 @@ def upd_cookie(manual=False):
             file.write(cookies)
 
     except Exception as e:
-        if os.path.exists(userData):
-            shutil.rmtree(userData)
+        if os.path.exists(USER_DATA):
+            shutil.rmtree(USER_DATA)
 
         send_email(
             "可能是登录状态失效或 chromedriver 版本不匹配造成的",

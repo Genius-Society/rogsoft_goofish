@@ -30,6 +30,6 @@ cd bilibili-relation-monitor
 
 ## 获取登录状态的方法
 1. 用 `VSCode` 打开工程，选中 `./bmonitor/cookie.py`;
-2. 在 `cookie.py` 的 `line 40` 处打个断点;
+2. 在 `cookie.py` 的 `line 48` 处打个断点;
 3. 按 `F5` 运行 `.py` 文件，弹出 `BiliBili` 登录页面;
 4. 用手机 `APP` 扫码登录后按 `F5` 使其运行完毕，断点可保留，之后用命令行以非 debug 模式运行。
