@@ -3,6 +3,8 @@ import zipfile
 import requests
 from tqdm import tqdm
 
+userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+
 
 def read_txt(file_path="cookie.txt"):
     try:
@@ -20,11 +22,7 @@ def read_txt(file_path="cookie.txt"):
     return ""
 
 
-userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-global_cookie = read_txt(file_path="../ONMP/bmonitor/cookie.txt")
-if not global_cookie:
-    print("Use default cookie path")
-    global_cookie = read_txt()
+global_cookie = read_txt()
 
 
 def save_traitors(traitors: list, file_path="traitors.txt"):
