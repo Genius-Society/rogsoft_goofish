@@ -7,6 +7,8 @@ from utils import download_file, unzip_file
 from smtp import send_email
 
 userData = "user_data"
+CHROME = "chrome-win64"
+CHROME_URL = f"https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/win64/{CHROME}.zip"
 
 
 def init_chrome(vision=False, keep_alive=False):
@@ -14,17 +16,12 @@ def init_chrome(vision=False, keep_alive=False):
     if not os.path.exists(user_dir_name):
         os.makedirs(user_dir_name)
 
-    if not os.path.exists("./chrome-win64.zip") and not os.path.exists(
-        "./chrome-win64"
-    ):
-        download_file(
-            "https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/win64/chrome-win64.zip"
-        )
-
-        unzip_file("./chrome-win64.zip")
+    if not os.path.exists(f"./{CHROME}.zip") and not os.path.exists(f"./{CHROME}"):
+        download_file(CHROME_URL)
+        unzip_file(f"./{CHROME}.zip")
 
     chrome_options = Options()
-    chrome_options.binary_location = "./chrome-win64/chrome.exe"
+    chrome_options.binary_location = f"./{CHROME}/chrome.exe"
     if not vision:
         chrome_options.add_argument("--headless")
 
