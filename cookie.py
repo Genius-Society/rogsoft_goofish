@@ -4,19 +4,31 @@ from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from utils import download_file, unzip_file
 from smtp import send_email
 import gradio as gr
 
 USER_DATA = "user_data"
-CHROME = "chrome-win64"
-CHROME_URL = f"https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/win64/{CHROME}.zip"
+CHROME_VER = "125.0.6422.78"
+DOMAIN = "https://storage.googleapis.com/chrome-for-testing-public"
+SYSTEM = "win64" if os.name == "nt" else "linux64"
+CHROME = f"chrome-{SYSTEM}"
+CHROME_DRIVER = f"chromedriver-{SYSTEM}"
+CHROME_URL = f"{DOMAIN}/{CHROME_VER}/{SYSTEM}/{CHROME}.zip"
+CHROME_DRIVER_URL = f"{DOMAIN}/{CHROME_VER}/{SYSTEM}/{CHROME_DRIVER}.zip"
 
 
 def init_chrome(vision=False, keep_alive=False):
     user_dir_name = f"{os.path.dirname(os.path.abspath(__file__))}/{USER_DATA}"
     if not os.path.exists(user_dir_name):
         os.makedirs(user_dir_name)
+
+    if not os.path.exists(f"./{CHROME_DRIVER}.zip") and not os.path.exists(
+        f"./{CHROME_DRIVER}"
+    ):
+        download_file(CHROME_DRIVER_URL)
+        unzip_file(f"./{CHROME_DRIVER}.zip")
 
     if not os.path.exists(f"./{CHROME}.zip") and not os.path.exists(f"./{CHROME}"):
         download_file(CHROME_URL)
@@ -32,7 +44,13 @@ def init_chrome(vision=False, keep_alive=False):
     if keep_alive:
         chrome_options.add_experimental_option("detach", True)
 
-    return webdriver.Chrome(options=chrome_options)
+    chromedriver_path = f"./{CHROME_DRIVER}/chromedriver"
+    if SYSTEM == "win64":
+        chromedriver_path = chromedriver_path + ".exe"
+
+    chrome_service = Service(executable_path=chromedriver_path)
+
+    return webdriver.Chrome(options=chrome_options, service=chrome_service)
 
 
 DRIVER = init_chrome()
@@ -96,10 +114,6 @@ def browse(url):
     return save_base64_image(base64_img)
 
 
-def inference():
-    return upd_cookie(scanned=(DRIVER != None))
-
-
 if __name__ == "__main__":
     with gr.Blocks() as demo:
         with gr.Row():
@@ -115,7 +129,7 @@ if __name__ == "__main__":
 
         with gr.Row():
             gr.Interface(
-                fn=inference,
+                fn=upd_cookie,
                 inputs=None,
                 outputs=gr.TextArea(),
                 allow_flagging=False,

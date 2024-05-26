@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 user_data/*
-chrome-win64/*
+chrome*
 
 # C extensions
 *.so
