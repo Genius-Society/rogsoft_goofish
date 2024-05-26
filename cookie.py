@@ -4,7 +4,6 @@ from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from utils import download_file, unzip_file
 from smtp import send_email
 import gradio as gr
@@ -24,11 +23,17 @@ def init_chrome(vision=False, keep_alive=False):
     if not os.path.exists(user_dir_name):
         os.makedirs(user_dir_name)
 
+    chromedriver_name = "chromedriver"
+    if SYSTEM == "win64":
+        chromedriver_name = chromedriver_name + ".exe"
+
     if not os.path.exists(f"./{CHROME_DRIVER}.zip") and not os.path.exists(
         f"./{CHROME_DRIVER}"
     ):
         download_file(CHROME_DRIVER_URL)
         unzip_file(f"./{CHROME_DRIVER}.zip")
+        shutil.move(f"./{CHROME_DRIVER}/{chromedriver_name}", f"./{chromedriver_name}")
+        shutil.rmtree(f"./{CHROME_DRIVER}")
 
     if not os.path.exists(f"./{CHROME}.zip") and not os.path.exists(f"./{CHROME}"):
         download_file(CHROME_URL)
@@ -48,9 +53,7 @@ def init_chrome(vision=False, keep_alive=False):
     if SYSTEM == "win64":
         chromedriver_path = chromedriver_path + ".exe"
 
-    chrome_service = Service(executable_path=chromedriver_path)
-
-    return webdriver.Chrome(options=chrome_options, service=chrome_service)
+    return webdriver.Chrome(options=chrome_options)
 
 
 DRIVER = init_chrome()
