@@ -2,9 +2,11 @@ import os
 import shutil
 from tqdm import tqdm
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from utils import download_file, unzip_file
 from smtp import send_email
+import gradio as gr
 
 USER_DATA = "user_data"
 CHROME = "chrome-win64"
@@ -33,6 +35,9 @@ def init_chrome(vision=False, keep_alive=False):
     return webdriver.Chrome(options=chrome_options)
 
 
+DRIVER = init_chrome()
+
+
 def list2str(cookies):
     cookie_list = []
     for cookie in tqdm(cookies, desc="parsing cookies..."):
@@ -41,13 +46,18 @@ def list2str(cookies):
     return "; ".join(cookie_list)
 
 
-def upd_cookie(manual=False):
+def upd_cookie(manual=False, scanned=False):
+    global DRIVER
     try:
-        driver = init_chrome(vision=manual)
-        driver.get("https://space.bilibili.com")
-        cookies = list2str(driver.get_cookies())
+        # if not scanned:
+        #     DRIVER = init_chrome(vision=manual)
+        DRIVER.get("https://space.bilibili.com")
+        cookies = list2str(DRIVER.get_cookies())
         with open("cookie.txt", "w", encoding="utf-8") as file:
             file.write(cookies)
+
+        DRIVER.quit()
+        return cookies
 
     except Exception as e:
         if os.path.exists(USER_DATA):
@@ -61,5 +71,60 @@ def upd_cookie(manual=False):
         exit()
 
 
+def save_base64_image(base64_string: str, file_path=f"{USER_DATA}/qrcode.jpg"):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    import base64
+
+    base64_data = base64_string.split(",")[1]
+
+    # 解码 base64 字符串
+    image_data = base64.b64decode(base64_data)
+
+    # 将解码后的数据写入 JPG 文件
+    with open(file_path, "wb") as f:
+        f.write(image_data)
+
+    return file_path
+
+
+def browse(url):
+    global DRIVER
+
+    # if not DRIVER:
+    #     DRIVER = init_chrome()
+
+    DRIVER.get(url)
+    img = DRIVER.find_element(By.CSS_SELECTOR, 'img[alt="Scan me!"]')
+    base64_img = img.get_attribute("src")
+    return save_base64_image(base64_img)
+
+
+def inference():
+    return upd_cookie(scanned=(DRIVER != None))
+
+
 if __name__ == "__main__":
-    upd_cookie(manual=True)
+    # upd_cookie(manual=True)
+    with gr.Blocks() as demo:
+        with gr.Row():
+            gr.Interface(
+                fn=browse,
+                inputs=gr.Textbox(
+                    label="输入网址",
+                    value="https://space.bilibili.com",
+                ),
+                outputs=gr.Image(label="扫码登陆", type="filepath"),
+                allow_flagging=False,
+            )
+
+        with gr.Row():
+            gr.Interface(
+                fn=inference,
+                inputs=None,
+                outputs=gr.TextArea(),
+                allow_flagging=False,
+            )
+
+    demo.launch(server_name="0.0.0.0")

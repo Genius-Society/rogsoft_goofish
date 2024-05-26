@@ -160,8 +160,9 @@ def get_follist(cookies, max_try=3):
 
 def filter_deleted(userlist: dict):
     deleted_users = []
-    blackcount = len(userlist)
+    blackcount = 0
     if userlist:
+        blackcount = len(userlist)
         for key in userlist:
             if userlist[key] == "账号已注销":
                 deleted_users.append(key)
