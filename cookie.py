@@ -47,6 +47,10 @@ def init_chrome(vision=False, keep_alive=False):
     chromedriver_path = f"./{CHROME_DRIVER}/chromedriver"
     if SYSTEM == "win64":
         chromedriver_path = chromedriver_path + ".exe"
+    else:
+        import subprocess
+
+        subprocess.call(f"chmod +x {chromedriver_path}")
 
     chrome_service = Service(executable_path=chromedriver_path)
 
