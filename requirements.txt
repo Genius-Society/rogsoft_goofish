@@ -1,5 +1,5 @@
 schedule
 tqdm
 requests
-selenium==3.11.0
+selenium
 gradio
