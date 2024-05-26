@@ -46,11 +46,9 @@ def list2str(cookies):
     return "; ".join(cookie_list)
 
 
-def upd_cookie(manual=False, scanned=False):
+def upd_cookie():
     global DRIVER
     try:
-        # if not scanned:
-        #     DRIVER = init_chrome(vision=manual)
         DRIVER.get("https://space.bilibili.com")
         cookies = list2str(DRIVER.get_cookies())
         with open("cookie.txt", "w", encoding="utf-8") as file:
@@ -92,9 +90,6 @@ def save_base64_image(base64_string: str, file_path=f"{USER_DATA}/qrcode.jpg"):
 def browse(url):
     global DRIVER
 
-    # if not DRIVER:
-    #     DRIVER = init_chrome()
-
     DRIVER.get(url)
     img = DRIVER.find_element(By.CSS_SELECTOR, 'img[alt="Scan me!"]')
     base64_img = img.get_attribute("src")
@@ -106,7 +101,6 @@ def inference():
 
 
 if __name__ == "__main__":
-    # upd_cookie(manual=True)
     with gr.Blocks() as demo:
         with gr.Row():
             gr.Interface(
