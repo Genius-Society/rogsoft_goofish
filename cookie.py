@@ -12,7 +12,7 @@ import gradio as gr
 USER_DATA = "user_data"
 CHROME_VER = "125.0.6422.78"
 DOMAIN = "https://storage.googleapis.com/chrome-for-testing-public"
-SYSTEM = "win64" if os.name == "nt" else "linux64"
+SYSTEM = "win64" if os.name == "nt" else "mac-arm64"
 CHROME = f"chrome-{SYSTEM}"
 CHROME_DRIVER = f"chromedriver-{SYSTEM}"
 CHROME_URL = f"{DOMAIN}/{CHROME_VER}/{SYSTEM}/{CHROME}.zip"
@@ -50,7 +50,9 @@ def init_chrome(vision=False, keep_alive=False):
     else:
         import subprocess
 
-        subprocess.call(f"chmod +x {chromedriver_path}")
+        subprocess.check_output(
+            f"chmod +x {chromedriver_path}", shell=True, stderr=subprocess.STDOUT
+        )
 
     chrome_service = Service(executable_path=chromedriver_path)
 
