@@ -62,7 +62,7 @@ def download_file(url: str, folder_path="./"):
     print(f"文件已下载到：{file_path}")
 
 
-def unzip_file(zip_file: str, extract_folder="./"):
+def unzip_file(zip_file: str, extract_folder="./", rm_pkg=True):
     # 确保解压缩目录存在，如果不存在则创建
     if not os.path.exists(extract_folder):
         os.makedirs(extract_folder)
@@ -73,3 +73,5 @@ def unzip_file(zip_file: str, extract_folder="./"):
         zip_ref.extractall(extract_folder)
 
     print(f"文件已解压缩到：{extract_folder}")
+    if rm_pkg:
+        os.remove(zip_file)
