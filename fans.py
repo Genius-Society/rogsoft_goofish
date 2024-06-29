@@ -6,13 +6,13 @@ import random
 import requests
 from tqdm import tqdm
 from smtp import send_email
-from cookie import upd_cookie
+# from cookie import upd_cookie
 from blackfollows import parse_cookie, clean_blackfollows
-from utils import save_traitors, userAgent, global_cookie
+from utils import save_traitors, USER_AGENT, global_cookie
 
 
 def refresh_cookie():
-    header = {"User-Agent": userAgent, "Cookie": global_cookie}
+    header = {"User-Agent": USER_AGENT, "Cookie": global_cookie}
     uid, _, _ = parse_cookie(global_cookie)
     try:
         response = requests.get(
@@ -26,7 +26,7 @@ def refresh_cookie():
 
 
 def get_fans(page):
-    header = {"User-Agent": userAgent, "Cookie": global_cookie}
+    header = {"User-Agent": USER_AGENT, "Cookie": global_cookie}
     uid, _, _ = parse_cookie(global_cookie)
 
     try:

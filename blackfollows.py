@@ -5,14 +5,14 @@ import random
 import requests
 from tqdm import tqdm
 from smtp import send_email
-from cookie import upd_cookie
-from utils import userAgent, global_cookie
+# from cookie import upd_cookie
+from utils import USER_AGENT, global_cookie
 
 MAX_BLACK = 1000
 
 
 def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"):
-    header = {"User-Agent": userAgent, "Cookie": cookie}
+    header = {"User-Agent": USER_AGENT, "Cookie": cookie}
 
     try:
         # 使用 requests 库下载 JSON 数据
@@ -48,7 +48,7 @@ def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"
 
 
 def get_whist(page, cookie, api_url="https://api.bilibili.com/x/relation/whispers?"):
-    header = {"User-Agent": userAgent, "Cookie": cookie}
+    header = {"User-Agent": USER_AGENT, "Cookie": cookie}
 
     try:
         # 使用 requests 库下载 JSON 数据
@@ -187,7 +187,7 @@ def batch_modify(uid: str, cookie_str: str, action=6):
 
     headers = {
         "Referer": "https://www.bilibili.com/",
-        "User-Agent": userAgent,
+        "User-Agent": USER_AGENT,
         "Origin": "https://www.bilibili.com/",
     }
 
