@@ -50,10 +50,13 @@ def get_fans(page):
         else:
             msg = json_data["message"]
             print(msg)
-            # send_email(
-            #     msg, subject="更新粉丝列表失败", title=f"错误代码：{json_data['code']}"
-            # )
-            # exit()
+            if msg == "服务调用超时":
+                send_email(
+                    msg,
+                    subject="可能需要重新手动扫码登陆",
+                    title=f"错误代码：{json_data['code']}",
+                )
+
             upd_cookie()
             get_fans(page)
 

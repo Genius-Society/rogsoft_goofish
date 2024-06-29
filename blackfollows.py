@@ -32,10 +32,13 @@ def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"
         else:
             msg = json_data["message"]
             print(msg)
-            # send_email(
-            #     msg, subject="更新用户列表失败", title=f"错误代码：{json_data['code']}"
-            # )
-            # exit()
+            if msg == "服务调用超时":
+                send_email(
+                    msg,
+                    subject="可能需要重新手动扫码登陆",
+                    title=f"错误代码：{json_data['code']}",
+                )
+
             upd_cookie()
             return get_list(page, cookie, api_url)
 
@@ -66,12 +69,13 @@ def get_whist(page, cookie, api_url="https://api.bilibili.com/x/relation/whisper
         else:
             msg = json_data["message"]
             print(msg)
-            # send_email(
-            #     msg,
-            #     subject="更新悄悄关注列表失败",
-            #     title=f"错误代码：{json_data['code']}",
-            # )
-            # exit()
+            if msg == "服务调用超时":
+                send_email(
+                    msg,
+                    subject="可能需要重新手动扫码登陆",
+                    title=f"错误代码：{json_data['code']}",
+                )
+
             upd_cookie()
             return get_whist(page, cookie, api_url)
 
