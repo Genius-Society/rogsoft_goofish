@@ -5,8 +5,7 @@ import random
 import requests
 from tqdm import tqdm
 from smtp import send_email
-# from cookie import upd_cookie
-from utils import USER_AGENT, global_cookie
+from utils import USER_AGENT, GLOBAL_COOKIE
 
 MAX_BLACK = 1000
 
@@ -229,7 +228,7 @@ def extract_uids(data: list):
     return uids, len(data)
 
 
-def clean_blackfollows(cookie=global_cookie):
+def clean_blackfollows(cookie=GLOBAL_COOKIE):
     if not cookie:
         print("请输入cookie")
         send_email(

@@ -22,13 +22,13 @@ def read_txt(file_path="cookie.txt"):
     return ""
 
 
-global_cookie = read_txt()
+GLOBAL_COOKIE = read_txt()
 
 
 def save_traitors(traitors: list, file_path="traitors.txt"):
-    with open(file_path, "a") as file:
+    with open(file_path, "a", encoding="utf-8") as file:
         for url in traitors:
-            file.write(url + "\n")
+            file.write(f"{url}\n")
 
 
 def download_file(url: str, folder_path="./"):

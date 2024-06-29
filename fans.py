@@ -6,14 +6,13 @@ import random
 import requests
 from tqdm import tqdm
 from smtp import send_email
-# from cookie import upd_cookie
 from blackfollows import parse_cookie, clean_blackfollows
-from utils import save_traitors, USER_AGENT, global_cookie
+from utils import save_traitors, USER_AGENT, GLOBAL_COOKIE
 
 
 def refresh_cookie():
-    header = {"User-Agent": USER_AGENT, "Cookie": global_cookie}
-    uid, _, _ = parse_cookie(global_cookie)
+    header = {"User-Agent": USER_AGENT, "Cookie": GLOBAL_COOKIE}
+    uid, _, _ = parse_cookie(GLOBAL_COOKIE)
     try:
         response = requests.get(
             f"https://api.bilibili.com/x/relation/followers?vmid={uid}",
@@ -26,8 +25,8 @@ def refresh_cookie():
 
 
 def get_fans(page):
-    header = {"User-Agent": USER_AGENT, "Cookie": global_cookie}
-    uid, _, _ = parse_cookie(global_cookie)
+    header = {"User-Agent": USER_AGENT, "Cookie": GLOBAL_COOKIE}
+    uid, _, _ = parse_cookie(GLOBAL_COOKIE)
 
     try:
         # 使用 requests 库下载 JSON 数据
