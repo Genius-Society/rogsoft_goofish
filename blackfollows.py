@@ -32,15 +32,14 @@ def get_list(page, cookie, api_url="https://api.bilibili.com/x/relation/blacks?"
         else:
             msg = json_data["message"]
             print(msg)
-            if msg == "服务调用超时":
-                send_email(
-                    msg,
-                    subject="可能需要重新手动扫码登陆",
-                    title=f"错误代码：{json_data['code']}",
-                )
-
-            upd_cookie()
-            return get_list(page, cookie, api_url)
+            send_email(
+                msg,
+                subject="可能需要重新手动扫码登陆",
+                title=f"错误代码：{json_data['code']}",
+            )
+            exit()
+            # upd_cookie()
+            # return get_list(page, cookie, api_url)
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -69,15 +68,14 @@ def get_whist(page, cookie, api_url="https://api.bilibili.com/x/relation/whisper
         else:
             msg = json_data["message"]
             print(msg)
-            if msg == "服务调用超时":
-                send_email(
-                    msg,
-                    subject="可能需要重新手动扫码登陆",
-                    title=f"错误代码：{json_data['code']}",
-                )
-
-            upd_cookie()
-            return get_whist(page, cookie, api_url)
+            send_email(
+                msg,
+                subject="可能需要重新手动扫码登陆",
+                title=f"错误代码：{json_data['code']}",
+            )
+            exit()
+            # upd_cookie()
+            # return get_whist(page, cookie, api_url)
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -211,14 +209,14 @@ def parse_cookie(cookie_str: str):
         return myuid, csrf, cookies
 
     except Exception:
-        # send_email(
-        #     "请确保cookie.txt存在且内容有效",
-        #     subject="cookie文件缺失或内容无效",
-        #     title=f"cookie解析异常",
-        # )
-        # exit()
-        upd_cookie()
-        parse_cookie(cookie_str)
+        send_email(
+            "请确保cookie.txt存在且内容有效",
+            subject="cookie文件缺失或内容无效",
+            title=f"cookie解析异常",
+        )
+        exit()
+        # upd_cookie()
+        # parse_cookie(cookie_str)
 
 
 def extract_uids(data: list):
@@ -233,15 +231,15 @@ def extract_uids(data: list):
 
 def clean_blackfollows(cookie=global_cookie):
     if not cookie:
-        # print("请输入cookie")
-        # send_email(
-        #     "请输入cookie",
-        #     subject="更新关系列表失败",
-        #     title="可能是由cookies缺失导致的",
-        # )
-        # exit()
-        upd_cookie()
-        clean_blackfollows(cookie)
+        print("请输入cookie")
+        send_email(
+            "请输入cookie",
+            subject="更新关系列表失败",
+            title="可能是由cookies缺失导致的",
+        )
+        exit()
+        # upd_cookie()
+        # clean_blackfollows(cookie)
 
     badlist = get_badlist(cookie)
     blacklist, blackcount = filter_deleted(badlist)
