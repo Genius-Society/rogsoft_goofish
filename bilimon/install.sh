@@ -75,6 +75,7 @@ if [ "${MODEL}" == "TUF-AX3000" ]; then
 fi
 
 # 安装插件
+mkdir /koolshare/bilimon/
 cp -rf /tmp/bilimon/bin/* /koolshare/bilimon/
 cp -rf /tmp/bilimon/scripts/* /koolshare/scripts/
 cp -rf /tmp/bilimon/webs/* /koolshare/webs/
@@ -93,7 +94,6 @@ else
 		sed -i '/rogcss/d' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
 	fi
 fi
-# chmod 755 /koolshare/bin/bilimon
 chmod +x /koolshare/scripts/bilimon*
 chmod +x /koolshare/scripts/uninstall_bilimon.sh
 
