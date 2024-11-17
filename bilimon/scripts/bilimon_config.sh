@@ -46,7 +46,7 @@ fun_wan_start() {
 start_bilimon() {
 	stop
 	nohup python /koolshare/bilimon/bilimon.py >/dev/null 2>&1 &
-	echo_date "bilimon插件启动完毕, 本窗口将在5s内自动关闭!"
+	echo_date "BiliMon插件启动完毕, 本窗口将在5s内自动关闭!"
 }
 
 close_in_five() {
@@ -73,7 +73,7 @@ case $1 in
 start)
 	set_lock
 	if [ "${bilimon_enable}" == "1" ]; then
-		logger "[软件中心]: 启动bilimon!"
+		logger "[软件中心]: 启动BiliMon!"
 		start_bilimon
 	fi
 	unset_lock
@@ -103,7 +103,7 @@ web_submit)
 		start_bilimon | tee -a $LOG_FILE
 	else
 		stop | tee -a $LOG_FILE
-		echo_date "bilimon已经停止运行, 本窗口将再5s后关闭!" | tee -a $LOG_FILE
+		echo_date "BiliMon已经停止运行, 本窗口将再5s后关闭!" | tee -a $LOG_FILE
 	fi
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock

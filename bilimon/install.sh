@@ -113,5 +113,5 @@ python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 完成
-echo_date "bilimon插件安装完毕!"
+echo_date "BiliMon插件安装完毕!"
 exit_install
