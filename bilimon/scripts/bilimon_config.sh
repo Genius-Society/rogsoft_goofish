@@ -43,11 +43,8 @@ fun_wan_start() {
 	fi
 }
 
-watch_bilimon() {
-	ps w | grep python
-}
-
 start_bilimon() {
+	stop
 	nohup python /koolshare/bilimon/bilimon.py >/dev/null 2>&1 &
 	echo_date "bilimon插件启动完毕, 本窗口将在5s内自动关闭!"
 }
@@ -70,11 +67,6 @@ stop() {
 	# 关闭bilimon进程
 	killall python
 	killall python3
-}
-
-restart() {
-	stop
-	start
 }
 
 case $1 in
