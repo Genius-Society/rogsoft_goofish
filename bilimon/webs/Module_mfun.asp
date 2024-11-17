@@ -122,6 +122,15 @@
                     E(params_chk[i]).checked = dbus[params_chk[i]] != "0";
                 }
             }
+            if (dbus["bilimon_period"]) {
+                E("bilimon_feat_period").value = dbus["bilimon_period"]
+            }
+            if (dbus["bilimon_email"]) {
+                E("bilimon_feat_email").value = dbus["bilimon_email"]
+            }
+            if (dbus["bilimon_smtp"]) {
+                E("bilimon_feat_smtp").value = dbus["bilimon_smtp"]
+            }
             if (dbus["bilimon_tmp"]) {
                 E("bilimon_feat_tmp").value = dbus["bilimon_tmp"]
             }
@@ -155,8 +164,13 @@
             for (var i = 0; i < params_chk.length; i++) {
                 dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
             }
+
+            dbus_new["bilimon_period"] = E("bilimon_feat_period").value
+            dbus_new["bilimon_email"] = E("bilimon_feat_email").value
+            dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
             dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
             dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
+
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["web_submit"], "fields": dbus_new };
@@ -343,7 +357,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>提示邮箱<span style="color: red;"> * </span></th>
+                                                    <th>提示邮箱(QQ/Foxmail)<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input style="width:300px;" type="text" class="input_ss_table"
                                                             id="bilimon_feat_email" name="bilimon_feat_email"

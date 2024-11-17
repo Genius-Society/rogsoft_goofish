@@ -45,7 +45,7 @@ fun_wan_start() {
 
 start_bilimon() {
 	stop
-	nohup python /koolshare/bilimon/bilimon.py >/dev/null 2>&1 &
+	nohup python /koolshare/bilimon/bilimon.py --period "$bilimon_period" --email "$bilimon_email" --smtp "$bilimon_smtp" --tmp "$bilimon_tmp" --cookie "$bilimon_cookie" >/dev/null 2>&1 &
 	echo_date "BiliMon插件启动完毕, 本窗口将在5s内自动关闭!"
 }
 

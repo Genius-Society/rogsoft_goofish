@@ -4,13 +4,28 @@ import time
 import json
 import random
 import smtplib
+import argparse
 import requests
 import schedule
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 
-GLOBAL_COOKIE = ""
+# 创建 ArgumentParser 对象
+parser = argparse.ArgumentParser(description="BiliMon configuration script.")
+
+# 添加参数
+parser.add_argument("--period", type=str, help="Specify the period for BiliMon.")
+parser.add_argument("--email", type=str, help="Specify the email address for BiliMon.")
+parser.add_argument("--smtp", type=str, help="Specify the SMTP server for BiliMon.")
+parser.add_argument("--tmp", type=str, help="Specify the temporary folder for BiliMon.")
+parser.add_argument("--cookie", type=str, help="Specify the cookie for BiliMon.")
+
+# 解析命令行参数
+args = parser.parse_args()
+
+
+GLOBAL_COOKIE = args.cookie
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
 
@@ -32,14 +47,14 @@ def send_email(
     # 构建邮件
     msg = MIMEText(body, "html", "utf-8")
     msg["Subject"] = Header(subject, "utf-8")
-    msg["From"] = "MuGeminorum@foxmail.com"
-    msg["To"] = "MuGeminorum@foxmail.com"
+    msg["From"] = args.email
+    msg["To"] = args.email
 
     # 发送邮件
     smtp_server = "smtp.qq.com"
     smtp_port = 587
-    sender_email = "MuGeminorum@foxmail.com"
-    password = "hstpwvmtntitbeee"
+    sender_email = args.email
+    password = args.smtp
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
@@ -134,8 +149,11 @@ def get_folowers():
     return fans
 
 
-def save_traitors(traitors: list, file_path="traitors.txt"):
-    with open(file_path, "a", encoding="utf-8") as file:
+def save_traitors(traitors: list, file_folder=args.tmp):
+    if file_folder[-1] != "/":
+        file_folder = file_folder + "/"
+
+    with open(file_folder + "traitors.txt", "a", encoding="utf-8") as file:
         for url in traitors:
             file.write(f"{url}\n")
 
@@ -215,4 +233,4 @@ def hour_monitor(period=2):
 
 
 if __name__ == "__main__":
-    hour_monitor()
+    hour_monitor(period=args.period)
