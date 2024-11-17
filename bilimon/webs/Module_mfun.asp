@@ -312,7 +312,7 @@
                                         </div>
                                         <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
                                         <div class="SimpleNote">
-                                            <li>bilimon 轻量影视媒体库</li>
+                                            <li>bilimon B站粉丝监控工具</li>
                                             <li style="color: #FC0;">请设置虚拟内存后再使用</li>
                                             <li style="color: #FC0;">初始账号密码: admin password</li>
                                         </div>

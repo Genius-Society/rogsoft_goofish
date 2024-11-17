@@ -161,7 +161,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 test.py
-*.txt
 blacks.js
 rename.sh
 fans.7z

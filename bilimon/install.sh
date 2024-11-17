@@ -100,7 +100,7 @@ chmod +x /koolshare/scripts/uninstall_bilimon.sh
 # 离线安装用
 dbus set bilimon_version="$(cat $DIR/version)"
 dbus set softcenter_module_bilimon_version="$(cat $DIR/version)"
-dbus set softcenter_module_bilimon_description="轻量影视媒体库"
+dbus set softcenter_module_bilimon_description="B站粉丝监控工具"
 dbus set softcenter_module_bilimon_install="1"
 dbus set softcenter_module_bilimon_name="bilimon"
 dbus set softcenter_module_bilimon_title="bilimon"
