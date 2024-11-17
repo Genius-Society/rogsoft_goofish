@@ -1,7 +1,5 @@
 # bilibili-relation-monitor
-[![Python application](https://github.com/MuGeminorum/bilibili-relation-monitor/actions/workflows/python-app.yml/badge.svg?branch=linux)](https://github.com/MuGeminorum/bilibili-relation-monitor/actions/workflows/python-app.yml)
-
-白嫖取关4🐎！
+白嫖取关4🐎4👊＋！
 
 ## 手动获取 cookie 方法
 0. 进入 `main` 分支;
