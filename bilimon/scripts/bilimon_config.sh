@@ -48,7 +48,7 @@ watch_bilimon() {
 }
 
 start_bilimon() {
-	nohup python ./clock.py >/dev/null 2>&1 &
+	nohup python /koolshare/bilimon/bilimon.py >/dev/null 2>&1 &
 	echo_date "bilimon插件启动完毕, 本窗口将在5s内自动关闭!"
 }
 

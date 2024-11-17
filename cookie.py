@@ -1,14 +1,61 @@
 import os
 import shutil
+import zipfile
+import requests
 from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from utils import download_file, unzip_file
-from smtp import send_email
+
 
 USER_DATA = "user_data"
 CHROME = "chrome-win64"
 CHROME_URL = f"https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/win64/{CHROME}.zip"
+
+
+def download_file(url: str, folder_path="./"):
+    # 确保文件夹存在，如果不存在则创建
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+    # 解析文件名
+    file_name = url.split("/")[-1]
+
+    # 文件的完整路径
+    file_path = os.path.join(folder_path, file_name)
+
+    # 下载文件
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get("content-length", 0))
+
+    # 添加进度条
+    with open(file_path, "wb") as f, tqdm(
+        total=total_size,
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        desc=file_name,
+        ascii=True,
+    ) as pbar:
+        for data in response.iter_content(chunk_size=1024):
+            f.write(data)
+            pbar.update(len(data))
+
+    print(f"文件已下载到：{file_path}")
+
+
+def unzip_file(zip_file: str, extract_folder="./", rm_pkg=True):
+    # 确保解压缩目录存在，如果不存在则创建
+    if not os.path.exists(extract_folder):
+        os.makedirs(extract_folder)
+
+    # 打开压缩包
+    with zipfile.ZipFile(zip_file, "r") as zip_ref:
+        # 解压缩到指定目录
+        zip_ref.extractall(extract_folder)
+
+    print(f"文件已解压缩到：{extract_folder}")
+    if rm_pkg:
+        os.remove(zip_file)
 
 
 def init_chrome(vision=False, keep_alive=False):
@@ -53,10 +100,8 @@ def upd_cookie(manual=False):
         if os.path.exists(USER_DATA):
             shutil.rmtree(USER_DATA)
 
-        send_email(
-            "可能是登录状态失效或 chromedriver 版本不匹配造成的",
-            subject="更新cookie失败",
-            title=f"错误信息：{e}",
+        print(
+            f"更新cookie失败: 可能是登录状态失效或 chromedriver 版本不匹配造成的, 错误信息：{e}"
         )
         exit()
 

@@ -3,11 +3,74 @@ import math
 import time
 import json
 import random
+import smtplib
 import requests
+import schedule
 from tqdm import tqdm
-from smtp import send_email
-from blackfollows import parse_cookie, clean_blackfollows
-from utils import save_traitors, USER_AGENT, GLOBAL_COOKIE
+from datetime import datetime
+from email.header import Header
+from email.mime.text import MIMEText
+
+GLOBAL_COOKIE = ""
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+
+
+def send_email(
+    content,
+    subject="按罪人名单降下终末",
+    title="白嫖完再取关？什么人啊？拉黑了",
+):
+    # 邮件内容
+    body = f"""
+    <html>
+        <body>
+            <h1>{title}</h1><br>
+            {content}
+        </body>
+    </html>
+    """
+
+    # 构建邮件
+    msg = MIMEText(body, "html", "utf-8")
+    msg["Subject"] = Header(subject, "utf-8")
+    msg["From"] = "MuGeminorum@foxmail.com"
+    msg["To"] = "MuGeminorum@foxmail.com"
+
+    # 发送邮件
+    smtp_server = "smtp.qq.com"
+    smtp_port = 587
+    sender_email = "MuGeminorum@foxmail.com"
+    password = "hstpwvmtntitbeee"
+
+    try:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, password)
+            server.sendmail(sender_email, [msg["To"]], msg.as_string())
+
+        print("邮件发送成功")
+
+    except smtplib.SMTPException as e:
+        print("邮件发送失败:", str(e))
+
+
+def parse_cookie(cookie_str: str):
+    try:
+        myuid = cookie_str.split("DedeUserID=")[1].split(";")[0]
+        csrf = cookie_str.split("bili_jct=")[1].split(";")[0]
+        cookies = {
+            cookie.split("=")[0]: cookie.split("=")[1]
+            for cookie in cookie_str.split("; ")
+        }
+        return myuid, csrf, cookies
+
+    except Exception:
+        send_email(
+            "请确保cookie.txt存在且内容有效",
+            subject="cookie文件缺失或内容无效",
+            title=f"cookie解析异常",
+        )
+        exit()
 
 
 def refresh_cookie():
@@ -55,8 +118,6 @@ def get_fans(page):
                 title=f"错误代码：{json_data['code']}",
             )
             exit()
-            # upd_cookie()
-            # get_fans(page)
 
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}, retrying...")
@@ -72,6 +133,12 @@ def get_folowers():
             fans.update(followers)
 
     return fans
+
+
+def save_traitors(traitors: list, file_path="traitors.txt"):
+    with open(file_path, "a", encoding="utf-8") as file:
+        for url in traitors:
+            file.write(f"{url}\n")
 
 
 def upd_fans(fans_json="fans.json"):
@@ -90,8 +157,6 @@ def upd_fans(fans_json="fans.json"):
             title="可能是由于cookies失效或无粉丝导致的",
         )
         exit()
-        # upd_cookie()
-        # upd_fans(fans_json)
 
     for fan in old_fans.keys():
         if fan not in new_fans:
@@ -117,6 +182,38 @@ def upd_fans(fans_json="fans.json"):
         print("No unfollower found.")
 
 
+def upd():
+    now_hour = datetime.now().hour
+    if now_hour > 7 and now_hour < 23:
+        upd_fans()
+    else:
+        refresh_cookie()
+        print("当前处于免打扰时间段")
+
+
+def monitor(trigger_time="12:50"):
+    print(f"监控开启中...每日触发时间：{trigger_time}")
+    schedule.every().day.at(trigger_time).do(upd)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+def min_monitor(period=2):
+    print(f"监控开启中...每{period}分钟触发一次")
+    schedule.every(period).minutes.do(upd)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+def hour_monitor(period=2):
+    print(f"监控开启中...每{period}小时触发一次")
+    schedule.every(period).hours.do(upd)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
 if __name__ == "__main__":
-    upd_fans()
-    clean_blackfollows()
+    hour_monitor()
