@@ -335,6 +335,32 @@
                                                     <td><span id="bilimon_status"></span></td>
                                                 </tr>
                                                 <tr>
+                                                    <th>刷新周期(小时)<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <input style="width:62px;" type="number" class="input_ss_table"
+                                                            id="bilimon_feat_period" name="bilimon_feat_period" min="1"
+                                                            value="2">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>提示邮箱<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <input style="width:300px;" type="text" class="input_ss_table"
+                                                            id="bilimon_feat_email" name="bilimon_feat_email"
+                                                            maxlength="100" value="" autocorrect="off"
+                                                            autocapitalize="off">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>SMTP密钥<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <input style="width:300px;" type="text" class="input_ss_table"
+                                                            id="bilimon_feat_smtp" name="bilimon_feat_smtp"
+                                                            maxlength="100" value="" autocorrect="off"
+                                                            autocapitalize="off">
+                                                    </td>
+                                                </tr>
+                                                <tr>
                                                     <th>缓存路径<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input style="width:300px;" type="text" class="input_ss_table"
@@ -350,6 +376,13 @@
                                                             class="input_ss_table" id="bilimon_feat_cookie"
                                                             name="bilimon_feat_cookie" maxlength="1000" rows="35"
                                                             autocorrect="off" autocapitalize="off"></textarea>
+                                                    </td>
+                                                </tr>
+                                                <tr id="bilimon_trigger">
+                                                    <th>单次手动触发</th>
+                                                    <td>
+                                                        <a type="button" id="bilimon_trigger" class="ks_btn" href=""
+                                                            target="_blank" style="border:none">单次手动触发</a>
                                                     </td>
                                                 </tr>
                                             </table>

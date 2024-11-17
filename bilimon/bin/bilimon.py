@@ -6,7 +6,6 @@ import random
 import smtplib
 import requests
 import schedule
-from tqdm import tqdm
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
@@ -126,7 +125,7 @@ def get_fans(page):
 
 def get_folowers():
     fans, pages = get_fans(page=1)
-    for i in tqdm(range(2, pages + 1), desc="Scanning followers..."):
+    for i in range(2, pages + 1):
         time.sleep(random.uniform(0.5, 1))
         followers, _ = get_fans(page=i)
         if followers:
