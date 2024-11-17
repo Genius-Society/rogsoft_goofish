@@ -93,7 +93,7 @@ else
 		sed -i '/rogcss/d' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
 	fi
 fi
-chmod 755 /koolshare/bin/bilimon
+# chmod 755 /koolshare/bin/bilimon
 chmod +x /koolshare/scripts/bilimon*
 chmod +x /koolshare/scripts/uninstall_bilimon.sh
 

@@ -9,7 +9,7 @@
     <meta HTTP-EQUIV="Expires" CONTENT="-1" />
     <link rel="shortcut icon" href="images/favicon.png" />
     <link rel="icon" href="images/favicon.png" />
-    <title>软件中心 - bilimon</title>
+    <title>软件中心 - BiliMon</title>
     <link rel="stylesheet" type="text/css" href="index_style.css" />
     <link rel="stylesheet" type="text/css" href="form_style.css" />
     <link rel="stylesheet" type="text/css" href="css/element.css">
@@ -84,7 +84,6 @@
             get_status();
             get_dbus_data();
             register_event();
-            setbilimonAddr();
         }
         function register_event() {
             $(".popup_bar_bg_ks").click(
@@ -123,17 +122,12 @@
                     E(params_chk[i]).checked = dbus[params_chk[i]] != "0";
                 }
             }
-            if (dbus["bilimon_store"]) {
-                E("bilimon_feat_store").value = dbus["bilimon_store"]
-            }
             if (dbus["bilimon_tmp"]) {
                 E("bilimon_feat_tmp").value = dbus["bilimon_tmp"]
             }
-            E("bilimon_feat_watch").checked = dbus["bilimon_watch"] == "1"
-            if (dbus["bilimon_port"]) {
-                E("bilimon_feat_port").value = dbus["bilimon_port"]
+            if (dbus["bilimon_cookie"]) {
+                E("bilimon_feat_cookie").value = dbus["bilimon_cookie"]
             }
-            E("bilimon_feat_open").checked = dbus["bilimon_open"] == "1"
         }
         function get_status() {
             var id = parseInt(Math.random() * 100000000);
@@ -161,15 +155,8 @@
             for (var i = 0; i < params_chk.length; i++) {
                 dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
             }
-            //for (var i = 0; i < params_inp.length; i++) {
-            //	dbus_new[params_inp[i]] = E(params_inp[i]).value;
-            //}
-            dbus_new["bilimon_store"] = E("bilimon_feat_store").value
             dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
-            dbus_new["bilimon_watch"] = E("bilimon_feat_watch").checked ? "1" : "0"
-            dbus_new["bilimon_old_port"] = dbus["bilimon_port"]
-            dbus_new["bilimon_port"] = E("bilimon_feat_port").value
-            dbus_new["bilimon_open"] = E("bilimon_feat_open").checked ? "1" : "0"
+            dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["web_submit"], "fields": dbus_new };
@@ -255,9 +242,6 @@
             tabtitle[tabtitle.length - 1] = new Array("", "bilimon");
             tablink[tablink.length - 1] = new Array("", "Module_bilimon.asp");
         }
-        function setbilimonAddr() {
-            E("bilimon_website").href = location.origin + ":" + E("bilimon_feat_port").value;
-        }
     </script>
 </head>
 
@@ -300,7 +284,7 @@
                                 <tr>
                                     <td bgcolor="#4D595D" colspan="3" valign="top">
                                         <div>&nbsp;</div>
-                                        <div class="formfonttitle">bilimon<lable id="bilimon_version">
+                                        <div class="formfonttitle">BiliMon<lable id="bilimon_version">
                                                 <lable>
                                         </div>
                                         <div style="float:right; width:15px; height:25px;margin-top:-20px">
@@ -312,16 +296,15 @@
                                         </div>
                                         <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
                                         <div class="SimpleNote">
-                                            <li>bilimon B站粉丝监控工具</li>
+                                            <li>BiliMon B站粉丝监控工具</li>
                                             <li style="color: #FC0;">请设置虚拟内存后再使用</li>
-                                            <li style="color: #FC0;">初始账号密码: admin password</li>
                                         </div>
                                         <div id="bilimon_main">
                                             <table width="100%" border="1" align="center" cellpadding="4"
                                                 cellspacing="0" class="FormTable">
                                                 <thead>
                                                     <tr>
-                                                        <td colspan="2">bilimon设定</td>
+                                                        <td colspan="2">BiliMon设定</td>
                                                     </tr>
                                                 </thead>
                                                 <tr id="switch_tr">
@@ -352,15 +335,6 @@
                                                     <td><span id="bilimon_status"></span></td>
                                                 </tr>
                                                 <tr>
-                                                    <th>配置路径<span style="color: red;"> * </span></th>
-                                                    <td>
-                                                        <input style="width:300px;" type="text" class="input_ss_table"
-                                                            id="bilimon_feat_store" name="bilimon_feat_store"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off">
-                                                    </td>
-                                                </tr>
-                                                <tr>
                                                     <th>缓存路径<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input style="width:300px;" type="text" class="input_ss_table"
@@ -370,28 +344,12 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>文件监控</th>
+                                                    <th>B站Cookie<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input type="checkbox" id="bilimon_feat_watch"
-                                                            style="vertical-align:middle;" checked="true">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>面板http端口</th>
-                                                    <td>
-                                                        <input style="width:62px;" type="number" class="input_ss_table"
-                                                            id="bilimon_feat_port" name="bilimon_feat_port" value="8990"
-                                                            min="1" max="65535">
-                                                        <input type="checkbox" id="bilimon_feat_open"
-                                                            style="vertical-align:middle;" checked="true">
-                                                        <span style="color: #FC0;">开放公网端口</span>
-                                                    </td>
-                                                </tr>
-                                                <tr id="bilimon_console">
-                                                    <th>控制台</th>
-                                                    <td>
-                                                        <a type="button" id="bilimon_website" class="ks_btn" href=""
-                                                            target="_blank" style="border:none">控制台</a>
+                                                        <textarea style="width:300px;height:auto;"
+                                                            class="input_ss_table" id="bilimon_feat_cookie"
+                                                            name="bilimon_feat_cookie" maxlength="1000" rows="35"
+                                                            autocorrect="off" autocapitalize="off"></textarea>
                                                     </td>
                                                 </tr>
                                             </table>
