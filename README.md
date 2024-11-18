@@ -12,6 +12,7 @@ pip install -r requirements.txt
 ```bash
 python build.py
 ```
+将生成的 `bilimon.tar.gz` 包上传至软件中心离线安装页面进行安装
 
 ## 手动获取 cookie 方法
 1. 用 `VSCode` 打开工程，选中 `cookie.py`;
