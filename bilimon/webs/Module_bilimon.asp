@@ -386,9 +386,9 @@
                                                 <tr>
                                                     <th>B站Cookie<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <textarea style="width:300px;height:auto;"
+                                                        <textarea style="width:453px;height:auto;"
                                                             class="input_ss_table" id="bilimon_feat_cookie"
-                                                            name="bilimon_feat_cookie" maxlength="1000" rows="35"
+                                                            name="bilimon_feat_cookie" maxlength="950" rows="20"
                                                             autocorrect="off" autocapitalize="off"></textarea>
                                                     </td>
                                                 </tr>
