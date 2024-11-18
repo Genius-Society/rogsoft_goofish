@@ -67,7 +67,7 @@
         }
 
         #bilimon_main {
-            border: 1px solid #91071f;
+            border-width: 0.5px;
         }
 
         /* W3C rogcss */
