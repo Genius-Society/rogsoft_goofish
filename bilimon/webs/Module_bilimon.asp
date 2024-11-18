@@ -353,7 +353,7 @@
                                                     <td>
                                                         <input style="width:62px;" type="number" class="input_ss_table"
                                                             id="bilimon_feat_period" name="bilimon_feat_period" min="1"
-                                                            value="2">
+                                                            max="8765" value="2">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -395,8 +395,15 @@
                                                 <tr id="bilimon_trigger">
                                                     <th>单次手动触发</th>
                                                     <td>
-                                                        <a type="button" id="bilimon_trigger" class="ks_btn" href=""
+                                                        <a type="button" id="bilimon_trigger" class="ks_btn" href="#"
                                                             target="_blank" style="border:none">单次手动触发</a>
+                                                    </td>
+                                                </tr>
+                                                <tr id="bilimon_traitor">
+                                                    <th>取关狗名单</th>
+                                                    <td>
+                                                        <a type="button" id="bilimon_traitor" class="ks_btn" href="#"
+                                                            target="_blank" style="border:none">取关狗名单</a>
                                                     </td>
                                                 </tr>
                                             </table>
