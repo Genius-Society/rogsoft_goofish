@@ -1,4 +1,6 @@
 # bilibili-relation-monitor
+[![license](https://img.shields.io/badge/license-Apache_2.0-99c711)](https://github.com/MuGemSt/bilimon/blob/master/LICENSE)
+
 取关狗死全家！
 
 ## Environment
