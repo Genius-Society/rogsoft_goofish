@@ -16,7 +16,7 @@ from email.mime.text import MIMEText
 parser = argparse.ArgumentParser(description="BiliMon configuration script.")
 
 # 添加参数
-parser.add_argument("--clock", type=int, help="true=clock on / false=monitor once")
+parser.add_argument("--clock", type=int, help="1=monitor on / 0=trigger once")
 parser.add_argument("--period", type=int, help="Specify the period for BiliMon.")
 parser.add_argument("--email", type=str, help="Specify the email address for BiliMon.")
 parser.add_argument("--smtp", type=str, help="Specify the SMTP server for BiliMon.")
@@ -64,19 +64,22 @@ def send_email(
     # 发送邮件
     smtp_server = "smtp.qq.com"
     smtp_port = 587
-    sender_mail = args.email
+    sender_email = args.email
     password = args.smtp
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
-            server.login(sender_mail, password)
-            server.sendmail(sender_mail, [msg["To"]], msg.as_string())
+            server.login(sender_email, password)
+            server.sendmail(sender_email, [msg["To"]], msg.as_string())
 
         print("邮件发送成功")
 
     except smtplib.SMTPException as e:
-        print("邮件发送失败:", str(e))
+        if e.smtp_code == -1:
+            print("邮件发送成功")
+        else:
+            print(f"邮件发送失败: {e}")
 
 
 def parse_cookie(cookie_str: str):
@@ -89,11 +92,11 @@ def parse_cookie(cookie_str: str):
         }
         return myuid, csrf, cookies
 
-    except Exception:
+    except Exception as e:
         send_email(
-            "请确保cookie.txt存在且内容有效",
-            subject="cookie文件缺失或内容无效",
-            title=f"cookie解析异常",
+            f"请确保 cookie.txt 存在且内容有效: {e}",
+            subject="cookie 文件缺失或内容无效",
+            title="cookie 解析异常",
         )
         exit()
 
@@ -285,5 +288,3 @@ if __name__ == "__main__":
         hour_monitor(period=args.period)
     else:
         upd_fans()
-
-    print("XU6J03M6")

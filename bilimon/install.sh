@@ -64,7 +64,8 @@ if [ -d "/opt" ]; then
 	echo_date 已检测到 Entware 环境, 开始安装插件!
 else
 	echo_date 未检测到 Entware 环境, 请先安装 Entware 插件!
-	exit_install 0
+	rm -rf /tmp/${module}* >/dev/null 2>&1
+	exit 1
 fi
 
 # 判断固件UI类型
