@@ -167,19 +167,15 @@
 
         function trigger() {
             var dbus_new = {};
-            for (var i = 0; i < params_chk.length; i++) {
-                dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
-            }
-
             dbus_new["bilimon_period"] = E("bilimon_feat_period").value
             dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
             dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
             dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
             dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
-
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["trigger_once"], "fields": dbus_new };
+            get_log(1);
             $.ajax({
                 type: "POST",
                 url: "/_api/",
@@ -187,10 +183,26 @@
                 dataType: "json",
                 success: function (response) {
                     E("bilimon_apply").disabled = false;
-                    get_log();
                 }
             });
+        }
+
+        function watchdog() {
+            var dbus_new = {};
+            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
+            E("bilimon_apply").disabled = true;
+            var id = parseInt(Math.random() * 100000000);
+            var postData = { "id": id, "method": "bilimon_config.sh", "params": ["watch_dogs"], "fields": dbus_new };
             get_log(1);
+            $.ajax({
+                type: "POST",
+                url: "/_api/",
+                data: JSON.stringify(postData),
+                dataType: "json",
+                success: function (response) {
+                    E("bilimon_apply").disabled = false;
+                }
+            });
         }
 
         function save() {
@@ -443,7 +455,7 @@
                                                     <th>取关狗名单</th>
                                                     <td>
                                                         <a type="button" id="bilimon_trigger" class="ks_btn"
-                                                            href="javascript:void(0);" onclick="get_log(1)"
+                                                            href="javascript:void(0);" onclick="watchdog()"
                                                             style="border:none">取关狗名单</a>
                                                     </td>
                                                 </tr>

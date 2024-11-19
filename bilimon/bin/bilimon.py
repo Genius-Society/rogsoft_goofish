@@ -40,7 +40,7 @@ GLOBAL_COOKIE = read_text(f"{args.tmp}/cookie.txt")
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
 
-def send_mail(
+def send_email(
     content,
     subject="按罪人名单降下终末",
     title="白嫖完再取关？什么人啊？拉黑了",
@@ -90,7 +90,7 @@ def parse_cookie(cookie_str: str):
         return myuid, csrf, cookies
 
     except Exception:
-        send_mail(
+        send_email(
             "请确保cookie.txt存在且内容有效",
             subject="cookie文件缺失或内容无效",
             title=f"cookie解析异常",
@@ -137,7 +137,7 @@ def get_fans(page):
         else:
             msg = json_data["message"]
             print(msg)
-            send_mail(
+            send_email(
                 msg,
                 subject="可能需要重新手动扫码登陆",
                 title=f"错误代码：{json_data['code']}",
@@ -169,42 +169,79 @@ def save_traitors(traitors: list, file_folder=args.tmp):
             file.write(f"{url}\n")
 
 
+def upd_json(new_total: int, new_fans: dict, fans_json="fans.json"):
+    with open(fans_json, "w", encoding="utf-8") as file:
+        json.dump(
+            {"total": new_total, "fans1000": new_fans},
+            file,
+            ensure_ascii=False,
+            indent=4,
+        )
+
+    print(f"./{fans_json} is updated!")
+
+
+def get_total_fans():
+    header = {"User-Agent": USER_AGENT, "Cookie": GLOBAL_COOKIE}
+    uid, _, _ = parse_cookie(GLOBAL_COOKIE)
+
+    try:
+        # 使用 requests 库下载 JSON 数据
+        response = requests.get(
+            f"https://api.bilibili.com/x/relation/stat?vmid={uid}",
+            headers=header,
+        )
+        response.raise_for_status()  # 检查是否成功获取数据
+
+        # 使用 json 库解析 JSON 数据
+        json_data = response.json()
+        return json_data["data"]["follower"]
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}, retrying...")
+        return get_total_fans()
+
+
 def upd_fans(fans_json=f"{args.tmp}/fans.json"):
-    old_fans = {}
+    old_total = -1
+    logs, old_fans = {}, {}
     if os.path.exists(fans_json):
         with open(fans_json, "r", encoding="utf-8") as file:
-            old_fans = json.load(file)
+            logs = json.load(file)
+            old_total = logs["total"]
 
-    unfollows = []
-    new_fans = get_folowers()
-    if not new_fans:
-        print("Failed to upd fans.")
-        send_mail(
-            "请手动更新cookies",
-            subject="更新粉丝列表失败",
-            title="可能是由于cookies失效或无粉丝导致的",
-        )
-        exit()
+    new_total = get_total_fans()
+    if new_total != old_total:
+        unfollows = []
+        new_fans = get_folowers()
+        if not new_fans:
+            upd_fans(fans_json)
 
-    for fan in old_fans.keys():
-        if fan not in new_fans:
-            unfollows.append({"uid": fan, "uname": old_fans[fan]})
+        if not logs:
+            upd_json(new_total, new_fans, fans_json)
+            return
 
-    if new_fans != old_fans:
-        with open(fans_json, "w", encoding="utf-8") as file:
-            json.dump(new_fans, file, ensure_ascii=False, indent=4)
+        old_fans: dict = logs["fans1000"]
+        for fan in old_fans.keys():
+            if fan not in new_fans:
+                unfollows.append({"uid": fan, "uname": old_fans[fan]})
 
-    if unfollows:
-        content = ""
-        traitors = []
-        for user in unfollows:
-            url = f'https://space.bilibili.com/{user["uid"]}'
-            content += f'<br><a href="{url}" target="_blank">{user["uname"]}</a><br>'
-            traitors.append(user["uid"])
+        if new_fans != old_fans or new_total != old_total:
+            upd_json(new_total, new_fans, fans_json)
 
-        if content:
-            save_traitors(traitors)
-            send_mail(content)
+        if unfollows and new_total < old_total:
+            content = ""
+            traitors = []
+            for user in unfollows:
+                url = f'https://m.bilibili.com/space/{user["uid"]}'
+                content += (
+                    f'<br><a href="{url}" target="_blank">{user["uname"]}</a><br>'
+                )
+                traitors.append(user["uid"])
+
+            if content:
+                save_traitors(traitors)
+                send_email(content)
 
     else:
         print("No unfollower found.")
@@ -248,3 +285,5 @@ if __name__ == "__main__":
         hour_monitor(period=args.period)
     else:
         upd_fans()
+        
+    print("XU6J03M6")

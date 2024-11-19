@@ -45,8 +45,14 @@ fun_wan_start() {
 
 start_bilimon() {
 	export PATH=$PATH:/opt/bin/
-	mkdir -p "$bilimon_tmp"
-	echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
+
+	if [ ! -d "$bilimon_tmp" ]; then
+		mkdir -p "$bilimon_tmp"
+	fi
+
+	if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
+		echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
+	fi
 
 	if [ "${bilimon_enable}" == "1" ]; then
 		nohup python /koolshare/bilimon/bilimon.py \
@@ -55,7 +61,7 @@ start_bilimon() {
 			--email "$bilimon_mail" \
 			--smtp "$bilimon_smtp" \
 			--tmp "$bilimon_tmp" \
-			>/dev/null 2>&1 &
+			>>$LOG_FILE 2>&1 &
 
 		echo_date "BiliMon插件启动完毕, 本窗口将在5s内自动关闭!"
 
@@ -66,15 +72,22 @@ start_bilimon() {
 
 trigger_once() {
 	export PATH=$PATH:/opt/bin/
-	mkdir -p "$bilimon_tmp"
-	echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
+
+	if [ ! -d "$bilimon_tmp" ]; then
+		mkdir -p "$bilimon_tmp"
+	fi
+
+	if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
+		echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
+	fi
+
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 0 \
 		--period "$bilimon_period" \
 		--email "$bilimon_mail" \
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
-		>$LOG_FILE 2>&1 &
+		>>$LOG_FILE 2>&1 &
 }
 
 close_in_five() {
@@ -137,7 +150,20 @@ web_submit)
 	;;
 trigger_once)
 	set_lock
+	true >$LOG_FILE
+	http_response "$1"
 	trigger_once
+	unset_lock
+	;;
+watch_dogs)
+	set_lock
+	true >$LOG_FILE
+	http_response "$1"
+	if [[ -f "$bilimon_tmp/traitors.txt" ]]; then
+		echo $(<"$bilimon_tmp/traitors.txt") | tee -a $LOG_FILE
+	else
+		echo "当前狗库为空!" | tee -a $LOG_FILE
+	fi
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;
