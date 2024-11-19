@@ -29,7 +29,7 @@ GLOBAL_COOKIE = args.cookie
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
 
-def send_email(
+def send_mail(
     content,
     subject="按罪人名单降下终末",
     title="白嫖完再取关？什么人啊？拉黑了",
@@ -53,14 +53,14 @@ def send_email(
     # 发送邮件
     smtp_server = "smtp.qq.com"
     smtp_port = 587
-    sender_email = args.email
+    sender_mail = args.email
     password = args.smtp
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
-            server.login(sender_email, password)
-            server.sendmail(sender_email, [msg["To"]], msg.as_string())
+            server.login(sender_mail, password)
+            server.sendmail(sender_mail, [msg["To"]], msg.as_string())
 
         print("邮件发送成功")
 
@@ -79,7 +79,7 @@ def parse_cookie(cookie_str: str):
         return myuid, csrf, cookies
 
     except Exception:
-        send_email(
+        send_mail(
             "请确保cookie.txt存在且内容有效",
             subject="cookie文件缺失或内容无效",
             title=f"cookie解析异常",
@@ -126,7 +126,7 @@ def get_fans(page):
         else:
             msg = json_data["message"]
             print(msg)
-            send_email(
+            send_mail(
                 msg,
                 subject="可能需要重新手动扫码登陆",
                 title=f"错误代码：{json_data['code']}",
@@ -168,7 +168,7 @@ def upd_fans(fans_json="fans.json"):
     new_fans = get_folowers()
     if not new_fans:
         print("Failed to upd fans.")
-        send_email(
+        send_mail(
             "请手动更新cookies",
             subject="更新粉丝列表失败",
             title="可能是由于cookies失效或无粉丝导致的",
@@ -193,7 +193,7 @@ def upd_fans(fans_json="fans.json"):
 
         if content:
             save_traitors(traitors)
-            send_email(content)
+            send_mail(content)
 
     else:
         print("No unfollower found.")

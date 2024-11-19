@@ -125,8 +125,8 @@
             if (dbus["bilimon_period"]) {
                 E("bilimon_feat_period").value = dbus["bilimon_period"]
             }
-            if (dbus["bilimon_email"]) {
-                E("bilimon_feat_email").value = dbus["bilimon_email"]
+            if (dbus["bilimon_mail"]) {
+                E("bilimon_feat_mail").value = dbus["bilimon_mail"]
             }
             if (dbus["bilimon_smtp"]) {
                 E("bilimon_feat_smtp").value = dbus["bilimon_smtp"]
@@ -166,7 +166,7 @@
             }
 
             dbus_new["bilimon_period"] = E("bilimon_feat_period").value
-            dbus_new["bilimon_email"] = E("bilimon_feat_email").value
+            dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
             dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
             dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
             dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
@@ -360,7 +360,7 @@
                                                     <th>提示邮箱(QQ/Foxmail)<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input style="width:300px;" type="text" class="input_ss_table"
-                                                            id="bilimon_feat_email" name="bilimon_feat_email"
+                                                            id="bilimon_feat_mail" name="bilimon_feat_mail"
                                                             maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off">
                                                     </td>
