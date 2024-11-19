@@ -44,9 +44,20 @@ fun_wan_start() {
 }
 
 start_bilimon() {
+	export PATH=$PATH:/opt/bin/
+	mkdir -p "$bilimon_tmp"
+	echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
+
 	if [ "${bilimon_enable}" == "1" ]; then
-		nohup python /koolshare/bilimon/bilimon.py --period "$bilimon_period" --email "$bilimon_mail" --smtp "$bilimon_smtp" --tmp "$bilimon_tmp" --cookie "$bilimon_cookie" >/dev/null 2>&1 &
+		nohup python /koolshare/bilimon/bilimon.py \
+			--period "$bilimon_period" \
+			--email "$bilimon_mail" \
+			--smtp "$bilimon_smtp" \
+			--tmp "$bilimon_tmp" \
+			>/dev/null 2>&1 &
+
 		echo_date "BiliMon插件启动完毕, 本窗口将在5s内自动关闭!"
+
 	else
 		stop
 	fi

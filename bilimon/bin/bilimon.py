@@ -15,17 +15,27 @@ from email.mime.text import MIMEText
 parser = argparse.ArgumentParser(description="BiliMon configuration script.")
 
 # 添加参数
-parser.add_argument("--period", type=str, help="Specify the period for BiliMon.")
+parser.add_argument("--period", type=int, help="Specify the period for BiliMon.")
 parser.add_argument("--email", type=str, help="Specify the email address for BiliMon.")
 parser.add_argument("--smtp", type=str, help="Specify the SMTP server for BiliMon.")
 parser.add_argument("--tmp", type=str, help="Specify the temporary folder for BiliMon.")
-parser.add_argument("--cookie", type=str, help="Specify the cookie for BiliMon.")
+# parser.add_argument("--cookie", type=str, help="Specify the cookie for BiliMon.")
 
 # 解析命令行参数
 args = parser.parse_args()
 
 
-GLOBAL_COOKIE = args.cookie
+def read_text(file_path: str):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            return file.read().strip()
+
+    except Exception as e:
+        print(f"读取文件时发生错误：{e}")
+        return None
+
+
+GLOBAL_COOKIE = read_text(f"{args.tmp}/cookie.txt")
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
 

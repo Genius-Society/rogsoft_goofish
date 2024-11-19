@@ -8,6 +8,7 @@
 conda create -n py310 python=3.10 -y
 conda activate py310
 pip install -r requirements.txt
+# pip install -r ./bilimon/bin/requirements.txt
 ```
 
 ## Build
