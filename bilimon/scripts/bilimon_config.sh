@@ -124,6 +124,6 @@ web_submit)
 	;;
 esac
 
-if [ "$bilimon_enable" == "1" ]; then
-	start_bilimon
-fi
+# if [ "$bilimon_enable" == "1" ]; then
+# 	start_bilimon
+# fi
