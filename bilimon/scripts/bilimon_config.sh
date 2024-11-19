@@ -153,7 +153,6 @@ trigger_once)
 	true >$LOG_FILE
 	http_response "$1"
 	trigger_once
-	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;
 watch_dogs)

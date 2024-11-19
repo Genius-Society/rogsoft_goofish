@@ -181,7 +181,7 @@ def upd_json(new_total: int, new_fans: dict, fans_json="fans.json"):
             indent=4,
         )
 
-    print(f"./{fans_json} is updated!")
+    print(f"{fans_json} is updated!")
 
 
 def get_total_fans():
@@ -288,3 +288,5 @@ if __name__ == "__main__":
         hour_monitor(period=args.period)
     else:
         upd_fans()
+
+    print("XU6J03M6")
