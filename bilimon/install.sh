@@ -94,6 +94,7 @@ else
 		sed -i '/rogcss/d' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
 	fi
 fi
+export PATH=$PATH:/opt/bin/
 chmod +x /koolshare/scripts/bilimon*
 chmod +x /koolshare/scripts/uninstall_bilimon.sh
 
