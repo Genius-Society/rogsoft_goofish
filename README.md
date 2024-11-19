@@ -17,6 +17,9 @@ python build.py
 ```
 将生成的 `bilimon.tar.gz` 包上传至软件中心离线安装页面进行安装
 
+## Requirement
+软件中心安装 Entware 插件并部署完成
+
 ## 手动获取 cookie 方法
 1. 用 `VSCode` 打开工程，选中 `cookie.py`;
 2. 在 `cookie.py` 的 `#TODO:` 处打个断点;

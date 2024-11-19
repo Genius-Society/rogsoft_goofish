@@ -166,6 +166,7 @@
         }
 
         function trigger() {
+            get_log(1);
             var dbus_new = {};
             dbus_new["bilimon_period"] = E("bilimon_feat_period").value
             dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
@@ -175,31 +176,32 @@
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["trigger_once"], "fields": dbus_new };
-            get_log(1);
             $.ajax({
                 type: "POST",
                 url: "/_api/",
                 data: JSON.stringify(postData),
                 dataType: "json",
                 success: function (response) {
+                    get_log(1);
                     E("bilimon_apply").disabled = false;
                 }
             });
         }
 
         function watchdog() {
+            get_log(1);
             var dbus_new = {};
             dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["watch_dogs"], "fields": dbus_new };
-            get_log(1);
             $.ajax({
                 type: "POST",
                 url: "/_api/",
                 data: JSON.stringify(postData),
                 dataType: "json",
                 success: function (response) {
+                    get_log(1);
                     E("bilimon_apply").disabled = false;
                 }
             });
