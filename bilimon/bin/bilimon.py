@@ -7,6 +7,7 @@ import smtplib
 import argparse
 import requests
 import schedule
+from tqdm import tqdm
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
@@ -15,11 +16,11 @@ from email.mime.text import MIMEText
 parser = argparse.ArgumentParser(description="BiliMon configuration script.")
 
 # 添加参数
+parser.add_argument("--clock", type=int, help="true=clock on / false=monitor once")
 parser.add_argument("--period", type=int, help="Specify the period for BiliMon.")
 parser.add_argument("--email", type=str, help="Specify the email address for BiliMon.")
 parser.add_argument("--smtp", type=str, help="Specify the SMTP server for BiliMon.")
 parser.add_argument("--tmp", type=str, help="Specify the temporary folder for BiliMon.")
-# parser.add_argument("--cookie", type=str, help="Specify the cookie for BiliMon.")
 
 # 解析命令行参数
 args = parser.parse_args()
@@ -150,7 +151,7 @@ def get_fans(page):
 
 def get_folowers():
     fans, pages = get_fans(page=1)
-    for i in range(2, pages + 1):
+    for i in tqdm(range(2, pages + 1), desc="Scanning followers..."):
         time.sleep(random.uniform(0.5, 1))
         followers, _ = get_fans(page=i)
         if followers:
@@ -168,7 +169,7 @@ def save_traitors(traitors: list, file_folder=args.tmp):
             file.write(f"{url}\n")
 
 
-def upd_fans(fans_json="fans.json"):
+def upd_fans(fans_json=f"{args.tmp}/fans.json"):
     old_fans = {}
     if os.path.exists(fans_json):
         with open(fans_json, "r", encoding="utf-8") as file:
@@ -243,4 +244,7 @@ def hour_monitor(period=2):
 
 
 if __name__ == "__main__":
-    hour_monitor(period=args.period)
+    if int(args.clock) == 1:
+        hour_monitor(period=args.period)
+    else:
+        upd_fans()

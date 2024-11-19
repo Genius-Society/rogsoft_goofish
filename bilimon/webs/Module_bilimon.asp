@@ -165,6 +165,34 @@
             });
         }
 
+        function trigger() {
+            var dbus_new = {};
+            for (var i = 0; i < params_chk.length; i++) {
+                dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
+            }
+
+            dbus_new["bilimon_period"] = E("bilimon_feat_period").value
+            dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
+            dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
+            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
+            dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
+
+            E("bilimon_apply").disabled = true;
+            var id = parseInt(Math.random() * 100000000);
+            var postData = { "id": id, "method": "bilimon_config.sh", "params": ["trigger_once"], "fields": dbus_new };
+            $.ajax({
+                type: "POST",
+                url: "/_api/",
+                data: JSON.stringify(postData),
+                dataType: "json",
+                success: function (response) {
+                    E("bilimon_apply").disabled = false;
+                    get_log();
+                }
+            });
+            get_log(1);
+        }
+
         function save() {
             var dbus_new = {};
             for (var i = 0; i < params_chk.length; i++) {
@@ -406,15 +434,17 @@
                                                 <tr id="bilimon_trigger">
                                                     <th>单次手动触发</th>
                                                     <td>
-                                                        <a type="button" id="bilimon_trigger" class="ks_btn" href="#"
-                                                            target="_blank" style="border:none">单次手动触发</a>
+                                                        <a type="button" id="bilimon_trigger" class="ks_btn"
+                                                            href="javascript:void(0);" onclick="trigger()"
+                                                            style="border:none">单次手动触发</a>
                                                     </td>
                                                 </tr>
                                                 <tr id="bilimon_traitor">
                                                     <th>取关狗名单</th>
                                                     <td>
-                                                        <a type="button" id="bilimon_traitor" class="ks_btn" href="#"
-                                                            target="_blank" style="border:none">取关狗名单</a>
+                                                        <a type="button" id="bilimon_trigger" class="ks_btn"
+                                                            href="javascript:void(0);" onclick="get_log(1)"
+                                                            style="border:none">取关狗名单</a>
                                                     </td>
                                                 </tr>
                                             </table>

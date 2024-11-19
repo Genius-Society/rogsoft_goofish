@@ -50,6 +50,7 @@ start_bilimon() {
 
 	if [ "${bilimon_enable}" == "1" ]; then
 		nohup python /koolshare/bilimon/bilimon.py \
+			--clock 1 \
 			--period "$bilimon_period" \
 			--email "$bilimon_mail" \
 			--smtp "$bilimon_smtp" \
@@ -61,6 +62,19 @@ start_bilimon() {
 	else
 		stop
 	fi
+}
+
+trigger_once() {
+	export PATH=$PATH:/opt/bin/
+	mkdir -p "$bilimon_tmp"
+	echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
+	nohup python /koolshare/bilimon/bilimon.py \
+		--clock 0 \
+		--period "$bilimon_period" \
+		--email "$bilimon_mail" \
+		--smtp "$bilimon_smtp" \
+		--tmp "$bilimon_tmp" \
+		>$LOG_FILE 2>&1 &
 }
 
 close_in_five() {
@@ -80,7 +94,6 @@ close_in_five() {
 stop() {
 	# 关闭bilimon进程
 	killall python
-	killall python3
 }
 
 case $1 in
@@ -122,8 +135,10 @@ web_submit)
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;
+trigger_once)
+	set_lock
+	trigger_once
+	echo XU6J03M6 | tee -a $LOG_FILE
+	unset_lock
+	;;
 esac
-
-# if [ "$bilimon_enable" == "1" ]; then
-# 	start_bilimon
-# fi
