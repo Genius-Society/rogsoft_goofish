@@ -79,12 +79,14 @@
         var params_inp = [];
         var refresh_flag;
         var count_down;
+
         function init() {
             show_menu(menu_hook);
             get_status();
             get_dbus_data();
             register_event();
         }
+
         function register_event() {
             $(".popup_bar_bg_ks").click(
                 function () {
@@ -103,6 +105,7 @@
                 }
             });
         }
+
         function get_dbus_data() {
             $.ajax({
                 type: "GET",
@@ -116,6 +119,7 @@
                 }
             });
         }
+
         function conf2obj() {
             for (var i = 0; i < params_chk.length; i++) {
                 if (dbus[params_chk[i]]) {
@@ -138,6 +142,7 @@
                 E("bilimon_feat_cookie").value = dbus["bilimon_cookie"]
             }
         }
+
         function get_status() {
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_status.sh", "params": [1], "fields": "" };
@@ -159,6 +164,7 @@
                 }
             });
         }
+
         function save() {
             var dbus_new = {};
             for (var i = 0; i < params_chk.length; i++) {
@@ -185,6 +191,7 @@
                 }
             });
         }
+
         function showWBLoadingBar() {
             document.scrollingElement.scrollTop = 0;
             E("loading_block_title").innerHTML = "应用中, 请稍后 ...";
@@ -197,6 +204,7 @@
             var log_w_offset = (page_w - log_w) / 2 + 90;
             $('#loadingBarBlock').offset({ top: log_h_offset, left: log_w_offset });
         }
+
         function hideWBLoadingBar() {
             E("LoadingBar").style.visibility = "hidden";
             E("ok_button").style.visibility = "hidden";
@@ -204,6 +212,7 @@
                 refreshpage();
             }
         }
+
         function count_down_close() {
             if (count_down == "0") {
                 hideWBLoadingBar();
@@ -216,6 +225,7 @@
             --count_down;
             setTimeout("count_down_close();", 1000);
         }
+
         function get_log(flag) {
             E("ok_button").style.visibility = "hidden";
             showWBLoadingBar();
@@ -252,8 +262,9 @@
                 }
             });
         }
+
         function menu_hook(title, tab) {
-            tabtitle[tabtitle.length - 1] = new Array("", "bilimon");
+            tabtitle[tabtitle.length - 1] = new Array("", "BiliMon");
             tablink[tablink.length - 1] = new Array("", "Module_bilimon.asp");
         }
     </script>

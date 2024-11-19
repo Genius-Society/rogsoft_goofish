@@ -107,8 +107,8 @@ dbus set softcenter_module_bilimon_name="bilimon"
 dbus set softcenter_module_bilimon_title="bilimon"
 
 # 安装运行环境
+sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 opkg update
-opkg install python3
 opkg install python3-pip
 python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
