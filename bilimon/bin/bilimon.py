@@ -285,5 +285,5 @@ if __name__ == "__main__":
         hour_monitor(period=args.period)
     else:
         upd_fans()
-        
+
     print("XU6J03M6")

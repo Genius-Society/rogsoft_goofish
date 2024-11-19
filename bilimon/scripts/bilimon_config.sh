@@ -160,7 +160,7 @@ watch_dogs)
 	true >$LOG_FILE
 	http_response "$1"
 	if [[ -f "$bilimon_tmp/traitors.txt" ]]; then
-		echo $(<"$bilimon_tmp/traitors.txt") | tee -a $LOG_FILE
+		awk '{print "https://space.bilibili.com/" $0}' "$bilimon_tmp/traitors.txt" | tee -a $LOG_FILE
 	else
 		echo "当前狗库为空!" | tee -a $LOG_FILE
 	fi
