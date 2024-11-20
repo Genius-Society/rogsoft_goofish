@@ -17,7 +17,6 @@ unset_lock() {
 }
 
 sync_ntp() {
-	# START_TIME=$(date +%Y/%m/%d-%X)
 	echo_date "尝试从ntp服务器: ntp1.aliyun.com 同步时间..."
 	ntpclient -h ntp1.aliyun.com -i3 -l -s >/tmp/ali_ntp.txt 2>&1
 	SYNC_TIME=$(cat /tmp/ali_ntp.txt | grep -E "\[ntpclient\]" | grep -Eo "[0-9]+" | head -n1)
@@ -61,7 +60,7 @@ start_bilimon() {
 	else
 		stop
 		dbus set bilimon_enable=0
-		echo_date "Entware 环境不可用, 请修复"
+		echo_date "Entware 环境不可用, 请修复!"
 		return
 	fi
 
@@ -82,7 +81,7 @@ start_bilimon() {
 			--tmp "$bilimon_tmp" \
 			>>$LOG_FILE 2>&1 &
 
-		echo_date "BiliMon插件启动完毕, 本窗口将在5s内自动关闭!"
+		echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 	fi
 }
 
@@ -96,7 +95,7 @@ trigger_once() {
 	else
 		stop
 		dbus set bilimon_enable=0
-		echo_date "Entware 环境不可用, 请修复"
+		echo_date "Entware 环境不可用, 请修复!"
 		echo XU6J03M6
 		return
 	fi
@@ -143,7 +142,7 @@ case $1 in
 start)
 	set_lock
 	if [ "${bilimon_enable}" == "1" ]; then
-		logger "[软件中心]: 启动BiliMon!"
+		logger "[软件中心]: 启动 BiliMon !"
 		start_bilimon
 	fi
 	unset_lock
@@ -173,7 +172,7 @@ web_submit)
 		start_bilimon | tee -a $LOG_FILE
 	else
 		stop | tee -a $LOG_FILE
-		echo_date "BiliMon已经停止运行, 本窗口将再5s后关闭!" | tee -a $LOG_FILE
+		echo_date "BiliMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $LOG_FILE
 	fi
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock

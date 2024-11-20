@@ -16,7 +16,7 @@ from email.mime.text import MIMEText
 parser = argparse.ArgumentParser(description="BiliMon configuration script.")
 
 # 添加参数
-parser.add_argument("--clock", type=int, help="1=monitor on / 0=trigger once")
+parser.add_argument("--clock", type=int, help="1=monitor on, 0=trigger once")
 parser.add_argument("--period", type=int, help="Specify the period for BiliMon.")
 parser.add_argument("--email", type=str, help="Specify the email address for BiliMon.")
 parser.add_argument("--smtp", type=str, help="Specify the SMTP server for BiliMon.")
@@ -32,7 +32,7 @@ def read_text(file_path: str):
             return file.read().strip()
 
     except Exception as e:
-        print(f"读取文件时发生错误：{e}")
+        print(f"读取文件时发生错误: {e}")
         return None
 
 
@@ -43,7 +43,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 def send_email(
     content,
     subject="按罪人名单降下终末",
-    title="白嫖完再取关？什么人啊？拉黑了",
+    title="白嫖完再取关? 什么人啊? 拉黑了",
 ):
     # 邮件内容
     body = f"""
@@ -143,7 +143,7 @@ def get_fans(page):
             send_email(
                 msg,
                 subject="可能需要重新手动扫码登陆",
-                title=f"错误代码：{json_data['code']}",
+                title=f"错误代码: {json_data['code']}",
             )
             exit()
 
@@ -260,7 +260,7 @@ def upd():
 
 
 def monitor(trigger_time="12:50"):
-    print(f"监控开启中...每日触发时间：{trigger_time}")
+    print(f"监控开启中...每日触发时间: {trigger_time}")
     schedule.every().day.at(trigger_time).do(upd)
     while True:
         schedule.run_pending()
@@ -268,7 +268,7 @@ def monitor(trigger_time="12:50"):
 
 
 def min_monitor(period=2):
-    print(f"监控开启中...每{period}分钟触发一次")
+    print(f"监控开启中...每 {period} 分钟触发一次")
     schedule.every(period).minutes.do(upd)
     while True:
         schedule.run_pending()
@@ -276,7 +276,7 @@ def min_monitor(period=2):
 
 
 def hour_monitor(period=2):
-    print(f"监控开启中...每{period}小时触发一次")
+    print(f"监控开启中...每 {period} 小时触发一次")
     schedule.every(period).hours.do(upd)
     while True:
         schedule.run_pending()

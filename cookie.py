@@ -13,7 +13,7 @@ CHROME_URL = f"https://mugem.asuscomm.cn:81/d/archive/mirrors/chrome/{CHROME}.zi
 
 
 def download_file(url: str, folder_path="./"):
-    # 确保文件夹存在，如果不存在则创建
+    # 确保文件夹存在, 如果不存在则创建
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
@@ -40,11 +40,11 @@ def download_file(url: str, folder_path="./"):
             f.write(data)
             pbar.update(len(data))
 
-    print(f"文件已下载到：{file_path}")
+    print(f"文件已下载到: {file_path}")
 
 
 def unzip_file(zip_file: str, extract_folder="./", rm_pkg=True):
-    # 确保解压缩目录存在，如果不存在则创建
+    # 确保解压缩目录存在, 如果不存在则创建
     if not os.path.exists(extract_folder):
         os.makedirs(extract_folder)
 
@@ -53,7 +53,7 @@ def unzip_file(zip_file: str, extract_folder="./", rm_pkg=True):
         # 解压缩到指定目录
         zip_ref.extractall(extract_folder)
 
-    print(f"文件已解压缩到：{extract_folder}")
+    print(f"文件已解压缩到: {extract_folder}")
     if rm_pkg:
         os.remove(zip_file)
 
@@ -101,7 +101,7 @@ def upd_cookie(manual=False):
             shutil.rmtree(USER_DATA)
 
         print(
-            f"更新cookie失败: 可能是登录状态失效或 chromedriver 版本不匹配造成的, 错误信息：{e}"
+            f"更新cookie失败: 可能是登录状态失效或 chromedriver 版本不匹配造成的, 错误信息: {e}"
         )
         exit()
 

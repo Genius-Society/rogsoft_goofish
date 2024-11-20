@@ -45,7 +45,7 @@
             z-index: 99;
             /*background-color: #444F53;*/
             filter: alpha(opacity=90);
-            /*IE5、IE5.5、IE6、IE7*/
+            /*IE5 \ IE5.5 \ IE6 \ IE7*/
             background-repeat: repeat;
             visibility: hidden;
             overflow: hidden;
