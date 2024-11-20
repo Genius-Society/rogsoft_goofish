@@ -104,7 +104,7 @@ start_bilimon() {
 		echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
 	fi
 
-	# 开启监控
+	# 开启周期监控
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 1 \
 		--period "$bilimon_period" \
@@ -281,4 +281,5 @@ if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]
 
 	# 开启 BiliMon
 	start_bilimon
+	echo XU6J03M6 | tee -a $LOG_FILE
 fi
