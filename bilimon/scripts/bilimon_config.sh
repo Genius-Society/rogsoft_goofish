@@ -87,6 +87,11 @@ start_bilimon() {
 		return
 	fi
 
+	# 插件开启的时候同步一次时间
+	if [ "${bilimon_enable}" == "1" -a -n "$(which ntpclient)" ]; then
+		sync_ntp
+	fi
+
 	# 检查运行环境
 	echo_date "检查 Entware 环境..."
 	if [ -d "/opt" ]; then
