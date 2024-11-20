@@ -197,3 +197,7 @@ watch_dogs)
 	unset_lock
 	;;
 esac
+
+if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
+	start_bilimon
+fi
