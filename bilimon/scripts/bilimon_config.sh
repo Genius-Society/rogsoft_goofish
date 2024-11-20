@@ -113,6 +113,7 @@ start_bilimon() {
 		--tmp "$bilimon_tmp" \
 		>>$LOG_FILE 2>&1 &
 
+	fun_wan_start
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
 
@@ -186,6 +187,7 @@ stop() {
 		echo_date "关闭监控进程..."
 		killall python
 	fi
+	fun_wan_start
 }
 
 case $1 in
