@@ -43,8 +43,27 @@ fun_wan_start() {
 	fi
 }
 
+install_env() {
+	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
+	opkg update
+	opkg install python3-pip
+	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+	pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+}
+
 start_bilimon() {
-	export PATH=$PATH:/opt/bin/
+	echo_date "检查 Entware 环境..."
+	if [ -d "/opt" ]; then
+		export PATH=$PATH:/opt/bin/
+		install_env
+		echo_date "Entware 环境可用!"
+
+	else
+		stop
+		dbus set bilimon_enable=0
+		echo_date "Entware 环境不可用, 请修复"
+		return
+	fi
 
 	if [ ! -d "$bilimon_tmp" ]; then
 		mkdir -p "$bilimon_tmp"
@@ -64,14 +83,23 @@ start_bilimon() {
 			>>$LOG_FILE 2>&1 &
 
 		echo_date "BiliMon插件启动完毕, 本窗口将在5s内自动关闭!"
-
-	else
-		stop
 	fi
 }
 
 trigger_once() {
-	export PATH=$PATH:/opt/bin/
+	echo_date "检查 Entware 环境..."
+	if [ -d "/opt" ]; then
+		export PATH=$PATH:/opt/bin/
+		install_env
+		echo_date "Entware 环境可用!"
+
+	else
+		stop
+		dbus set bilimon_enable=0
+		echo_date "Entware 环境不可用, 请修复"
+		echo XU6J03M6
+		return
+	fi
 
 	if [ ! -d "$bilimon_tmp" ]; then
 		mkdir -p "$bilimon_tmp"
@@ -105,8 +133,10 @@ close_in_five() {
 }
 
 stop() {
-	# 关闭bilimon进程
-	killall python
+	if [ ! -z "$(ps w | grep python | grep -v grep)" ]; then
+		echo_date "关闭监控进程..."
+		killall python
+	fi
 }
 
 case $1 in
@@ -152,7 +182,7 @@ trigger_once)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	trigger_once
+	trigger_once | tee -a $LOG_FILE
 	unset_lock
 	;;
 watch_dogs)
@@ -162,7 +192,7 @@ watch_dogs)
 	if [[ -f "$bilimon_tmp/traitors.txt" ]]; then
 		awk '{print "https://space.bilibili.com/" $0}' "$bilimon_tmp/traitors.txt" | tee -a $LOG_FILE
 	else
-		echo "当前狗库为空!" | tee -a $LOG_FILE
+		echo_date "当前狗库为空!" | tee -a $LOG_FILE
 	fi
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock

@@ -21,9 +21,9 @@ _get_type() {
 	local FWTYPE=$(nvram get extendno | grep koolshare)
 	if [ -d "/koolshare" ]; then
 		if [ -n "${FWTYPE}" ]; then
-			echo "koolshare官改固件"
+			echo "koolshare 官改固件"
 		else
-			echo "koolshare梅林改版固件"
+			echo "koolshare 梅林改版固件"
 		fi
 	else
 		if [ "$(uname -o | grep Merlin)" ]; then
@@ -54,18 +54,9 @@ exit_install() {
 
 # 判断路由架构和平台: koolshare固件, 并且linux版本大于等于4.1
 if [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -ge "41" ]; then
-	echo_date 机型: ${MODEL} $(_get_type) 符合安装要求, 进入下一步!
+	echo_date 机型: ${MODEL} $(_get_type) 符合安装要求, 开始安装插件!
 else
 	exit_install 1
-fi
-
-# 判断 Entware 是否已安装
-if [ -d "/opt" ]; then
-	echo_date 已检测到 Entware 环境, 开始安装插件!
-else
-	echo_date 未检测到 Entware 环境, 请先安装 Entware 插件!
-	rm -rf /tmp/${module}* >/dev/null 2>&1
-	exit 1
 fi
 
 # 判断固件UI类型
@@ -92,36 +83,43 @@ cp -rf /tmp/bilimon/res/* /koolshare/res/
 cp -rf /tmp/bilimon/uninstall.sh /koolshare/scripts/uninstall_bilimon.sh
 
 if [ "$ROG" == "1" ]; then
-	echo_date "安装ROG皮肤!"
+	echo_date "安装 ROG 皮肤!"
 	continue
 else
 	if [ "$TUF" == "1" ]; then
-		echo_date "安装TUF皮肤!"
+		echo_date "安装 TUF 皮肤!"
 		sed -i 's/3e030d/3e2902/g;s/91071f/92650F/g;s/680516/D0982C/g;s/cf0a2c/c58813/g;s/700618/74500b/g;s/530412/92650F/g' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
 	else
-		echo_date "安装ASUSWRT皮肤!"
+		echo_date "安装 ASUSWRT 皮肤!"
 		sed -i '/rogcss/d' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
 	fi
 fi
-export PATH=$PATH:/opt/bin/
+
 chmod +x /koolshare/scripts/bilimon*
 chmod +x /koolshare/scripts/uninstall_bilimon.sh
 
 # 离线安装用
 dbus set bilimon_version="$(cat $DIR/version)"
 dbus set softcenter_module_bilimon_version="$(cat $DIR/version)"
-dbus set softcenter_module_bilimon_description="B站粉丝监控工具"
+dbus set softcenter_module_bilimon_description="B站最近1K粉丝监控工具"
 dbus set softcenter_module_bilimon_install="1"
 dbus set softcenter_module_bilimon_name="bilimon"
-dbus set softcenter_module_bilimon_title="bilimon"
+dbus set softcenter_module_bilimon_title="BiliMon"
 
-# 安装运行环境
-sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
-opkg update
-opkg install python3-pip
-python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 判断 Entware 是否已安装
+if [ -d "/opt" ]; then
+	echo_date 已检测到 Entware 环境, 开始安装依赖包!
+	export PATH=$PATH:/opt/bin/
+	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
+	opkg update
+	opkg install python3-pip
+	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+	pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	echo_date "BiliMon 插件安装完毕!"
+
+else
+	echo_date "BiliMon 插件安装完毕, 但未检测到 Entware 环境, 请补充安装部署 Entware 插件!"
+fi
 
 # 完成
-echo_date "BiliMon插件安装完毕!"
 exit_install

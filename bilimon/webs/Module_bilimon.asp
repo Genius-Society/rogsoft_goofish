@@ -363,7 +363,7 @@
                                         </div>
                                         <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
                                         <div class="SimpleNote">
-                                            <li>B站粉丝监控工具 BiliMon</li>
+                                            <li>B站最近1K粉丝监控工具 BiliMon</li>
                                             <li style="color: #FC0;">请设置虚拟内存后再使用</li>
                                         </div>
                                         <div id="bilimon_main">
