@@ -1,14 +1,14 @@
-# bilibili-relation-monitor
+# Bilibili relation monitor
 [![license](https://img.shields.io/badge/license-Apache_2.0-99c711)](https://github.com/MuGemSt/bilimon/blob/master/LICENSE)
 
-监控最近 1K 粉丝动向：取关狗死全家！
+监控B站最近1K粉丝动向：取关狗死全家！
 
 ## Environment
 ```bash
 conda create -n py310 python=3.10 -y
 conda activate py310
 pip install -r requirements.txt
-# pip install -r ./bilimon/bin/requirements.txt
+pip install -r ./bilimon/bin/requirements.txt
 ```
 
 ## Build
