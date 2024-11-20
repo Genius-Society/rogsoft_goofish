@@ -67,24 +67,19 @@ fix_path() {
 start_bilimon() {
 	# 检查入参
 	if [[ -z $bilimon_period ]]; then
-		echo_date "请输入有效周期!"
-		return
+		close_in_five "请输入有效周期!"
 	fi
 	if [[ -z $bilimon_mail ]]; then
-		echo_date "请输入有效邮箱!"
-		return
+		close_in_five "请输入有效邮箱!"
 	fi
 	if [[ -z $bilimon_smtp ]]; then
-		echo_date "请输入有效SMTP密钥!"
-		return
+		close_in_five "请输入有效SMTP密钥!"
 	fi
 	if [[ -z $bilimon_cookie ]]; then
-		echo_date "请输入有效B站cookie!"
-		return
+		close_in_five "请输入有效B站cookie!"
 	fi
 	if [ -z $bilimon_tmp ] || [ ! -d $bilimon_tmp ]; then
-		echo_date "请输入有效缓存路径!"
-		return
+		close_in_five "请输入有效缓存路径!"
 	fi
 
 	# 插件开启的时候同步一次时间
@@ -98,10 +93,7 @@ start_bilimon() {
 		install_env
 		echo_date "Entware 环境可用!"
 	else
-		stop
-		dbus set bilimon_enable=0
-		echo_date "Entware 环境不可用, 请修复!"
-		return
+		close_in_five "Entware 环境不可用, 请修复!"
 	fi
 
 	# 加载B站cookie
@@ -150,8 +142,6 @@ trigger_once() {
 		install_env
 		echo_date "Entware 环境可用!"
 	else
-		stop
-		dbus set bilimon_enable=0
 		echo_date "Entware 环境不可用, 请修复!XU6J03M6"
 		return
 	fi
@@ -172,6 +162,8 @@ trigger_once() {
 }
 
 close_in_five() {
+	dbus set bilimon_enable=0
+	echo_date $1
 	echo_date "插件将在5秒后自动关闭!!"
 	local i=5
 	while [ $i -ge 0 ]; do
