@@ -277,6 +277,6 @@ if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]
 	fi
 
 	# 开启 BiliMon
-	start_bilimon
+	start_bilimon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
 fi
