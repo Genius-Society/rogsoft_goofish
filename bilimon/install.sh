@@ -105,6 +105,7 @@ dbus set softcenter_module_bilimon_description="B站最近1K粉丝监控工具"
 dbus set softcenter_module_bilimon_install="1"
 dbus set softcenter_module_bilimon_name="bilimon"
 dbus set softcenter_module_bilimon_title="BiliMon"
+dbus set bilimon_enable=0
 
 # 判断 Entware 是否已安装
 if [ -d "/opt" ]; then

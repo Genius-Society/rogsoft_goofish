@@ -5,6 +5,7 @@ eval $(dbus export bilimon)
 LOG_FILE=/tmp/upload/bilimon_log.txt
 LOCK_FILE=/var/lock/bilimon.lock
 alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
+export PATH=$PATH:/opt/bin/
 
 set_lock() {
 	exec 1000>"$LOCK_FILE"
@@ -42,6 +43,7 @@ fun_wan_start() {
 	fi
 }
 
+# 安装运行环境
 install_env() {
 	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 	opkg update
@@ -50,13 +52,46 @@ install_env() {
 	pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 }
 
+# 自动修复路由器重启导致的盘符变化
+fix_path() {
+	for dir in /mnt/*/; do
+		if [ -d "$dir" ]; then
+			sub=$(echo "$1" | cut -d'/' -f4-)
+			if [ -d "$dir$sub" ]; then
+				echo "$dir$sub"
+			fi
+		fi
+	done
+}
+
 start_bilimon() {
+	# 检查入参
+	if [[ -z $bilimon_period ]]; then
+		echo_date "请输入有效周期!"
+		return
+	fi
+	if [[ -z $bilimon_mail ]]; then
+		echo_date "请输入有效邮箱!"
+		return
+	fi
+	if [[ -z $bilimon_smtp ]]; then
+		echo_date "请输入有效SMTP密钥!"
+		return
+	fi
+	if [[ -z $bilimon_cookie ]]; then
+		echo_date "请输入有效B站cookie!"
+		return
+	fi
+	if [ -z $bilimon_tmp ] || [ ! -d $bilimon_tmp ]; then
+		echo_date "请输入有效缓存路径!"
+		return
+	fi
+
+	# 检查运行环境
 	echo_date "检查 Entware 环境..."
 	if [ -d "/opt" ]; then
-		export PATH=$PATH:/opt/bin/
 		install_env
 		echo_date "Entware 环境可用!"
-
 	else
 		stop
 		dbus set bilimon_enable=0
@@ -64,50 +99,64 @@ start_bilimon() {
 		return
 	fi
 
-	if [ ! -d "$bilimon_tmp" ]; then
-		mkdir -p "$bilimon_tmp"
-	fi
-
+	# 加载B站cookie
 	if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
 		echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
 	fi
 
-	if [ "${bilimon_enable}" == "1" ]; then
-		nohup python /koolshare/bilimon/bilimon.py \
-			--clock 1 \
-			--period "$bilimon_period" \
-			--email "$bilimon_mail" \
-			--smtp "$bilimon_smtp" \
-			--tmp "$bilimon_tmp" \
-			>>$LOG_FILE 2>&1 &
+	# 开启监控
+	nohup python /koolshare/bilimon/bilimon.py \
+		--clock 1 \
+		--period "$bilimon_period" \
+		--email "$bilimon_mail" \
+		--smtp "$bilimon_smtp" \
+		--tmp "$bilimon_tmp" \
+		>>$LOG_FILE 2>&1 &
 
-		echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
-	fi
+	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
 
 trigger_once() {
-	echo_date "检查 Entware 环境..."
-	if [ -d "/opt" ]; then
-		export PATH=$PATH:/opt/bin/
-		install_env
-		echo_date "Entware 环境可用!"
-
-	else
-		stop
-		dbus set bilimon_enable=0
-		echo_date "Entware 环境不可用, 请修复!"
-		echo XU6J03M6
+	# 检查入参
+	if [[ -z $bilimon_period ]]; then
+		echo_date "请输入有效周期!XU6J03M6"
+		return
+	fi
+	if [[ -z $bilimon_mail ]]; then
+		echo_date "请输入有效邮箱!XU6J03M6"
+		return
+	fi
+	if [[ -z $bilimon_smtp ]]; then
+		echo_date "请输入有效SMTP密钥!XU6J03M6"
+		return
+	fi
+	if [[ -z $bilimon_cookie ]]; then
+		echo_date "请输入有效B站cookie!XU6J03M6"
+		return
+	fi
+	if [ -z $bilimon_tmp ] || [ ! -d $bilimon_tmp ]; then
+		echo_date "请输入有效缓存路径!XU6J03M6"
 		return
 	fi
 
-	if [ ! -d "$bilimon_tmp" ]; then
-		mkdir -p "$bilimon_tmp"
+	# 检查运行环境
+	echo_date "检查 Entware 环境..."
+	if [ -d "/opt" ]; then
+		install_env
+		echo_date "Entware 环境可用!"
+	else
+		stop
+		dbus set bilimon_enable=0
+		echo_date "Entware 环境不可用, 请修复!XU6J03M6"
+		return
 	fi
 
+	# 加载B站cookie
 	if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
 		echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
 	fi
 
+	# 开启单次触发
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 0 \
 		--period "$bilimon_period" \
@@ -132,6 +181,7 @@ close_in_five() {
 }
 
 stop() {
+	# 关闭监控进程
 	if [ ! -z "$(ps w | grep python | grep -v grep)" ]; then
 		echo_date "关闭监控进程..."
 		killall python
@@ -198,6 +248,36 @@ watch_dogs)
 	;;
 esac
 
+# 重启自启时需初始化
+if [[ -z $bilimon_enable ]]; then
+	bilimon_enable=$(dbus get bilimon_enable)
+fi
+
+# 当开关已打开且没有正在运行的进程
 if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
+	# 初始化其余变量
+	if [[ -z $bilimon_period ]]; then
+		bilimon_period=$(dbus get bilimon_period)
+	fi
+	if [[ -z $bilimon_mail ]]; then
+		bilimon_mail=$(dbus get bilimon_mail)
+	fi
+	if [[ -z $bilimon_smtp ]]; then
+		bilimon_smtp=$(dbus get bilimon_smtp)
+	fi
+	if [[ -z $bilimon_tmp ]]; then
+		bilimon_tmp=$(dbus get bilimon_tmp)
+	fi
+
+	# 修复重启导致的缓存目录盘符变化
+	fixed_bilimon_tmp=$(fix_path $bilimon_tmp)
+	if [ ! -z $fixed_bilimon_tmp ]; then
+		bilimon_tmp=$fixed_bilimon_tmp
+		if [ $(dbus get bilimon_tmp) != $bilimon_tmp ]; then
+			dbus set bilimon_tmp=$bilimon_tmp
+		fi
+	fi
+
+	# 开启 BiliMon
 	start_bilimon
 fi
