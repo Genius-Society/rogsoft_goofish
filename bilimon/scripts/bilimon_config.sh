@@ -78,8 +78,21 @@ start_bilimon() {
 	if [[ -z $bilimon_cookie ]]; then
 		close_in_five "请输入有效B站cookie!"
 	fi
-	if [ -z $bilimon_tmp ] || [ ! -d $bilimon_tmp ]; then
+	if [ -z $bilimon_tmp ]; then
 		close_in_five "请输入有效缓存路径!"
+	fi
+
+	if [ ! -d $bilimon_tmp ]; then
+		# 修复重启导致的缓存目录盘符变化
+		echo_date "检查缓存路径..."
+		fixed_bilimon_tmp=$(fix_path $bilimon_tmp)
+		if [ $fixed_bilimon_tmp != $bilimon_tmp ] && [ -d $fixed_bilimon_tmp ]; then
+			bilimon_tmp=$fixed_bilimon_tmp
+			dbus set bilimon_tmp=$bilimon_tmp
+			echo_date "缓存路径已自动修复!"
+		else
+			close_in_five "请输入有效缓存路径!"
+		fi
 	fi
 
 	# 插件开启的时候同步一次时间
@@ -254,14 +267,6 @@ if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]
 	bilimon_mail=$(dbus get bilimon_mail)
 	bilimon_smtp=$(dbus get bilimon_smtp)
 	bilimon_tmp=$(dbus get bilimon_tmp)
-	# 修复重启导致的缓存目录盘符变化
-	fixed_bilimon_tmp=$(fix_path $bilimon_tmp)
-	if [ ! -z $fixed_bilimon_tmp ]; then
-		bilimon_tmp=$fixed_bilimon_tmp
-		if [ $(dbus get bilimon_tmp) != $bilimon_tmp ]; then
-			dbus set bilimon_tmp=$bilimon_tmp
-		fi
-	fi
 	# 开启 BiliMon
 	start_bilimon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
