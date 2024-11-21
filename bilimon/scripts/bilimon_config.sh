@@ -43,7 +43,7 @@ fun_wan_start() {
 	fi
 }
 
-# 安装运行环境
+# 安装\检查运行环境
 install_env() {
 	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 	opkg update
@@ -57,7 +57,7 @@ fix_path() {
 	for dir in /mnt/*/; do
 		if [ -d "$dir" ]; then
 			sub=$(echo "$1" | cut -d'/' -f4-)
-			if [ -d "$dir$sub" ]; then
+			if [ ! -z $sub ] [ -d "$dir$sub" ]; then
 				echo "$dir$sub"
 			fi
 		fi
@@ -246,27 +246,14 @@ watch_dogs)
 	;;
 esac
 
-# 重启自启时需初始化
-if [[ -z $bilimon_enable ]]; then
-	bilimon_enable=$(dbus get bilimon_enable)
-fi
-
-# 当开关已打开且没有正在运行的进程
+# 重启自启时触发
+bilimon_enable=$(dbus get bilimon_enable)
 if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
-	# 初始化其余变量
-	if [[ -z $bilimon_period ]]; then
-		bilimon_period=$(dbus get bilimon_period)
-	fi
-	if [[ -z $bilimon_mail ]]; then
-		bilimon_mail=$(dbus get bilimon_mail)
-	fi
-	if [[ -z $bilimon_smtp ]]; then
-		bilimon_smtp=$(dbus get bilimon_smtp)
-	fi
-	if [[ -z $bilimon_tmp ]]; then
-		bilimon_tmp=$(dbus get bilimon_tmp)
-	fi
-
+	# 初始化变量
+	bilimon_period=$(dbus get bilimon_period)
+	bilimon_mail=$(dbus get bilimon_mail)
+	bilimon_smtp=$(dbus get bilimon_smtp)
+	bilimon_tmp=$(dbus get bilimon_tmp)
 	# 修复重启导致的缓存目录盘符变化
 	fixed_bilimon_tmp=$(fix_path $bilimon_tmp)
 	if [ ! -z $fixed_bilimon_tmp ]; then
@@ -275,7 +262,6 @@ if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]
 			dbus set bilimon_tmp=$bilimon_tmp
 		fi
 	fi
-
 	# 开启 BiliMon
 	start_bilimon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
