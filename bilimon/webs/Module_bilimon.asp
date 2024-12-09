@@ -421,10 +421,10 @@
                                                 <tr>
                                                     <th>SMTP密钥<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input style="width:300px;" type="text" class="input_ss_table"
-                                                            id="bilimon_feat_smtp" name="bilimon_feat_smtp"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off">
+                                                        <input style="width:300px;" type="password"
+                                                            class="input_ss_table" id="bilimon_feat_smtp"
+                                                            name="bilimon_feat_smtp" maxlength="100" value=""
+                                                            autocorrect="off" autocapitalize="off">
                                                     </td>
                                                 </tr>
                                                 <tr>
