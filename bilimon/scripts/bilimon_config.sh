@@ -192,9 +192,12 @@ close_in_five() {
 
 stop() {
 	# 关闭监控进程
-	if [ ! -z "$(ps w | grep python | grep -v grep)" ]; then
+	pids=$(ps | grep "python" | grep "bilimon.py" | awk '{print $1}')
+	if [ ! -z $pids ]; then
 		echo_date "关闭监控进程..."
-		killall python
+		for pid in $pids; do
+			kill "$pid"
+		done
 	fi
 	fun_wan_start
 }
