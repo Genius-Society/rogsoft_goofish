@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options
 
 USER_DATA = "user_data"
 CHROME = "chrome-win64"
-CHROME_URL = f"https://mugem.asuscomm.cn:81/d/archive/mirrors/chrome/{CHROME}.zip"
+CHROME_URL = f"https://genius-society.asuscomm.cn:81/d/archive/mirrors/{CHROME}.zip"
 
 
 def download_file(url: str, folder_path="./"):
