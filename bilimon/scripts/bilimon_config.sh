@@ -109,11 +109,6 @@ start_bilimon() {
 		close_in_five "Entware 环境不可用, 请修复!"
 	fi
 
-	# 加载B站cookie
-	if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
-		echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
-	fi
-
 	# 开启周期监控
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 1 \
@@ -121,6 +116,7 @@ start_bilimon() {
 		--email "$bilimon_mail" \
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
+		--cookie "$bilimon_cookie" \
 		>>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
 
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
@@ -159,11 +155,6 @@ trigger_once() {
 		return
 	fi
 
-	# 加载B站cookie
-	# if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
-	# 	echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
-	# fi
-
 	# 开启单次触发
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 0 \
@@ -171,6 +162,7 @@ trigger_once() {
 		--email "$bilimon_mail" \
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
+		--cookie "$bilimon_cookie" \
 		>>$LOG_FILE 2>&1 &
 }
 

@@ -21,29 +21,21 @@ parser.add_argument("--period", type=int, help="Specify the period for BiliMon."
 parser.add_argument("--email", type=str, help="Specify the email address for BiliMon.")
 parser.add_argument("--smtp", type=str, help="Specify the SMTP server for BiliMon.")
 parser.add_argument("--tmp", type=str, help="Specify the temporary folder for BiliMon.")
+parser.add_argument("--cookie", type=str, help="Specify the cookie for BiliMon.")
 
 # 解析命令行参数
 args = parser.parse_args()
-
-
-def read_text(file_path: str):
-    try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            return file.read().strip()
-
-    except Exception as e:
-        print(f"读取文件时发生错误: {e}")
-        return None
-
-
-GLOBAL_COOKIE = read_text(f"{args.tmp}/cookie.txt")
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
 
 def send_email(
     content,
     subject="按罪人名单降下终末",
-    title="白嫖完再取关? 什么人啊? 拉黑了",
+    title="监测到取关狗",
+    smtp_server="smtp.qq.com",
+    smtp_port=587,
+    sender_email=args.email,
+    password=args.smtp,
 ):
     # 邮件内容
     body = f"""
@@ -60,12 +52,6 @@ def send_email(
     msg["Subject"] = Header(subject, "utf-8")
     msg["From"] = args.email
     msg["To"] = args.email
-
-    # 发送邮件
-    smtp_server = "smtp.qq.com"
-    smtp_port = 587
-    sender_email = args.email
-    password = args.smtp
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
@@ -102,8 +88,8 @@ def parse_cookie(cookie_str: str):
 
 
 def refresh_cookie():
-    header = {"User-Agent": USER_AGENT, "Cookie": GLOBAL_COOKIE}
-    uid, _, _ = parse_cookie(GLOBAL_COOKIE)
+    header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
+    uid, _, _ = parse_cookie(args.cookie)
     try:
         response = requests.get(
             f"https://api.bilibili.com/x/relation/followers?vmid={uid}",
@@ -116,8 +102,8 @@ def refresh_cookie():
 
 
 def get_fans(page):
-    header = {"User-Agent": USER_AGENT, "Cookie": GLOBAL_COOKIE}
-    uid, _, _ = parse_cookie(GLOBAL_COOKIE)
+    header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
+    uid, _, _ = parse_cookie(args.cookie)
 
     try:
         # 使用 requests 库下载 JSON 数据
@@ -185,8 +171,8 @@ def upd_json(new_total: int, new_fans: dict, fans_json="fans.json"):
 
 
 def get_total_fans():
-    header = {"User-Agent": USER_AGENT, "Cookie": GLOBAL_COOKIE}
-    uid, _, _ = parse_cookie(GLOBAL_COOKIE)
+    header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
+    uid, _, _ = parse_cookie(args.cookie)
 
     try:
         # 使用 requests 库下载 JSON 数据
