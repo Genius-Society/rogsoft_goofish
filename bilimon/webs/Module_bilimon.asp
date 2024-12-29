@@ -87,7 +87,7 @@
         var params_inp = [];
         var refresh_flag;
         var count_down;
-
+        var _responseLen;
         function init() {
             show_menu(menu_hook);
             get_status();

@@ -121,7 +121,7 @@ start_bilimon() {
 		--email "$bilimon_mail" \
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
-		>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
+		>>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
 
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
