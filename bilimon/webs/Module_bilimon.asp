@@ -313,6 +313,58 @@
             });
         }
 
+        function get_run_log() {
+            if (STATUS_FLAG == 0) return;
+            $.ajax({
+                url: '/_temp/bilimon_run_log.txt',
+                type: 'GET',
+                dataType: 'html',
+                async: true,
+                cache: false,
+                success: function (response) {
+                    var retArea = E("log_content_bilimon");
+                    if (_responseLen == response.length) {
+                        noChange++;
+                    } else {
+                        noChange = 0;
+                    }
+                    if (noChange > 10) {
+                        return false;
+                    } else {
+                        setTimeout("get_run_log();", 1500);
+                    }
+                    retArea.value = response;
+
+                    if (E("bilimon_stop_log").checked == false) {
+                        retArea.scrollTop = retArea.scrollHeight;
+                    }
+                    _responseLen = response.length;
+                },
+                error: function (xhr) {
+                    E("log_pannel_title").innerHTML = "暂无日志信息 ...";
+                    E("log_content_bilimon").value = "日志文件为空, 请关闭本窗口!";
+                    setTimeout("get_run_log();", 5000);
+                }
+            });
+        }
+        function show_log_pannel() {
+            document.scrollingElement.scrollTop = 0;
+            E("log_pannel_div").style.visibility = "visible";
+            var page_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            var page_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            var log_h = E("log_pannel_table").clientHeight;
+            var log_w = E("log_pannel_table").clientWidth;
+            var log_h_offset = (page_h - log_h) / 2;
+            var log_w_offset = (page_w - log_w) / 2;
+            $('#log_pannel_table').offset({ top: log_h_offset, left: log_w_offset });
+            STATUS_FLAG = 1;
+            get_run_log();
+        }
+        function hide_log_pannel() {
+            E("log_pannel_div").style.visibility = "hidden";
+            STATUS_FLAG = 0;
+        }
+
         function menu_hook(title, tab) {
             tabtitle[tabtitle.length - 1] = new Array("", "BiliMon");
             tablink[tablink.length - 1] = new Array("", "Module_bilimon.asp");
@@ -337,6 +389,29 @@
                     </div>
                     <div id="ok_button" class="apply_gen" style="background:#000;visibility:hidden;">
                         <input id="ok_button1" class="button_gen" type="button" onclick="hideWBLoadingBar()" value="确定">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="log_pannel_div" class="popup_bar_bg_ks" style="z-index: 200;">
+        <table cellpadding="5" cellspacing="0" id="log_pannel_table" class="loadingBarBlock" style="width:960px"
+            align="center">
+            <tr>
+                <td height="100">
+                    <div style="text-align: center;font-size: 18px;color: #99FF00;padding: 10px;font-weight: bold;">
+                        bilimon日志信息</div>
+                    <div style="margin-left:15px"><i>🗒️此处展示bilimon程序的运行日志...</i></div>
+                    <div
+                        style="margin-left:15px;margin-right:15px;margin-top:10px;outline: 1px solid #3c3c3c;overflow:hidden">
+                        <textarea cols="50" rows="32" wrap="off" readonly="readonly" id="log_content_bilimon"
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                            style="border:1px solid #000;width:99%; font-family:'Lucida Console'; font-size:11px;background:transparent;color:#FFFFFF;outline: none;padding-left:5px;padding-right:22px;line-height:1.3;overflow-x:hidden;white-space:break-spaces;"></textarea>
+                    </div>
+                    <div id="ok_button_bilimon" class="apply_gen" style="background:#000;">
+                        <input class="button_gen" type="button" onclick="hide_log_pannel()" value="返回主界面">
+                        <input style="margin-left:10px" type="checkbox" id="bilimon_stop_log">
+                        <lable>&nbsp;暂停日志刷新</lable>
                     </div>
                 </td>
             </tr>
@@ -398,7 +473,7 @@
                                                                 </div>
                                                             </label>
                                                         </div>
-                                                        <div style="float: right;margin-top:5px;margin-right:30px;">
+                                                        <div style="float: right;margin-top:5px;margin-right:5px;">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="get_log(1)"
                                                                 style="cursor: pointer;margin-left:5px;border:none">查看日志</a>
@@ -407,7 +482,12 @@
                                                 </tr>
                                                 <tr>
                                                     <th>运行状态</th>
-                                                    <td><span id="bilimon_status"></span></td>
+                                                    <td><span id="bilimon_status"></span>
+                                                        <div style="float: right;margin-right:5px;">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="show_log_pannel()">bilimon运行日志</a>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <th>刷新周期(小时)<span style="color: red;"> * </span></th>

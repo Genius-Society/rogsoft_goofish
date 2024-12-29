@@ -121,7 +121,7 @@ start_bilimon() {
 		--email "$bilimon_mail" \
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
-		>>$LOG_FILE 2>&1 &
+		>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
 
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
@@ -160,9 +160,9 @@ trigger_once() {
 	fi
 
 	# 加载B站cookie
-	if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
-		echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
-	fi
+	# if [ ! -f "$bilimon_tmp/cookie.txt" ] || [ $(<"$bilimon_tmp/cookie.txt") != "$bilimon_cookie" ]; then
+	# 	echo "$bilimon_cookie" >"$bilimon_tmp/cookie.txt"
+	# fi
 
 	# 开启单次触发
 	nohup python /koolshare/bilimon/bilimon.py \

@@ -74,6 +74,14 @@ if [ "${MODEL}" == "TUF-AX3000" ]; then
 	TUF=1
 fi
 
+# 关闭进程
+pids=$(ps | grep "python" | grep "bilimon.py" | awk '{print $1}')
+if [ ! -z $pids ]; then
+	for pid in $pids; do
+		kill "$pid"
+	done
+fi
+
 # 安装插件
 mkdir -p /koolshare/bilimon/
 cp -rf /tmp/bilimon/bin/* /koolshare/bilimon/
@@ -116,7 +124,7 @@ if [ -d "/opt" ]; then
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 	pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 	echo_date "BiliMon 插件安装完毕!"
-
+	sh /koolshare/scripts/bilimon_config.sh
 else
 	echo_date "BiliMon 插件安装完毕, 但未检测到 Entware 环境, 请补充安装部署 Entware 插件!"
 fi

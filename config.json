@@ -1,7 +1,7 @@
 {
     "description": "B站最近1K粉丝监控工具",
     "home_url": "Module_bilimon.asp",
-    "md5": "9f6bf4aeb4c523575480f5a25be1121f",
+    "md5": "37cf59de3b5ff25ae7c9113c73fcff00",
     "module": "bilimon",
     "title": "BiliMon",
     "version": "0.1"
