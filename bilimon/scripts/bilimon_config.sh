@@ -265,6 +265,8 @@ esac
 # 重启自启时触发
 bilimon_enable=$(dbus get bilimon_enable)
 if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
+	set_lock
+	true >$LOG_FILE
 	# 初始化变量
 	bilimon_period=$(dbus get bilimon_period)
 	bilimon_mail=$(dbus get bilimon_mail)
@@ -273,4 +275,5 @@ if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]
 	# 开启 BiliMon
 	start_bilimon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
+	unset_lock
 fi

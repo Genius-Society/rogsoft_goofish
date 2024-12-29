@@ -77,6 +77,7 @@ fi
 # 关闭进程
 pids=$(ps | grep "python" | grep "bilimon.py" | awk '{print $1}')
 if [ ! -z $pids ]; then
+	echo_date "关闭当前进程..."
 	for pid in $pids; do
 		kill "$pid"
 	done
