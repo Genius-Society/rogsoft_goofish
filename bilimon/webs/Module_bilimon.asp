@@ -15,10 +15,10 @@
     <link rel="stylesheet" type="text/css" href="css/element.css">
     <link rel="stylesheet" type="text/css" href="/res/softcenter.css">
     <link rel="stylesheet" type="text/css" href="/res/layer/theme/default/layer.css">
+    <script language="JavaScript" type="text/javascript" src="/js/jquery.js"></script>
     <script type="text/javascript" src="/res/Browser.js"></script>
     <script type="text/javascript" src="/res/softcenter.js"></script>
     <script type="text/javascript" src="/state.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/js/jquery.js"></script>
     <script type="text/javascript" src="/general.js"></script>
     <script type="text/javascript" src="/popup.js"></script>
     <style>
@@ -68,6 +68,14 @@
 
         #bilimon_main {
             border-width: 0.5px;
+        }
+
+        #bilimon_feat_cookie {
+            -webkit-text-security: square;
+        }
+
+        #bilimon_feat_cookie:focus {
+            -webkit-text-security: none;
         }
 
         /* W3C rogcss */
@@ -412,10 +420,13 @@
                                                 <tr>
                                                     <th>提示邮箱(QQ/Foxmail)<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input style="width:300px;" type="text" class="input_ss_table"
-                                                            id="bilimon_feat_mail" name="bilimon_feat_mail"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off">
+                                                        <input style="width:300px;" type="password"
+                                                            class="input_ss_table" id="bilimon_feat_mail"
+                                                            name="bilimon_feat_mail" maxlength="100" value=""
+                                                            autocorrect="off" autocapitalize="off" readonly
+                                                            onblur="switchType(this, false);"
+                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
+                                                            value="">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -424,7 +435,10 @@
                                                         <input style="width:300px;" type="password"
                                                             class="input_ss_table" id="bilimon_feat_smtp"
                                                             name="bilimon_feat_smtp" maxlength="100" value=""
-                                                            autocorrect="off" autocapitalize="off">
+                                                            autocorrect="off" autocapitalize="off" readonly
+                                                            onblur="switchType(this, false);"
+                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
+                                                            value="">
                                                     </td>
                                                 </tr>
                                                 <tr>
