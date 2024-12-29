@@ -28,6 +28,14 @@ args = parser.parse_args()
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
 
+def upd_log(txt):
+    if int(args.clock) == 1:
+        with open("/tmp/upload/bilimon_run_log.txt", "a", encoding="utf-8") as file:
+            file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S] ") + txt + "\n")
+    else:
+        print(txt)
+
+
 def send_email(
     content,
     subject="按罪人名单降下终末",
@@ -59,13 +67,13 @@ def send_email(
             server.login(sender_email, password)
             server.sendmail(sender_email, [msg["To"]], msg.as_string())
 
-        print("邮件发送成功")
+        upd_log("邮件发送成功")
 
     except smtplib.SMTPException as e:
         if e.smtp_code == -1:
-            print("邮件发送成功")
+            upd_log("邮件发送成功")
         else:
-            print(f"邮件发送失败: {e}")
+            upd_log(f"邮件发送失败: {e}")
 
 
 def parse_cookie(cookie_str: str):
@@ -98,7 +106,7 @@ def refresh_cookie():
         response.raise_for_status()
 
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}...")
+        upd_log(f"Error: {e}...")
 
 
 def get_fans(page):
@@ -125,7 +133,7 @@ def get_fans(page):
 
         else:
             msg = json_data["message"]
-            print(msg)
+            upd_log(msg)
             send_email(
                 msg,
                 subject="可能需要重新手动扫码登陆",
@@ -134,7 +142,7 @@ def get_fans(page):
             exit()
 
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}, retrying...")
+        upd_log(f"Error: {e}, retrying...")
         return get_fans(page, uid)
 
 
@@ -167,7 +175,7 @@ def upd_json(new_total: int, new_fans: dict, fans_json="fans.json"):
             indent=4,
         )
 
-    print(f"{fans_json} is updated!")
+    upd_log(f"{fans_json} is updated!")
 
 
 def get_total_fans():
@@ -187,7 +195,7 @@ def get_total_fans():
         return json_data["data"]["follower"]
 
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}, retrying...")
+        upd_log(f"Error: {e}, retrying...")
         return get_total_fans()
 
 
@@ -233,7 +241,7 @@ def upd_fans(fans_json=f"{args.tmp}/fans.json"):
                 send_email(content)
 
     else:
-        print("No unfollower found.")
+        upd_log("No unfollower found.")
 
 
 def upd():
@@ -242,27 +250,11 @@ def upd():
         upd_fans()
     else:
         refresh_cookie()
-        print("当前处于免打扰时间段")
-
-
-def monitor(trigger_time="12:50"):
-    print(f"监控开启中...每日触发时间: {trigger_time}")
-    schedule.every().day.at(trigger_time).do(upd)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-def min_monitor(period=2):
-    print(f"监控开启中...每 {period} 分钟触发一次")
-    schedule.every(period).minutes.do(upd)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+        upd_log("当前处于免打扰时间段")
 
 
 def hour_monitor(period=2):
-    print(f"监控开启中...每 {period} 小时触发一次")
+    upd_log(f"监控开启中...每 {period} 小时触发一次")
     schedule.every(period).hours.do(upd)
     while True:
         schedule.run_pending()
@@ -275,4 +267,4 @@ if __name__ == "__main__":
     else:
         upd_fans()
 
-    print("XU6J03M6")
+    upd_log("XU6J03M6")

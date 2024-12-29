@@ -264,6 +264,7 @@ if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]
 	bilimon_mail=$(dbus get bilimon_mail)
 	bilimon_smtp=$(dbus get bilimon_smtp)
 	bilimon_tmp=$(dbus get bilimon_tmp)
+	bilimon_cookie=$(dbus get bilimon_cookie)
 	# 开启 BiliMon
 	start_bilimon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
