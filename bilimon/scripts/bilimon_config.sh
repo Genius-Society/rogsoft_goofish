@@ -110,6 +110,7 @@ start_bilimon() {
 	fi
 
 	# 开启周期监控
+	rm -rf "/tmp/upload/bilimon_run_log.txt"
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 1 \
 		--period "$bilimon_period" \
@@ -117,7 +118,7 @@ start_bilimon() {
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
 		--cookie "$bilimon_cookie" \
-		>>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
+		>/dev/null 2>&1 &
 
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
