@@ -215,6 +215,25 @@
             });
         }
 
+        function fixenv() {
+            get_log(1);
+            var dbus_new = {};
+            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
+            E("bilimon_apply").disabled = true;
+            var id = parseInt(Math.random() * 100000000);
+            var postData = { "id": id, "method": "bilimon_config.sh", "params": ["fix_env"], "fields": dbus_new };
+            $.ajax({
+                type: "POST",
+                url: "/_api/",
+                data: JSON.stringify(postData),
+                dataType: "json",
+                success: function (response) {
+                    get_log(1);
+                    E("bilimon_apply").disabled = false;
+                }
+            });
+        }
+
         function save() {
             var dbus_new = {};
             for (var i = 0; i < params_chk.length; i++) {
@@ -550,9 +569,17 @@
                                                 <tr id="bilimon_traitor">
                                                     <th>取关狗名单</th>
                                                     <td>
-                                                        <a type="button" id="bilimon_trigger" class="ks_btn"
+                                                        <a type="button" id="bilimon_traitor" class="ks_btn"
                                                             href="javascript:void(0);" onclick="watchdog()"
                                                             style="border:none">取关狗名单</a>
+                                                    </td>
+                                                </tr>
+                                                <tr id="bilimon_env">
+                                                    <th>修复运行环境</th>
+                                                    <td>
+                                                        <a type="button" id="bilimon_env" class="ks_btn"
+                                                            href="javascript:void(0);" onclick="fixenv()"
+                                                            style="border:none">修复运行环境</a>
                                                     </td>
                                                 </tr>
                                             </table>

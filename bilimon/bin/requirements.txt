@@ -1,3 +1,3 @@
-tqdm
 schedule
 requests
+bilibili-api-python==16.3

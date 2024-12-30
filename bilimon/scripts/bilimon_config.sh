@@ -45,11 +45,13 @@ fun_wan_start() {
 
 # 安装\检查运行环境
 install_env() {
+	echo "修复 Python 运行环境..."
 	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 	opkg update
 	opkg install python3-pip
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
 	pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	echo "修复完毕!"
 }
 
 # 自动修复路由器重启导致的盘符变化
@@ -102,11 +104,8 @@ start_bilimon() {
 
 	# 检查运行环境
 	echo_date "检查 Entware 环境..."
-	if [ -d "/opt" ]; then
-		install_env
-		echo_date "Entware 环境可用!"
-	else
-		close_in_five "Entware 环境不可用, 请修复!"
+	if [ ! -d "/opt" ]; then
+		close_in_five "Entware 环境不可用, 请先安装 Entware 插件!"
 	fi
 
 	# 开启周期监控
@@ -118,7 +117,7 @@ start_bilimon() {
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
 		--cookie "$bilimon_cookie" \
-		>/dev/null 2>&1 &
+		>>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
 
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
@@ -148,11 +147,8 @@ trigger_once() {
 
 	# 检查运行环境
 	echo_date "检查 Entware 环境..."
-	if [ -d "/opt" ]; then
-		install_env
-		echo_date "Entware 环境可用!"
-	else
-		echo_date "Entware 环境不可用, 请修复!XU6J03M6"
+	if [ ! -d "/opt" ]; then
+		echo_date "Entware 环境不可用, 请先安装 Entware 插件!XU6J03M6"
 		return
 	fi
 
@@ -250,6 +246,14 @@ watch_dogs)
 	else
 		echo_date "当前狗库为空!" | tee -a $LOG_FILE
 	fi
+	echo XU6J03M6 | tee -a $LOG_FILE
+	unset_lock
+	;;
+fix_env)
+	set_lock
+	true >$LOG_FILE
+	http_response "$1"
+	install_env | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;

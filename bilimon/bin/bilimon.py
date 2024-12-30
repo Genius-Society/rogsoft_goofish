@@ -3,6 +3,7 @@ import math
 import time
 import json
 import random
+import asyncio
 import smtplib
 import argparse
 import requests
@@ -11,6 +12,7 @@ from tqdm import tqdm
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
+from bilibili_api import user, Credential
 
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="BiliMon configuration script.")
@@ -76,31 +78,38 @@ def send_email(
             upd_log(f"邮件发送失败: {e}")
 
 
-def parse_cookie(cookie_str: str):
+def parse_cookie(cookies: str):
     try:
-        myuid = cookie_str.split("DedeUserID=")[1].split(";")[0]
-        csrf = cookie_str.split("bili_jct=")[1].split(";")[0]
-        cookies = {
-            cookie.split("=")[0]: cookie.split("=")[1]
-            for cookie in cookie_str.split("; ")
-        }
-        return myuid, csrf, cookies
+        UID = cookies.split("DedeUserID=")[1].split(";")[0]
+        SESSDATA = cookies.split("SESSDATA=")[1].split(";")[0]
+        BILI_JCT = cookies.split("bili_jct=")[1].split(";")[0]
+        BUVID3 = cookies.split("buvid3=")[1].split(";")[0]
+        return UID, SESSDATA, BILI_JCT, BUVID3
 
     except Exception as e:
         send_email(
-            f"请确保 cookie.txt 存在且内容有效: {e}",
-            subject="cookie 文件缺失或内容无效",
+            f"请确保 cookie 存在且内容有效: {e}",
+            subject="cookie 内容缺失或内容无效",
             title="cookie 解析异常",
         )
         exit()
 
 
+UID, SESSDATA, BILI_JCT, BUVID3 = parse_cookie(args.cookie)
+if not (UID and SESSDATA and BILI_JCT and BUVID3):
+    send_email(
+        f"请确保 cookie 存在且内容有效",
+        subject="cookie 内容缺失或内容无效",
+        title="cookie 解析异常",
+    )
+    exit()
+
+
 def refresh_cookie():
     header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
-    uid, _, _ = parse_cookie(args.cookie)
     try:
         response = requests.get(
-            f"https://api.bilibili.com/x/relation/followers?vmid={uid}",
+            f"https://api.bilibili.com/x/relation/followers?vmid={UID}",
             headers=header,
         )
         response.raise_for_status()
@@ -111,12 +120,10 @@ def refresh_cookie():
 
 def get_fans(page):
     header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
-    uid, _, _ = parse_cookie(args.cookie)
-
     try:
         # 使用 requests 库下载 JSON 数据
         response = requests.get(
-            f"https://api.bilibili.com/x/relation/followers?vmid={uid}&pn={page}",
+            f"https://api.bilibili.com/x/relation/followers?vmid={UID}&pn={page}",
             headers=header,
         )
         response.raise_for_status()  # 检查是否成功获取数据
@@ -143,10 +150,10 @@ def get_fans(page):
 
     except requests.exceptions.RequestException as e:
         upd_log(f"Error: {e}, retrying...")
-        return get_fans(page, uid)
+        return get_fans(page, UID)
 
 
-def get_folowers():
+def get_followers():
     fans, pages = get_fans(page=1)
     for i in tqdm(range(2, pages + 1), desc="Scanning followers..."):
         time.sleep(random.uniform(0.5, 1))
@@ -166,10 +173,10 @@ def save_traitors(traitors: list, file_folder=args.tmp):
             file.write(f"{url}\n")
 
 
-def upd_json(new_total: int, new_fans: dict, fans_json="fans.json"):
+def upd_json(new_fans: list, fans_json=f"{args.tmp}/fans.json"):
     with open(fans_json, "w", encoding="utf-8") as file:
         json.dump(
-            {"total": new_total, "fans1000": new_fans},
+            {"total": len(new_fans), "fans1000": new_fans},
             file,
             ensure_ascii=False,
             indent=4,
@@ -178,55 +185,42 @@ def upd_json(new_total: int, new_fans: dict, fans_json="fans.json"):
     upd_log(f"{fans_json} is updated!")
 
 
-def get_total_fans():
-    header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
-    uid, _, _ = parse_cookie(args.cookie)
+async def get_user_relation(relation_id):
+    c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
+    user_ins = user.User(uid=UID, credential=c)
+    relation = await user_ins.get_relation(relation_id)
+    followed_status = relation["be_relation"]["attribute"]
+    return followed_status == 2 or followed_status == 6
 
-    try:
-        # 使用 requests 库下载 JSON 数据
-        response = requests.get(
-            f"https://api.bilibili.com/x/relation/stat?vmid={uid}",
-            headers=header,
-        )
-        response.raise_for_status()  # 检查是否成功获取数据
 
-        # 使用 json 库解析 JSON 数据
-        json_data = response.json()
-        return json_data["data"]["follower"]
+def filter_unfollowers(unfollows):
+    filtered_followers = []
+    for unfollower in tqdm(unfollows, desc="Filtering unfollowers..."):
+        if not asyncio.run(get_user_relation(unfollower["uid"])):
+            filtered_followers.append(unfollower)
 
-    except requests.exceptions.RequestException as e:
-        upd_log(f"Error: {e}, retrying...")
-        return get_total_fans()
+    return filtered_followers
 
 
 def upd_fans(fans_json=f"{args.tmp}/fans.json"):
-    old_total = -1
-    logs, old_fans = {}, {}
+    old_fans = []
     if os.path.exists(fans_json):
         with open(fans_json, "r", encoding="utf-8") as file:
-            logs = json.load(file)
-            old_total = logs["total"]
+            old_fans = json.load(file)["fans1000"]
 
-    new_total = get_total_fans()
-    if new_total != old_total:
+    new_fans = get_followers()
+    while not new_fans:
+        upd_log("Failed to get followers, retrying...")
+        new_fans = get_followers()
+
+    if new_fans != old_fans:
         unfollows = []
-        new_fans = get_folowers()
-        if not new_fans:
-            upd_fans(fans_json)
-
-        if not logs:
-            upd_json(new_total, new_fans, fans_json)
-            return
-
-        old_fans: dict = logs["fans1000"]
-        for fan in old_fans.keys():
+        for fan in old_fans:
             if fan not in new_fans:
                 unfollows.append({"uid": fan, "uname": old_fans[fan]})
 
-        if new_fans != old_fans or new_total != old_total:
-            upd_json(new_total, new_fans, fans_json)
-
-        if unfollows and new_total < old_total:
+        unfollows = filter_unfollowers(unfollows)
+        if unfollows:
             content = ""
             traitors = []
             for user in unfollows:
@@ -239,6 +233,11 @@ def upd_fans(fans_json=f"{args.tmp}/fans.json"):
             if content:
                 save_traitors(traitors)
                 send_email(content)
+
+        else:
+            upd_log("No unfollower found.")
+
+        upd_json(new_fans)
 
     else:
         upd_log("No unfollower found.")
