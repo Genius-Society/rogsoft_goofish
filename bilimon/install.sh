@@ -104,7 +104,8 @@ else
 	fi
 fi
 
-chmod +x /koolshare/scripts/bilimon*
+chmod +x /koolshare/scripts/bilimon_config.sh
+chmod +x /koolshare/scripts/bilimon_status.sh
 chmod +x /koolshare/scripts/uninstall_bilimon.sh
 
 # 离线安装用
@@ -123,7 +124,9 @@ if [ -d "/opt" ]; then
 	opkg update
 	opkg install python3-pip
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-	pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	pip install --cache-dir /koolshare/bilimon/.cache -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	pip list
+	rm -rf /koolshare/bilimon/.cache
 	echo_date "BiliMon 插件安装完毕!"
 	sh /koolshare/scripts/bilimon_config.sh
 else

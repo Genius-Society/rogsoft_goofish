@@ -50,8 +50,10 @@ install_env() {
 	opkg update
 	opkg install python3-pip
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-	pip install -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-	echo "修复完毕!"
+	pip install --cache-dir /koolshare/bilimon/.cache -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	echo "修复完毕! 当前 pypi 列表如下:"
+	pip list
+	rm -rf /koolshare/bilimon/.cache
 }
 
 # 自动修复路由器重启导致的盘符变化
