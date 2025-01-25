@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options
 
 USER_DATA = "user_data"
 CHROME = "chrome-win64"
-CHROME_URL = f"https://genius-society.asuscomm.cn:81/d/archive/mirrors/{CHROME}.zip"
+CHROME_URL = f"https://genius-society.asuscomm.com:81/d/archive/mirrors/{CHROME}.zip"
 
 
 def download_file(url: str, folder_path="./"):
@@ -88,13 +88,21 @@ def list2str(cookies):
     return "; ".join(cookie_list)
 
 
+def simplify_ck(cookies: str):
+    simple_ck = ["DedeUserID=" + cookies.split("DedeUserID=")[1].split(";")[0]]
+    simple_ck.append("SESSDATA=" + cookies.split("SESSDATA=")[1].split(";")[0])
+    simple_ck.append("bili_jct=" + cookies.split("bili_jct=")[1].split(";")[0])
+    simple_ck.append("buvid3=" + cookies.split("buvid3=")[1].split(";")[0])
+    return ";".join(simple_ck)
+
+
 def upd_cookie(manual=False):
     try:
         driver = init_chrome(vision=manual)
         driver.get("https://space.bilibili.com")
         cookies = list2str(driver.get_cookies())  # TODO: 在这打断点手动登录
         with open("cookie.txt", "w", encoding="utf-8") as file:
-            file.write(cookies)
+            file.write(simplify_ck(cookies))
 
     except Exception as e:
         if os.path.exists(USER_DATA):

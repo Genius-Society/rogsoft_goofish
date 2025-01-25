@@ -52,7 +52,7 @@ def send_email(
     <html>
         <body>
             <h1>{title}</h1><br>
-            {content}
+            [bilimon 插件] {content}
         </body>
     </html>
     """
@@ -80,11 +80,11 @@ def send_email(
 
 def parse_cookie(cookies: str):
     try:
-        UID = cookies.split("DedeUserID=")[1].split(";")[0]
-        SESSDATA = cookies.split("SESSDATA=")[1].split(";")[0]
-        BILI_JCT = cookies.split("bili_jct=")[1].split(";")[0]
-        BUVID3 = cookies.split("buvid3=")[1].split(";")[0]
-        return UID, SESSDATA, BILI_JCT, BUVID3
+        uid = cookies.split("DedeUserID=")[1].split(";")[0]
+        sessdata = cookies.split("SESSDATA=")[1].split(";")[0]
+        bili_jct = cookies.split("bili_jct=")[1].split(";")[0]
+        buvid3 = cookies.split("buvid3=")[1].split(";")[0]
+        return uid, sessdata, bili_jct, buvid3
 
     except Exception as e:
         send_email(
@@ -98,7 +98,7 @@ def parse_cookie(cookies: str):
 UID, SESSDATA, BILI_JCT, BUVID3 = parse_cookie(args.cookie)
 if not (UID and SESSDATA and BILI_JCT and BUVID3):
     send_email(
-        f"请确保 cookie 存在且内容有效",
+        "请确保 cookie 存在且内容有效",
         subject="cookie 内容缺失或内容无效",
         title="cookie 解析异常",
     )
@@ -106,11 +106,10 @@ if not (UID and SESSDATA and BILI_JCT and BUVID3):
 
 
 def refresh_cookie():
-    header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
     try:
         response = requests.get(
             f"https://api.bilibili.com/x/relation/followers?vmid={UID}",
-            headers=header,
+            headers={"User-Agent": USER_AGENT, "Cookie": args.cookie},
         )
         response.raise_for_status()
 
@@ -119,17 +118,13 @@ def refresh_cookie():
 
 
 def get_fans(page):
-    header = {"User-Agent": USER_AGENT, "Cookie": args.cookie}
     try:
-        # 使用 requests 库下载 JSON 数据
         response = requests.get(
             f"https://api.bilibili.com/x/relation/followers?vmid={UID}&pn={page}",
-            headers=header,
-        )
+            headers={"User-Agent": USER_AGENT, "Cookie": args.cookie},
+        )  # 使用 requests 库下载 JSON 数据
         response.raise_for_status()  # 检查是否成功获取数据
-
-        # 使用 json 库解析 JSON 数据
-        json_data = response.json()
+        json_data = response.json()  # 使用 json 库解析 JSON 数据
         if json_data["code"] == 0:
             fans = {}
             fan_list = json_data["data"]["list"]
@@ -146,6 +141,7 @@ def get_fans(page):
                 subject="可能需要重新手动扫码登陆",
                 title=f"错误代码: {json_data['code']}",
             )
+            upd_log("XU6J03M6")
             exit()
 
     except requests.exceptions.RequestException as e:
