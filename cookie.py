@@ -17,14 +17,9 @@ def download_file(url: str, folder_path="./"):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-    # 解析文件名
-    file_name = url.split("/")[-1]
-
-    # 文件的完整路径
-    file_path = os.path.join(folder_path, file_name)
-
-    # 下载文件
-    response = requests.get(url, stream=True)
+    file_name = url.split("/")[-1]  # 解析文件名
+    file_path = os.path.join(folder_path, file_name)  # 文件的完整路径
+    response = requests.get(url, stream=True)  # 下载文件
     total_size = int(response.headers.get("content-length", 0))
 
     # 添加进度条
@@ -50,8 +45,7 @@ def unzip_file(zip_file: str, extract_folder="./", rm_pkg=True):
 
     # 打开压缩包
     with zipfile.ZipFile(zip_file, "r") as zip_ref:
-        # 解压缩到指定目录
-        zip_ref.extractall(extract_folder)
+        zip_ref.extractall(extract_folder)  # 解压缩到指定目录
 
     print(f"文件已解压缩到: {extract_folder}")
     if rm_pkg:

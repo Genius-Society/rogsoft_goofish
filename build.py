@@ -3,7 +3,7 @@ import json
 import hashlib
 import subprocess
 
-parent_path = os.path.dirname(os.path.realpath(__file__))
+PARENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def md5sum(full_path):
@@ -12,11 +12,11 @@ def md5sum(full_path):
 
 
 def get_or_create():
-    conf_path = os.path.join(parent_path, "config.json")
+    conf_path = os.path.join(PARENT_PATH, "config.json")
     conf = {}
     if not os.path.isfile(conf_path):
         print("config.json not found, build.py is root path. auto write config.json")
-        module_name = os.path.basename(parent_path)
+        module_name = os.path.basename(PARENT_PATH)
         conf["module"] = module_name
         conf["version"] = "0.1"
         conf["home_url"] = "Module_%s.asp" % module_name
@@ -45,7 +45,6 @@ def pack_folder(module_name: str):
 def build_module():
     try:
         conf = get_or_create()
-
     except Exception as e:
         print(f"config.json file format is incorrect: {e}")
 
@@ -53,23 +52,21 @@ def build_module():
         print(" module is not in config.json")
         return
 
-    module_path = os.path.join(parent_path, conf["module"])
+    module_path = os.path.join(PARENT_PATH, conf["module"])
     if not os.path.isdir(module_path):
         print("not found %s dir, check config.json is module ?" % module_path)
         return
 
-    install_path = os.path.join(parent_path, conf["module"], "install.sh")
+    install_path = os.path.join(PARENT_PATH, conf["module"], "install.sh")
     if not os.path.isfile(install_path):
         print("not found %s file, check install.sh file")
         return
 
     print("build...")
-    open(parent_path + "/" + conf["module"] + "/" + "version", "w").write(
-        conf["version"]
-    )
+    open(f"{PARENT_PATH}/" + conf["module"] + "/version", "w").write(conf["version"])
     pack_folder(conf["module"])
-    conf["md5"] = md5sum(os.path.join(parent_path, conf["module"] + ".tar.gz"))
-    conf_path = os.path.join(parent_path, "config.json")
+    conf["md5"] = md5sum(os.path.join(PARENT_PATH, conf["module"] + ".tar.gz"))
+    conf_path = os.path.join(PARENT_PATH, "config.json")
     with open(conf_path, "w", encoding="utf-8") as fw:
         json.dump(conf, fw, sort_keys=True, indent=4, ensure_ascii=False)
 

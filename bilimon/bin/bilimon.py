@@ -92,6 +92,7 @@ def parse_cookie(cookies: str):
             subject="cookie 内容缺失或内容无效",
             title="cookie 解析异常",
         )
+        upd_log("XU6J03M6")
         exit()
 
 
@@ -102,6 +103,7 @@ if not (UID and SESSDATA and BILI_JCT and BUVID3):
         subject="cookie 内容缺失或内容无效",
         title="cookie 解析异常",
     )
+    upd_log("XU6J03M6")
     exit()
 
 
