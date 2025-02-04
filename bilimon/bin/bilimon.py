@@ -28,6 +28,7 @@ parser.add_argument("--cookie", type=str, help="Specify the cookie for BiliMon."
 # 解析命令行参数
 args = parser.parse_args()
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+TMP_DIR = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
 
 
 def upd_log(txt):
@@ -165,16 +166,13 @@ def get_followers():
     return fans
 
 
-def save_traitors(traitors: list, file_folder=args.tmp):
-    if file_folder[-1] != "/":
-        file_folder = file_folder + "/"
-
-    with open(f"{file_folder}traitors.txt", "a", encoding="utf-8") as file:
+def save_traitors(traitors: list, file_folder=TMP_DIR):
+    with open(f"{file_folder}/traitors.txt", "a", encoding="utf-8") as file:
         for url in traitors:
             file.write(f"{url}\n")
 
 
-def upd_json(new_fans: list, fans_json=f"{args.tmp}/fans.json"):
+def upd_json(new_fans: list, fans_json=f"{TMP_DIR}/fans.json"):
     with open(fans_json, "w", encoding="utf-8") as file:
         json.dump(
             {"total": len(new_fans), "fans1000": new_fans},
@@ -203,7 +201,7 @@ def filter_unfollowers(unfollows):
     return filtered_followers
 
 
-def upd_fans(fans_json=f"{args.tmp}/fans.json"):
+def upd_fans(fans_json=f"{TMP_DIR}/fans.json"):
     old_fans = []
     if os.path.exists(fans_json):
         with open(fans_json, "r", encoding="utf-8") as file:
@@ -279,8 +277,19 @@ def send_report_request(
             send_report_request(mid, retry=True)
 
 
-def batch_report(mids="452534064;3546770269277061;1484237382;1736295612"):
-    targets = mids.split(";")
+def txt2list(txt_file):
+    try:
+        with open(txt_file, "r", encoding="utf-8") as file:
+            lines = [line.rstrip("\n") for line in file]
+
+        return lines
+
+    except Exception:
+        return []
+
+
+def batch_report(mids=f"{TMP_DIR}/traitors.txt"):
+    targets = txt2list(mids)
     for mid in tqdm(targets, desc="正在举报指定 UID 中"):
         send_report_request(mid)
         time.sleep(random.uniform(181, 185))
