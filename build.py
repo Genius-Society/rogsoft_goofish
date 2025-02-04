@@ -19,9 +19,9 @@ def get_or_create():
         module_name = os.path.basename(PARENT_PATH)
         conf["module"] = module_name
         conf["version"] = "0.1"
-        conf["home_url"] = "Module_%s.asp" % module_name
-        conf["title"] = "title of " + module_name
-        conf["description"] = "description of " + module_name
+        conf["home_url"] = f"Module_{module_name}.asp"
+        conf["title"] = f"title of {module_name}"
+        conf["description"] = f"description of {module_name}"
 
     else:
         with open(conf_path, "r", encoding="utf-8") as fc:
@@ -49,21 +49,21 @@ def build_module():
         print(f"config.json file format is incorrect: {e}")
 
     if "module" not in conf:
-        print(" module is not in config.json")
+        print("module is not in config.json")
         return
 
     module_path = os.path.join(PARENT_PATH, conf["module"])
     if not os.path.isdir(module_path):
-        print("not found %s dir, check config.json is module ?" % module_path)
+        print(f"dir {module_path} not found, check config.json is module ?")
         return
 
     install_path = os.path.join(PARENT_PATH, conf["module"], "install.sh")
     if not os.path.isfile(install_path):
-        print("not found %s file, check install.sh file")
+        print(f"file {install_path} not found, check install.sh file")
         return
 
     print("build...")
-    open(f"{PARENT_PATH}/" + conf["module"] + "/version", "w").write(conf["version"])
+    open(f"{PARENT_PATH}/{conf['module']}/version", "w").write(conf["version"])
     pack_folder(conf["module"])
     conf["md5"] = md5sum(os.path.join(PARENT_PATH, conf["module"] + ".tar.gz"))
     conf_path = os.path.join(PARENT_PATH, "config.json")

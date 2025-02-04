@@ -504,7 +504,7 @@
                                                     <td><span id="bilimon_status"></span>
                                                         <div style="float: right;margin-right:5px;">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="show_log_pannel()">bilimon运行日志</a>
+                                                                onclick="show_log_pannel()">BiliMon运行日志</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -554,7 +554,7 @@
                                                     <td>
                                                         <textarea style="width:453px;height:auto;"
                                                             class="input_ss_table" id="bilimon_feat_cookie"
-                                                            name="bilimon_feat_cookie" maxlength="950" rows="20"
+                                                            name="bilimon_feat_cookie" maxlength="950" rows="8"
                                                             autocorrect="off" autocapitalize="off"></textarea>
                                                     </td>
                                                 </tr>
