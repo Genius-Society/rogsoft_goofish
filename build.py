@@ -54,7 +54,7 @@ def build_module():
 
     module_path = os.path.join(PARENT_PATH, conf["module"])
     if not os.path.isdir(module_path):
-        print(f"dir {module_path} not found, check config.json is module ?")
+        print(f"dir {module_path} not found, check config.json is module?")
         return
 
     install_path = os.path.join(PARENT_PATH, conf["module"], "install.sh")

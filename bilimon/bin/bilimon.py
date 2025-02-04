@@ -268,7 +268,11 @@ def send_report_request(
         if msg == "举报成功":
             print(f"{msg}: {mid}")
         else:
-            send_email(f"举报 {mid} 失败：{msg}")
+            send_email(
+                f"举报 {mid} 失败：{msg}",
+                subject="举报失败",
+                title="举报失败",
+            )
 
     except Exception as e:
         print(f"举报 {mid} 失败：{e}")
@@ -300,8 +304,6 @@ def activate(url="https://geniussociety-ksa.hf.space"):
 
 
 def upd():
-    activate()
-    batch_report()
     now_hour = datetime.now().hour
     if now_hour > 7 and now_hour < 23:
         upd_fans()
@@ -309,8 +311,12 @@ def upd():
         refresh_cookie()
         upd_log("当前处于免打扰时间段")
 
+    activate()
+    batch_report()
+
 
 def hour_monitor(period=2):
+    upd()
     upd_log(f"监控开启中...每 {period} 小时触发一次")
     schedule.every(period).hours.do(upd)
     while True:

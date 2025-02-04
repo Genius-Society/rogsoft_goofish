@@ -554,7 +554,7 @@
                                                     <td>
                                                         <textarea style="width:453px;height:auto;"
                                                             class="input_ss_table" id="bilimon_feat_cookie"
-                                                            name="bilimon_feat_cookie" maxlength="950" rows="8"
+                                                            name="bilimon_feat_cookie" maxlength="950" rows="18"
                                                             autocorrect="off" autocapitalize="off"></textarea>
                                                     </td>
                                                 </tr>
