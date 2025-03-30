@@ -1,5 +1,5 @@
 # Bilibili relation monitor
-[![license](https://img.shields.io/badge/license-Apache_2.0-99c711)](https://github.com/MuGemSt/bilimon/blob/master/LICENSE)
+[![license](https://img.shields.io/badge/license-Apache_2.0-99c711)](https://github.com/MuGemSt/bilimon/blob/main/LICENSE)
 
 监控B站最近1K粉丝动向: 取关狗死全家!
 
