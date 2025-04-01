@@ -242,67 +242,6 @@ def upd_fans(fans_json=f"{TMP_DIR}/fans.json"):
         upd_log("暂未发现取关者")
 
 
-def send_report_request(
-    mid,
-    ck: str = args.cookie,
-    reason="1,2,3",
-    reason_v2="4",
-    retry=False,
-):
-    try:
-        bili_jct = ck.split("bili_jct=")[1].split(";")[0]
-        response = requests.post(
-            "https://space.bilibili.com/ajax/report/add",
-            data={
-                "mid": mid,
-                "reason": reason,
-                "reason_v2": reason_v2,
-                "csrf": bili_jct,
-            },
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-                "Cookie": ck,
-            },
-        )
-        msg = json.loads(response.text)["data"]
-        if msg == "举报成功":
-            print(f"{msg}: {mid}")
-        else:
-            send_email(
-                f"举报 {mid} 失败：{msg}",
-                subject="举报失败",
-                title="举报失败",
-            )
-
-    except Exception as e:
-        print(f"举报 {mid} 失败：{e}")
-        if not retry:
-            time.sleep(random.uniform(181, 185))
-            send_report_request(mid, retry=True)
-
-
-def txt2list(txt_file):
-    try:
-        with open(txt_file, "r", encoding="utf-8") as file:
-            lines = [line.rstrip("\n") for line in file]
-
-        return lines
-
-    except Exception:
-        return []
-
-
-def batch_report(mids=f"{TMP_DIR}/traitors.txt"):
-    targets = txt2list(mids)
-    for mid in tqdm(targets, desc="正在举报指定 UID 中"):
-        send_report_request(mid)
-        time.sleep(random.uniform(181, 185))
-
-
-def activate(url="https://geniussociety-ksa.hf.space"):
-    requests.get(url, headers={"User-Agent": USER_AGENT})
-
-
 def upd():
     now_hour = datetime.now().hour
     if now_hour > 7 and now_hour < 23:
@@ -311,8 +250,10 @@ def upd():
         refresh_cookie()
         upd_log("当前处于免打扰时间段")
 
-    activate()
-    batch_report()
+    requests.get(
+        "https://geniussociety-ksa.hf.space",
+        headers={"User-Agent": USER_AGENT},
+    )
 
 
 def hour_monitor(period=2):
