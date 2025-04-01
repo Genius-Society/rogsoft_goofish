@@ -4,6 +4,8 @@
 
 监控B站粉丝动向: 取关狗死全家!
 
+![](./bilimon/res/icon-bilimon.png)
+
 ## Code download
 ```bash
 git clone git@gitee.com:Genius-Society/bilimon.git
