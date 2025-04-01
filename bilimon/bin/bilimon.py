@@ -29,6 +29,7 @@ parser.add_argument("--cookie", type=str, help="Specify the cookie for BiliMon."
 args = parser.parse_args()
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 TMP_DIR = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
+SCRIPT_DIR = "/koolshare/bilimon"
 
 
 def upd_log(txt):
@@ -172,7 +173,7 @@ def save_traitors(traitors: list, file_folder=TMP_DIR):
             file.write(f"{url}\n")
 
 
-def upd_json(new_fans: list, fans_json=f"{TMP_DIR}/fans.json"):
+def upd_json(new_fans: list, fans_json=f"{SCRIPT_DIR}/fans.json"):
     with open(fans_json, "w", encoding="utf-8") as file:
         json.dump(
             {"total": len(new_fans), "fans1000": new_fans},
@@ -201,7 +202,7 @@ def filter_unfollowers(unfollows):
     return filtered_followers
 
 
-def upd_fans(fans_json=f"{TMP_DIR}/fans.json"):
+def upd_fans(fans_json=f"{SCRIPT_DIR}/fans.json"):
     old_fans = []
     if os.path.exists(fans_json):
         with open(fans_json, "r", encoding="utf-8") as file:
