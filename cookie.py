@@ -94,9 +94,7 @@ def upd_cookie(manual=False):
         if os.path.exists(USER_DATA):
             shutil.rmtree(USER_DATA)
 
-        print(
-            f"更新cookie失败: 可能是登录状态失效或 chromedriver 版本不匹配造成的, 错误信息: {e}"
-        )
+        print(f"更新cookie失败, 错误信息: {e}")
         exit()
 
 

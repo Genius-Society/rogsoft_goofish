@@ -1,5 +1,5 @@
 # Bilibili relation monitor
-[![license](https://img.shields.io/badge/license-Apache_2.0-99c711)](https://github.com/MuGemSt/bilimon/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](https://github.com/Genius-Society/bilimon/blob/main/LICENSE)
 
 监控B站粉丝动向: 取关狗死全家!
 
@@ -7,7 +7,6 @@
 ```bash
 conda create -n py310 python=3.10 -y
 conda activate py310
-pip install -r requirements.txt
 pip install -r ./bilimon/bin/requirements.txt
 ```
 
