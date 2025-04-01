@@ -173,7 +173,7 @@
             });
         }
 
-        function trigger() {
+        function trigger(mode) {
             get_log(1);
             var dbus_new = {};
             dbus_new["bilimon_period"] = E("bilimon_feat_period").value
@@ -183,7 +183,8 @@
             dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
-            var postData = { "id": id, "method": "bilimon_config.sh", "params": ["trigger_once"], "fields": dbus_new };
+            var trigger_mode = mode == 1 ? "trigger_once" : "trigger_clean";
+            var postData = { "id": id, "method": "bilimon_config.sh", "params": [trigger_mode], "fields": dbus_new };
             $.ajax({
                 type: "POST",
                 url: "/_api/",
@@ -559,11 +560,14 @@
                                                     </td>
                                                 </tr>
                                                 <tr id="bilimon_trigger">
-                                                    <th>单次手动触发</th>
+                                                    <th>手动触发</th>
                                                     <td>
                                                         <a type="button" id="bilimon_trigger" class="ks_btn"
-                                                            href="javascript:void(0);" onclick="trigger()"
-                                                            style="border:none">单次手动触发</a>
+                                                            href="javascript:void(0);" onclick="trigger(1)"
+                                                            style="border:none">单轮粉丝扫描</a>
+                                                        <a type="button" id="bilimon_trigger" class="ks_btn"
+                                                            href="javascript:void(0);" onclick="trigger(2)"
+                                                            style="border:none">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                                 <tr id="bilimon_traitor">

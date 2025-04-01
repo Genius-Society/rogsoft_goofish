@@ -12,7 +12,7 @@ from tqdm import tqdm
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from bilibili_api import user, Credential
+from bilibili_api import ResponseCodeException, user, Credential
 
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="BiliMon configuration script.")
@@ -109,18 +109,6 @@ if not (UID and SESSDATA and BILI_JCT and BUVID3):
     exit()
 
 
-def refresh_cookie():
-    try:
-        response = requests.get(
-            f"https://api.bilibili.com/x/relation/followers?vmid={UID}",
-            headers={"User-Agent": USER_AGENT, "Cookie": args.cookie},
-        )
-        response.raise_for_status()
-
-    except requests.exceptions.RequestException as e:
-        upd_log(f"错误: {e}...")
-
-
 def get_fans(page):
     try:
         response = requests.get(
@@ -167,10 +155,50 @@ def get_followers():
     return fans
 
 
-def save_traitors(traitors: list, file_folder=TMP_DIR):
-    with open(f"{file_folder}/traitors.txt", "a", encoding="utf-8") as file:
+def deleted_sync(uid):
+    async def deleted(user_id):
+        c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
+        user_ins = user.User(uid=int(user_id), credential=c)
+        try:
+            await user_ins.get_user_info()
+            return False
+
+        except ResponseCodeException as e:
+            return e.code == -404
+
+    return asyncio.run(deleted(uid))
+
+
+def save_traitors(traitors: list, file_folder=TMP_DIR, mode="a"):
+    with open(f"{file_folder}/traitors.txt", mode, encoding="utf-8") as file:
         for url in traitors:
             file.write(f"{url}\n")
+
+
+def txt2lst(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+        # 去掉每行末尾的换行符
+        lines = [line.strip() for line in lines]
+        return list(set(lines))
+
+    except Exception as e:
+        print(f"读取文件时出错: {e}")
+        return []
+
+
+def clean_traitors(file_folder=TMP_DIR):
+    cleaned_traitors = []
+    traitors = txt2lst(f"{file_folder}/traitors.txt")
+    for traitor in tqdm(traitors, desc="清理已注销的取关狗"):
+        if deleted_sync(traitor):
+            print(f"取关狗{traitor}已被清理!")
+        else:
+            cleaned_traitors.append(traitor)
+
+    if cleaned_traitors:
+        save_traitors(cleaned_traitors, file_folder, "w")
 
 
 def upd_json(new_fans: list, fans_json=f"{SCRIPT_DIR}/fans.json"):
@@ -185,18 +213,21 @@ def upd_json(new_fans: list, fans_json=f"{SCRIPT_DIR}/fans.json"):
     upd_log(f"{fans_json} 已更新!")
 
 
-async def get_user_relation(relation_id):
-    c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
-    user_ins = user.User(uid=UID, credential=c)
-    relation = await user_ins.get_relation(relation_id)
-    followed_status = relation["be_relation"]["attribute"]
-    return followed_status == 2 or followed_status == 6
+def relation_sync(uid):
+    async def get_user_relation(relation_id):
+        c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
+        user_ins = user.User(uid=UID, credential=c)
+        relation = await user_ins.get_relation(relation_id)
+        followed_status = relation["be_relation"]["attribute"]
+        return followed_status == 2 or followed_status == 6
+
+    return asyncio.run(get_user_relation(uid))
 
 
 def filter_unfollowers(unfollows):
     filtered_followers = []
     for unfollower in tqdm(unfollows, desc="过滤取关列表"):
-        if not asyncio.run(get_user_relation(unfollower["uid"])):
+        if not relation_sync(unfollower["uid"]):
             filtered_followers.append(unfollower)
 
     return filtered_followers
@@ -248,7 +279,7 @@ def upd():
     if now_hour > 7 and now_hour < 23:
         upd_fans()
     else:
-        refresh_cookie()
+        clean_traitors()
         upd_log("当前处于免打扰时间段")
 
     requests.get(
@@ -269,7 +300,9 @@ def hour_monitor(period=2):
 if __name__ == "__main__":
     if int(args.clock) == 1:
         hour_monitor(period=args.period)
-    else:
+    elif int(args.clock) == 0:
         upd_fans()
+    elif int(args.clock) == 2:
+        clean_traitors()
 
     upd_log("XU6J03M6")
