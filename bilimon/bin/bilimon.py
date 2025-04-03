@@ -71,11 +71,11 @@ def send_email(
             server.login(sender_email, password)
             server.sendmail(sender_email, [msg["To"]], msg.as_string())
 
-        upd_log("邮件发送成功")
+        upd_log("邮件发送成功!")
 
     except smtplib.SMTPException as e:
         if e.smtp_code == -1:
-            upd_log("邮件发送成功")
+            upd_log("邮件发送成功!")
         else:
             upd_log(f"邮件发送失败: {e}")
 
@@ -169,12 +169,6 @@ def deleted_sync(uid):
     return asyncio.run(deleted(uid))
 
 
-def save_traitors(traitors: list, file_folder=TMP_DIR, mode="a"):
-    with open(f"{file_folder}/traitors.txt", mode, encoding="utf-8") as file:
-        for url in traitors:
-            file.write(f"{url}\n")
-
-
 def txt2lst(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -188,6 +182,18 @@ def txt2lst(file_path):
         return []
 
 
+def save_traitors(traitors: list, file_folder=TMP_DIR):
+    with open(f"{file_folder}/traitors.txt", "w", encoding="utf-8") as file:
+        for url in traitors:
+            file.write(f"{url}\n")
+
+
+def add_traitors(traitors: list, file_folder=TMP_DIR):
+    old_traitors = txt2lst(f"{file_folder}/traitors.txt")
+    merged_traitors = list(set(old_traitors + traitors))
+    save_traitors(merged_traitors, file_folder)
+
+
 def clean_traitors(file_folder=TMP_DIR):
     cleaned_traitors = []
     traitors = txt2lst(f"{file_folder}/traitors.txt")
@@ -198,7 +204,7 @@ def clean_traitors(file_folder=TMP_DIR):
             cleaned_traitors.append(traitor)
 
     if cleaned_traitors:
-        save_traitors(cleaned_traitors, file_folder, "w")
+        save_traitors(cleaned_traitors, file_folder)
 
 
 def upd_json(new_fans: dict, out1000: dict, fans_json=f"{SCRIPT_DIR}/fans.json"):
@@ -207,7 +213,7 @@ def upd_json(new_fans: dict, out1000: dict, fans_json=f"{SCRIPT_DIR}/fans.json")
             out1000.update(json.load(file)["out1000"])
 
     out1000_keys = list(out1000.keys())
-    for item in tqdm(out1000_keys, desc="Filtering users out of 1K"):
+    for item in tqdm(out1000_keys, desc="过滤1K以外列表"):
         if item in new_fans:
             del out1000[item]
 
@@ -271,13 +277,11 @@ def upd_fans(fans_json=f"{SCRIPT_DIR}/fans.json"):
             traitors = []
             for user in unfollows:
                 url = f'https://m.bilibili.com/space/{user["uid"]}'
-                content += (
-                    f'<br><a href="{url}" target="_blank">{user["uname"]}</a><br>'
-                )
+                content += f'<br><a href="{url}">{user["uname"]}</a><br>'
                 traitors.append(user["uid"])
 
             if content:
-                save_traitors(traitors)
+                add_traitors(traitors)
                 send_email(content)
 
         else:
@@ -300,7 +304,7 @@ def upd():
     requests.get(
         "https://geniussociety-ksa.hf.space",
         headers={"User-Agent": USER_AGENT},
-    )
+    )  # keep ksa alive
 
 
 def hour_monitor(period=2):
