@@ -201,10 +201,23 @@ def clean_traitors(file_folder=TMP_DIR):
         save_traitors(cleaned_traitors, file_folder, "w")
 
 
-def upd_json(new_fans: list, fans_json=f"{SCRIPT_DIR}/fans.json"):
+def upd_json(new_fans: dict, out1000: dict, fans_json=f"{SCRIPT_DIR}/fans.json"):
+    if os.path.exists(fans_json):
+        with open(fans_json, "r", encoding="utf-8") as file:
+            out1000.update(json.load(file)["out1000"])
+
+    out1000_keys = list(out1000.keys())
+    for item in tqdm(out1000_keys, desc="Filtering users out of 1K"):
+        if item in new_fans:
+            del out1000[item]
+
     with open(fans_json, "w", encoding="utf-8") as file:
         json.dump(
-            {"total": len(new_fans), "fans1000": new_fans},
+            {
+                "total": len(new_fans) + len(out1000),
+                "fans1000": new_fans,
+                "out1000": out1000,
+            },
             file,
             ensure_ascii=False,
             indent=4,
@@ -219,18 +232,20 @@ def relation_sync(uid):
         user_ins = user.User(uid=UID, credential=c)
         relation = await user_ins.get_relation(relation_id)
         followed_status = relation["be_relation"]["attribute"]
-        return followed_status == 2 or followed_status == 6
+        return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
 
     return asyncio.run(get_user_relation(uid))
 
 
-def filter_unfollowers(unfollows):
-    filtered_followers = []
+def filter_unfollows(unfollows):
+    real_unfollows, out1000 = [], {}
     for unfollower in tqdm(unfollows, desc="过滤取关列表"):
-        if not relation_sync(unfollower["uid"]):
-            filtered_followers.append(unfollower)
+        if relation_sync(unfollower["uid"]):
+            out1000.update({unfollower["uid"]: unfollower["uname"]})
+        else:
+            real_unfollows.append(unfollower)
 
-    return filtered_followers
+    return real_unfollows, out1000
 
 
 def upd_fans(fans_json=f"{SCRIPT_DIR}/fans.json"):
@@ -239,7 +254,7 @@ def upd_fans(fans_json=f"{SCRIPT_DIR}/fans.json"):
         with open(fans_json, "r", encoding="utf-8") as file:
             old_fans = json.load(file)["fans1000"]
 
-    new_fans = get_followers()
+    new_fans: dict = get_followers()
     while not new_fans:
         upd_log("获取粉丝列表失败, 重试中...")
         new_fans = get_followers()
@@ -250,7 +265,7 @@ def upd_fans(fans_json=f"{SCRIPT_DIR}/fans.json"):
             if fan not in new_fans:
                 unfollows.append({"uid": fan, "uname": old_fans[fan]})
 
-        unfollows = filter_unfollowers(unfollows)
+        unfollows, out1000 = filter_unfollows(unfollows)
         if unfollows:
             content = ""
             traitors = []
@@ -268,7 +283,7 @@ def upd_fans(fans_json=f"{SCRIPT_DIR}/fans.json"):
         else:
             upd_log("暂未发现取关者")
 
-        upd_json(new_fans)
+        upd_json(new_fans, out1000)
 
     else:
         upd_log("暂未发现取关者")
