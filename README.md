@@ -1,6 +1,7 @@
 # Bilibili relation monitor
 [![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](https://github.com/Genius-Society/bilimon/blob/main/LICENSE)
 [![hf](https://img.shields.io/badge/huggingface-ksa-ffd21e.svg)](https://huggingface.co/spaces/GeniusSociety/ksa)
+[![ms](https://img.shields.io/badge/modelscope-bar-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bar)
 
 监控B站粉丝动向: 取关狗死全家!
 
@@ -36,4 +37,5 @@ python build.py
 
 ## Thanks
 - <https://github.com/koolshare/rogsoft>
+- <https://nemo2011.github.io/bilibili-api>
 - <https://github.com/Nemo2011/bilibili-api>
