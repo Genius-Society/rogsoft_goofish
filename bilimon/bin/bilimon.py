@@ -169,6 +169,17 @@ def deleted_sync(uid):
     return asyncio.run(deleted(uid))
 
 
+def relation_sync(uid):
+    async def get_user_relation(relation_id):
+        c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
+        user_ins = user.User(uid=UID, credential=c)
+        relation = await user_ins.get_relation(relation_id)
+        followed_status = relation["be_relation"]["attribute"]
+        return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
+
+    return asyncio.run(get_user_relation(uid))
+
+
 def txt2lst(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -197,8 +208,8 @@ def add_traitors(traitors: list, file_folder=TMP_DIR):
 def clean_traitors(file_folder=TMP_DIR):
     cleaned_traitors = []
     traitors = txt2lst(f"{file_folder}/traitors.txt")
-    for traitor in tqdm(traitors, desc="清理已注销的取关狗"):
-        if deleted_sync(traitor):
+    for traitor in tqdm(traitors, desc="清理已注销或误判的取关狗"):
+        if deleted_sync(traitor) or relation_sync(traitor):
             print(f"取关狗{traitor}已被清理!")
         else:
             cleaned_traitors.append(traitor)
@@ -230,17 +241,6 @@ def upd_json(new_fans: dict, out1000: dict, fans_json=f"{SCRIPT_DIR}/fans.json")
         )
 
     upd_log(f"{fans_json} 已更新!")
-
-
-def relation_sync(uid):
-    async def get_user_relation(relation_id):
-        c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
-        user_ins = user.User(uid=UID, credential=c)
-        relation = await user_ins.get_relation(relation_id)
-        followed_status = relation["be_relation"]["attribute"]
-        return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
-
-    return asyncio.run(get_user_relation(uid))
 
 
 def filter_unfollows(unfollows):
