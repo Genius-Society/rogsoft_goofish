@@ -223,10 +223,18 @@ def upd_json(new_fans: dict, out1000: dict, fans_json=f"{SCRIPT_DIR}/fans.json")
         with open(fans_json, "r", encoding="utf-8") as file:
             out1000.update(json.load(file)["out1000"])
 
+    traitors_out1000 = []
     out1000_keys = list(out1000.keys())
     for item in tqdm(out1000_keys, desc="过滤1K以外列表"):
         if item in new_fans:
             del out1000[item]
+
+        elif not relation_sync(item):
+            traitors_out1000.append(item)
+            del out1000[item]
+
+    if traitors_out1000:
+        add_traitors(traitors_out1000)
 
     with open(fans_json, "w", encoding="utf-8") as file:
         json.dump(
@@ -317,11 +325,15 @@ def hour_monitor(period=2):
 
 
 if __name__ == "__main__":
-    if int(args.clock) == 1:
-        hour_monitor(period=args.period)
-    elif int(args.clock) == 0:
-        upd_fans()
-    elif int(args.clock) == 2:
-        clean_traitors()
+    try:
+        if int(args.clock) == 1:
+            hour_monitor(period=args.period)
+        elif int(args.clock) == 0:
+            upd_fans()
+        elif int(args.clock) == 2:
+            clean_traitors()
 
-    upd_log("XU6J03M6")
+        upd_log("XU6J03M6")
+
+    except Exception as e:
+        send_email(f"运行错误: {e}")
