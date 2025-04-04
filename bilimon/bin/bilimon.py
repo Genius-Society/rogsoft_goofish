@@ -3,7 +3,6 @@ import math
 import time
 import json
 import random
-import asyncio
 import smtplib
 import argparse
 import requests
@@ -12,7 +11,7 @@ from tqdm import tqdm
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from bilibili_api import ResponseCodeException, user, Credential
+from bilibili_api import ResponseCodeException, Credential, user, sync
 
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="BiliMon configuration script.")
@@ -155,8 +154,8 @@ def get_followers():
     return fans
 
 
-def deleted_sync(uid):
-    async def deleted(user_id):
+def is_deleted(uid):
+    async def is_deleted_async(user_id):
         c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
         user_ins = user.User(uid=int(user_id), credential=c)
         try:
@@ -166,18 +165,18 @@ def deleted_sync(uid):
         except ResponseCodeException as e:
             return e.code == -404
 
-    return asyncio.run(deleted(uid))
+    return sync(is_deleted_async(uid))
 
 
-def relation_sync(uid):
-    async def get_user_relation(relation_id):
+def is_fans(uid):
+    async def is_fans_async(relation_id):
         c = Credential(sessdata=SESSDATA, bili_jct=BILI_JCT, buvid3=BUVID3)
         user_ins = user.User(uid=UID, credential=c)
         relation = await user_ins.get_relation(relation_id)
         followed_status = relation["be_relation"]["attribute"]
         return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
 
-    return asyncio.run(get_user_relation(uid))
+    return sync(is_fans_async(uid))
 
 
 def txt2lst(file_path):
@@ -209,7 +208,7 @@ def clean_traitors(file_folder=TMP_DIR):
     cleaned_traitors = []
     traitors = txt2lst(f"{file_folder}/traitors.txt")
     for traitor in tqdm(traitors, desc="清理已注销或误判的取关狗"):
-        if deleted_sync(traitor) or relation_sync(traitor):
+        if is_deleted(traitor) or is_fans(traitor):
             print(f"取关狗{traitor}已被清理!")
         else:
             cleaned_traitors.append(traitor)
@@ -229,7 +228,7 @@ def upd_json(new_fans: dict, out1000: dict, fans_json=f"{SCRIPT_DIR}/fans.json")
         if item in new_fans:
             del out1000[item]
 
-        elif not relation_sync(item):
+        elif not is_fans(item):
             traitors_out1000.append(item)
             del out1000[item]
 
@@ -254,7 +253,7 @@ def upd_json(new_fans: dict, out1000: dict, fans_json=f"{SCRIPT_DIR}/fans.json")
 def filter_unfollows(unfollows):
     real_unfollows, out1000 = [], {}
     for unfollower in tqdm(unfollows, desc="过滤取关列表"):
-        if relation_sync(unfollower["uid"]):
+        if is_fans(unfollower["uid"]):
             out1000.update({unfollower["uid"]: unfollower["uname"]})
         else:
             real_unfollows.append(unfollower)
