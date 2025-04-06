@@ -70,11 +70,13 @@
             border-width: 0.5px;
         }
 
-        #bilimon_feat_cookie {
+        #bilimon_feat_cookie,
+        #bilimon_feat_cookie2 {
             -webkit-text-security: square;
         }
 
-        #bilimon_feat_cookie:focus {
+        #bilimon_feat_cookie:focus,
+        #bilimon_feat_cookie2:focus {
             -webkit-text-security: none;
         }
 
@@ -149,6 +151,9 @@
             if (dbus["bilimon_cookie"]) {
                 E("bilimon_feat_cookie").value = dbus["bilimon_cookie"]
             }
+            if (dbus["bilimon_cookie2"]) {
+                E("bilimon_feat_cookie2").value = dbus["bilimon_cookie2"]
+            }
         }
 
         function get_status() {
@@ -181,6 +186,7 @@
             dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
             dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
             dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
+            dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var trigger_mode = mode == 1 ? "trigger_once" : "trigger_clean";
@@ -246,7 +252,7 @@
             dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
             dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
             dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
-
+            dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["web_submit"], "fields": dbus_new };
@@ -551,11 +557,18 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>B站Cookie<span style="color: red;"> * </span></th>
+                                                    <th>B站Cookie</th>
                                                     <td>
+                                                        <span id="cookie1">账号1<span style="color: red;"> *
+                                                            </span></span>
                                                         <textarea style="width:453px;height:auto;"
                                                             class="input_ss_table" id="bilimon_feat_cookie"
-                                                            name="bilimon_feat_cookie" maxlength="950" rows="18"
+                                                            name="bilimon_feat_cookie" maxlength="2048" rows="12"
+                                                            autocorrect="off" autocapitalize="off"></textarea>
+                                                        <span id="cookie2">账号2</span>
+                                                        <textarea style="width:453px;height:auto;"
+                                                            class="input_ss_table" id="bilimon_feat_cookie2"
+                                                            name="bilimon_feat_cookie2" maxlength="2048" rows="12"
                                                             autocorrect="off" autocapitalize="off"></textarea>
                                                     </td>
                                                 </tr>

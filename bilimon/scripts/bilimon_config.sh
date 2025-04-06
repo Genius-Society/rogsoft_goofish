@@ -119,6 +119,7 @@ start_bilimon() {
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
 		--cookie "$bilimon_cookie" \
+		--ck2 "$bilimon_cookie2" \
 		>>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
 
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
@@ -165,6 +166,7 @@ trigger_once() {
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
 		--cookie "$bilimon_cookie" \
+		--ck2 "$bilimon_cookie2" \
 		>>$LOG_FILE 2>&1 &
 }
 
@@ -178,6 +180,7 @@ trigger_clean() {
 		--smtp "$bilimon_smtp" \
 		--tmp "$bilimon_tmp" \
 		--cookie "$bilimon_cookie" \
+		--ck2 "$bilimon_cookie2" \
 		>>$LOG_FILE 2>&1 &
 }
 
@@ -295,6 +298,7 @@ if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]
 	bilimon_smtp=$(dbus get bilimon_smtp)
 	bilimon_tmp=$(dbus get bilimon_tmp)
 	bilimon_cookie=$(dbus get bilimon_cookie)
+	bilimon_cookie2=$(dbus get bilimon_cookie2)
 	# 开启 BiliMon
 	start_bilimon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
