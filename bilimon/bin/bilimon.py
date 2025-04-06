@@ -153,7 +153,7 @@ class BiliUser:
                 upd_log(msg)
                 send_email(
                     msg,
-                    subject="可能需要重新手动扫码登陆",
+                    subject=f"可能 {self.uid} 需要重新手动扫码登陆",
                     title=f"错误代码: {json_data['code']}",
                 )
                 upd_log("XU6J03M6")
@@ -165,7 +165,7 @@ class BiliUser:
 
     def _get_followers(self):
         fans, pages = self._get_fans(page=1)
-        for i in tqdm(range(2, pages + 1), desc="扫描粉丝中"):
+        for i in tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} 粉丝中"):
             time.sleep(random.uniform(0.5, 1))
             followers, _ = self._get_fans(page=i)
             if followers:
@@ -209,7 +209,7 @@ class BiliUser:
         traitors = txt2lst(f"{file_folder}/traitors.txt")
         for traitor in tqdm(traitors, desc="清理已注销的取关狗"):
             if self._is_deleted(traitor):
-                print(f"取关狗{traitor}已被清理!")
+                print(f"取关狗 {traitor} 已被清理!")
             else:
                 cleaned_traitors.append(traitor)
 
@@ -224,7 +224,7 @@ class BiliUser:
 
         traitors_out1000 = []
         out1000_keys = list(out1000.keys())
-        for item in tqdm(out1000_keys, desc="过滤1K以外列表"):
+        for item in tqdm(out1000_keys, desc=f"过滤 {self.uid} 的1K以外列表"):
             if item in new_fans:
                 del out1000[item]
 
@@ -251,7 +251,7 @@ class BiliUser:
 
     def _filter_unfollows(self, unfollows):
         real_unfollows, out1000 = [], {}
-        for unfollower in tqdm(unfollows, desc="过滤取关列表"):
+        for unfollower in tqdm(unfollows, desc=f"过滤 {self.uid} 取关列表"):
             if self._is_fans(unfollower["uid"]):
                 out1000.update({unfollower["uid"]: unfollower["uname"]})
             else:
@@ -268,7 +268,7 @@ class BiliUser:
 
         new_fans: dict = self._get_followers()
         while not new_fans:
-            upd_log("获取粉丝列表失败, 重试中...")
+            upd_log(f"获取 {self.uid} 粉丝列表失败, 重试中...")
             new_fans = self._get_followers()
 
         if new_fans != old_fans:
@@ -291,12 +291,12 @@ class BiliUser:
                     send_email(content)
 
             else:
-                upd_log("暂未发现取关者")
+                upd_log(f"暂未发现取关 {self.uid} 者")
 
             self._upd_json(new_fans, out1000)
 
         else:
-            upd_log("暂未发现取关者")
+            upd_log(f"暂未发现取关 {self.uid} 者")
 
 
 def upd_all_fans():
