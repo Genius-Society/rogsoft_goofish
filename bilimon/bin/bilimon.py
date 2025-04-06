@@ -90,7 +90,7 @@ def parse_cookie(cookies: str):
         return uid, sessdata, bili_jct, buvid3
 
     except Exception as e:
-        return f"{e}", sessdata, bili_jct, buvid3
+        return uid, f"{e}", bili_jct, buvid3
 
 
 def txt2lst(file_path):
@@ -102,8 +102,13 @@ def txt2lst(file_path):
         return list(set(lines))
 
     except Exception as e:
-        print(f"读取文件时出错: {e}")
-        return []
+        send_email(
+            f"读取文件时出错: {e}",
+            subject=f"{file_path} 内容缺失或内容无效",
+            title="txt 解析异常",
+        )
+        upd_log("XU6J03M6")
+        exit()
 
 
 def save_traitors(traitors: list, file_folder=TMP_DIR):
@@ -125,7 +130,7 @@ class BiliUser:
         self.uid, self.sessdata, self.bili_jct, self.buvid3 = parse_cookie(self.cookie)
         if not (self.uid and self.sessdata and self.bili_jct and self.buvid3):
             send_email(
-                f"请确保 cookie 存在且内容有效: {self.uid}",
+                f"请确保 {self.uid} cookie 存在且内容有效: {self.sessdata}",
                 subject="cookie 内容缺失或内容无效",
                 title="cookie 解析异常",
             )
