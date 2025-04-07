@@ -35,6 +35,8 @@ python build.py
 3. 按 `F5` 运行 `.py` 文件, 弹出 `BiliBili` 登录页面;
 4. 用手机 `APP` 扫码登录后按 `F5` 使其运行完毕, 断点可保留, 之后用命令行以非 debug 模式运行
 
+注: 多账号切换获取 cookie 时推荐清理 `user_data` 文件夹而非登出, 否则会导致被登出的账号 cookie 失效
+
 ## Thanks
 - <https://github.com/koolshare/rogsoft>
 - <https://nemo2011.github.io/bilibili-api>
