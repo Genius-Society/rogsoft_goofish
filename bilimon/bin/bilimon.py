@@ -350,4 +350,8 @@ if __name__ == "__main__":
         upd_log("XU6J03M6")
 
     except Exception as e:
-        send_email(f"运行错误: {e}")
+        send_email(
+            f"运行错误: {e}",
+            subject="BiliMon 插件运行错误",
+            title="请手动重启插件",
+        )
