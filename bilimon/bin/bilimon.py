@@ -218,6 +218,8 @@ class BiliUser:
             else:
                 cleaned_traitors.append(traitor)
 
+            time.sleep(random.uniform(0.5, 1))
+
         if cleaned_traitors:
             save_traitors(cleaned_traitors, file_folder)
 
