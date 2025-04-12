@@ -1,5 +1,5 @@
 # Bilibili relation monitor
-[![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](https://github.com/Genius-Society/bilimon/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](./LICENSE)
 [![hf](https://img.shields.io/badge/huggingface-ksa-ffd21e.svg)](https://huggingface.co/spaces/GeniusSociety/ksa)
 [![ms](https://img.shields.io/badge/modelscope-bar-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bar)
 
@@ -36,6 +36,9 @@ python build.py
 4. 用手机 `APP` 扫码登录后按 `F5` 使其运行完毕, 断点可保留, 之后用命令行以非 debug 模式运行
 
 注: 多账号切换获取 cookie 时推荐清理 `user_data` 文件夹而非登出, 否则会导致被登出的账号 cookie 失效
+
+## 批量私信
+- <https://www.modelscope.cn/studios/kakamond/bili_batch_whisper>
 
 ## Thanks
 - <https://github.com/koolshare/rogsoft>
