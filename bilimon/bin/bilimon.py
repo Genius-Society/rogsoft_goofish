@@ -348,7 +348,10 @@ def main(retry=True):
 
     except Exception as e:
         if retry:
+            time.sleep(1)
             main(False)
+            upd_log(f"运行错误: {e}, 重试中...")
+
         else:
             send_email(
                 f"运行错误: {e}",
