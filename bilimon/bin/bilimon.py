@@ -325,11 +325,6 @@ def upd():
         clean_all_traitors()
         upd_log("当前处于免打扰时间段")
 
-    requests.get(
-        "https://geniussociety-ksa.hf.space",
-        headers={"User-Agent": USER_AGENT},
-    )  # keep ksa alive
-
 
 def hour_monitor(period=2):
     upd()
@@ -340,7 +335,7 @@ def hour_monitor(period=2):
         time.sleep(1)
 
 
-if __name__ == "__main__":
+def main(retry=True):
     try:
         if int(args.clock) == 1:
             hour_monitor(period=args.period)
@@ -352,8 +347,15 @@ if __name__ == "__main__":
         upd_log("XU6J03M6")
 
     except Exception as e:
-        send_email(
-            f"运行错误: {e}",
-            subject="BiliMon 插件运行错误",
-            title="请手动重启插件",
-        )
+        if retry:
+            main(False)
+        else:
+            send_email(
+                f"运行错误: {e}",
+                subject="BiliMon 插件运行错误",
+                title="请手动重启插件",
+            )
+
+
+if __name__ == "__main__":
+    main()
