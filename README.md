@@ -1,7 +1,7 @@
 # Bilibili relation monitor
 [![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](./LICENSE)
-[![hf](https://img.shields.io/badge/huggingface-ksa-ffd21e.svg)](https://huggingface.co/spaces/GeniusSociety/ksa)
-[![ms](https://img.shields.io/badge/modelscope-bar-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bar)
+[![hf](https://img.shields.io/badge/huggingface-keep__spaces__alive-ffd21e.svg)](https://huggingface.co/spaces/kakamond/keep_spaces_alive)
+[![ms](https://img.shields.io/badge/modelscope-bili__batch__report-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bili_batch_report)
 
 监控B站粉丝动向: 取关狗死全家!
 

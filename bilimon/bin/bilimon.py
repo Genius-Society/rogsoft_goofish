@@ -335,7 +335,7 @@ def hour_monitor(period=2):
         time.sleep(1)
 
 
-def main(retry=True):
+def main(retry=False):
     try:
         if int(args.clock) == 1:
             hour_monitor(period=args.period)
@@ -347,14 +347,14 @@ def main(retry=True):
         upd_log("XU6J03M6")
 
     except Exception as e:
-        if retry:
+        if not retry:
             time.sleep(1)
-            main(False)
             upd_log(f"运行错误: {e}, 重试中...")
+            main(True)
 
         else:
             send_email(
-                f"运行错误: {e}",
+                f"二次运行错误: {e}",
                 subject="BiliMon 插件运行错误",
                 title="请手动重启插件",
             )
