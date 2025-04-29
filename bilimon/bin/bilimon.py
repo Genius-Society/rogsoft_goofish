@@ -137,6 +137,12 @@ class BiliUser:
             upd_log("XU6J03M6")
             exit()
 
+        self.credential = Credential(
+            sessdata=self.sessdata,
+            bili_jct=self.bili_jct,
+            buvid3=self.buvid3,
+        )
+
     def _get_fans(self, page):
         try:
             response = requests.get(
@@ -180,12 +186,7 @@ class BiliUser:
 
     def _is_deleted(self, uid):
         async def is_deleted_async(user_id):
-            c = Credential(
-                sessdata=self.sessdata,
-                bili_jct=self.bili_jct,
-                buvid3=self.buvid3,
-            )
-            user_ins = user.User(uid=int(user_id), credential=c)
+            user_ins = user.User(uid=int(user_id), credential=self.credential)
             try:
                 await user_ins.get_user_info()
                 return False
@@ -197,12 +198,7 @@ class BiliUser:
 
     def _is_fans(self, uid):
         async def is_fans_async(relation_id):
-            c = Credential(
-                sessdata=self.sessdata,
-                bili_jct=self.bili_jct,
-                buvid3=self.buvid3,
-            )
-            user_ins = user.User(uid=self.uid, credential=c)
+            user_ins = user.User(uid=self.uid, credential=self.credential)
             relation = await user_ins.get_relation(relation_id)
             followed_status = relation["be_relation"]["attribute"]
             return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
@@ -335,7 +331,7 @@ def hour_monitor(period=2):
         time.sleep(1)
 
 
-def main(retry=False):
+def main():
     try:
         if int(args.clock) == 1:
             hour_monitor(period=args.period)
@@ -347,17 +343,9 @@ def main(retry=False):
         upd_log("XU6J03M6")
 
     except Exception as e:
-        if not retry:
-            time.sleep(1)
-            upd_log(f"运行错误: {e}, 重试中...")
-            main(True)
-
-        else:
-            send_email(
-                f"二次运行错误: {e}",
-                subject="BiliMon 插件运行错误",
-                title="请手动重启插件",
-            )
+        upd_log(f"运行错误: {e}, 重试中...")
+        time.sleep(1)
+        main()
 
 
 if __name__ == "__main__":
