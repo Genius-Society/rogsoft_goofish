@@ -38,7 +38,7 @@ python build.py
 注: 多账号切换获取 cookie 时推荐清理 `user_data` 文件夹而非登出, 否则会导致被登出的账号 cookie 失效
 
 ## 批量私信
-- <https://www.modelscope.cn/studios/kakamond/bili_batch_whisper>
+- <https://www.modelscope.cn/studios/kakamond/bili_dark_tools>
 
 ## Thanks
 - <https://github.com/koolshare/rogsoft>
