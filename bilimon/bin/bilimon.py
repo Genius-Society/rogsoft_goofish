@@ -29,7 +29,6 @@ parser.add_argument("--ck2", type=str, help="Specify the second cookie for BiliM
 args = parser.parse_args()
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 TMP_DIR = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
-SCRIPT_DIR = "/koolshare/bilimon"
 
 
 def upd_log(txt):
@@ -124,7 +123,7 @@ def add_traitors(traitors: list, file_folder=TMP_DIR):
 
 
 class BiliUser:
-    def __init__(self, cookie: str, dbfile=f"{SCRIPT_DIR}/fans.json"):
+    def __init__(self, cookie: str, dbfile=f"{TMP_DIR}/fans.json"):
         self.cookie = cookie
         self.dbfile = dbfile
         self.uid, self.sessdata, self.bili_jct, self.buvid3 = parse_cookie(self.cookie)
@@ -306,7 +305,7 @@ def upd_all_fans():
     BiliUser(cookie=args.cookie).upd_fans()
     cookie2 = str(args.ck2).strip()
     if cookie2:
-        BiliUser(cookie=cookie2, dbfile=f"{SCRIPT_DIR}/fans2.json").upd_fans()
+        BiliUser(cookie=cookie2, dbfile=f"{TMP_DIR}/fans2.json").upd_fans()
 
 
 def clean_all_traitors():
