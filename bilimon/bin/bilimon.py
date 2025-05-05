@@ -281,7 +281,7 @@ class BiliUser:
 
             unfollows, out1000 = self._filter_unfollows(unfollows)
             if unfollows:
-                content = ""
+                content = f"以下狗取关了 {self.uid}:"
                 traitors = []
                 for user in unfollows:
                     url = f'https://space.bilibili.com/{user["uid"]}'
