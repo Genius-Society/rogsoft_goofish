@@ -83,23 +83,36 @@ def list2str(cookies):
     return "; ".join(cookie_list)
 
 
-def upd_cookie(manual=False, step=MAX_CK_LEN, page="https://space.bilibili.com"):
+def upd_cookie(
+    manual=False,
+    split=True,
+    step=MAX_CK_LEN,
+    page="https://space.bilibili.com",
+):
     try:
         driver = init_chrome(vision=manual)
         driver.get(page)
         cookies = list2str(driver.get_cookies())  # TODO: 在这打断点手动登录
-        size = len(cookies)
-        count = math.ceil(size / step)
-        for i in range(count):
-            cookie_txt = f"./{TMP_DIR}/cookie{i + 1 if i else ''}.txt"
-            with open(cookie_txt, "w", encoding="utf-8") as file:
-                file.write(cookies[i * step : min((i + 1) * step, size)])
-
-            if i:
-                subprocess.Popen(["notepad", cookie_txt])
-
         driver.close()
-        os.system(f"notepad ./{TMP_DIR}/cookie.txt")
+        if split:
+            size = len(cookies)
+            count = math.ceil(size / step)
+            for i in range(count):
+                cookie_txt = f"./{TMP_DIR}/cookie{i + 1}.txt"
+                with open(cookie_txt, "w", encoding="utf-8") as file:
+                    file.write(cookies[i * step : min((i + 1) * step, size)])
+
+                if i + 1 < count:
+                    subprocess.Popen(["notepad", cookie_txt])
+                else:
+                    os.system(f"notepad {cookie_txt}")
+
+        else:
+            cookie_txt = f"./{TMP_DIR}/cookie.txt"
+            with open(cookie_txt, "w", encoding="utf-8") as file:
+                file.write(cookies)
+
+            os.system(f"notepad {cookie_txt}")
 
     except Exception as e:
         if os.path.exists(f"./{TMP_DIR}/user_data"):
@@ -110,4 +123,4 @@ def upd_cookie(manual=False, step=MAX_CK_LEN, page="https://space.bilibili.com")
 
 
 if __name__ == "__main__":
-    upd_cookie(manual=True)
+    upd_cookie(manual=True, split=False)
