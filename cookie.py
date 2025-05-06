@@ -1,4 +1,5 @@
 import os
+import math
 import shutil
 import zipfile
 import requests
@@ -82,28 +83,23 @@ def list2str(cookies):
     return "; ".join(cookie_list)
 
 
-def upd_cookie(manual=False, upper=MAX_CK_LEN, page="https://space.bilibili.com"):
+def upd_cookie(manual=False, step=MAX_CK_LEN, page="https://space.bilibili.com"):
     try:
         driver = init_chrome(vision=manual)
         driver.get(page)
         cookies = list2str(driver.get_cookies())  # TODO: 在这打断点手动登录
-        cookie_txt = f"./{TMP_DIR}/cookie.txt"
-        if len(cookies) <= upper:
+        size = len(cookies)
+        count = math.ceil(size / step)
+        for i in range(count):
+            cookie_txt = f"./{TMP_DIR}/cookie{i + 1 if i else ''}.txt"
             with open(cookie_txt, "w", encoding="utf-8") as file:
-                file.write(cookies)
+                file.write(cookies[i * step : min((i + 1) * step, size)])
 
-        else:
-            cookie2_txt = f"./{TMP_DIR}/cookie2.txt"
-            with open(cookie_txt, "w", encoding="utf-8") as file:
-                file.write(cookies[:upper])
-
-            with open(cookie2_txt, "w", encoding="utf-8") as file:
-                file.write(cookies[upper:])
-
-            subprocess.Popen(["notepad", cookie2_txt])
+            if i:
+                subprocess.Popen(["notepad", cookie_txt])
 
         driver.close()
-        os.system(f"notepad {cookie_txt}")
+        os.system(f"notepad ./{TMP_DIR}/cookie.txt")
 
     except Exception as e:
         if os.path.exists(f"./{TMP_DIR}/user_data"):
