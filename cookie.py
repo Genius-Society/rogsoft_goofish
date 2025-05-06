@@ -15,21 +15,18 @@ CHROME_URL = f"https://genius-society.asuscomm.com:81/d/archive/mirrors/{CHROME}
 
 
 def download_file(url: str, folder_path=f"./{TMP_DIR}"):
-    # 确保文件夹存在, 如果不存在则创建
-    if not os.path.exists(folder_path):
+    if not os.path.exists(folder_path):  # 确保文件夹存在, 如果不存在则创建
         os.makedirs(folder_path)
 
     file_name = url.split("/")[-1]  # 解析文件名
     file_path = os.path.join(folder_path, file_name)  # 文件的完整路径
     response = requests.get(url, stream=True)  # 下载文件
     total_size = int(response.headers.get("content-length", 0))
-
-    # 添加进度条
     with open(file_path, "wb") as f, tqdm(
         total=total_size,
         desc=file_name,
         unit_scale=True,
-    ) as pbar:
+    ) as pbar:  # 添加进度条
         for data in response.iter_content(chunk_size=1024):
             f.write(data)
             pbar.update(len(data))
@@ -38,10 +35,8 @@ def download_file(url: str, folder_path=f"./{TMP_DIR}"):
 
 
 def unzip_file(zip_file: str, extract_folder=f"./{TMP_DIR}"):
-    # 确保解压缩目录存在, 如果不存在则创建
-    if not os.path.exists(extract_folder):
+    if not os.path.exists(extract_folder):  # 确保解压缩目录存在, 如果不存在则创建
         os.makedirs(extract_folder)
-
     # 打开压缩包
     with zipfile.ZipFile(zip_file, "r") as zip_ref:
         zip_ref.extractall(extract_folder)  # 解压缩到指定目录
