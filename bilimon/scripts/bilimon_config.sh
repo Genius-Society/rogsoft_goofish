@@ -8,13 +8,13 @@ alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 export PATH=$PATH:/opt/bin/
 
 set_lock() {
-	exec 1000>"$LOCK_FILE"
+	exec 1000>"${LOCK_FILE}"
 	flock -x 1000
 }
 
 unset_lock() {
 	flock -u 1000
-	rm -rf "$LOCK_FILE"
+	rm -rf "${LOCK_FILE}"
 }
 
 sync_ntp() {
@@ -59,10 +59,10 @@ install_env() {
 # 自动修复路由器重启导致的盘符变化
 fix_path() {
 	for dir in /mnt/*/; do
-		if [ -d "$dir" ]; then
+		if [ -d "${dir}" ]; then
 			sub=$(echo "$1" | cut -d'/' -f4-)
-			if [ ! -z $sub ] [ -d "$dir$sub" ]; then
-				echo "$dir$sub"
+			if [ ! -z $sub ] [ -d "${dir}${sub}" ]; then
+				echo "${dir}${sub}"
 			fi
 		fi
 	done
@@ -70,23 +70,23 @@ fix_path() {
 
 start_bilimon() {
 	# 检查入参
-	if [[ -z $bilimon_period ]]; then
+	if [[ -z "${bilimon_period}" ]]; then
 		close_in_five "请输入有效周期!"
 	fi
-	if [[ -z $bilimon_mail ]]; then
+	if [[ -z "${bilimon_mail}" ]]; then
 		close_in_five "请输入有效邮箱!"
 	fi
-	if [[ -z $bilimon_smtp ]]; then
+	if [[ -z "${bilimon_smtp}" ]]; then
 		close_in_five "请输入有效SMTP密钥!"
 	fi
-	if [[ -z $bilimon_cookie ]]; then
+	if [[ -z "${bilimon_cookie}" ]]; then
 		close_in_five "请输入有效B站cookie!"
 	fi
-	if [ -z $bilimon_tmp ]; then
+	if [ -z "${bilimon_tmp}" ]; then
 		close_in_five "请输入有效缓存路径!"
 	fi
 
-	if [ ! -d $bilimon_tmp ]; then
+	if [ ! -d "${bilimon_tmp}" ]; then
 		# 修复重启导致的缓存目录盘符变化
 		echo_date "检查缓存路径..."
 		fixed_bilimon_tmp=$(fix_path $bilimon_tmp)
@@ -114,12 +114,12 @@ start_bilimon() {
 	rm -rf "/tmp/upload/bilimon_run_log.txt"
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 1 \
-		--period "$bilimon_period" \
-		--email "$bilimon_mail" \
-		--smtp "$bilimon_smtp" \
-		--tmp "$bilimon_tmp" \
-		--cookie "$bilimon_cookie" \
-		--ck2 "$bilimon_cookie2" \
+		--period "${bilimon_period}" \
+		--email "${bilimon_mail}" \
+		--smtp "${bilimon_smtp}" \
+		--tmp "${bilimon_tmp}" \
+		--ck "${bilimon_cookie}" \
+		--ck2 "${bilimon_cookie2}" \
 		>>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
 
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
@@ -127,23 +127,23 @@ start_bilimon() {
 
 trigger_check() {
 	# 检查入参
-	if [[ -z $bilimon_period ]]; then
+	if [[ -z "${bilimon_period}" ]]; then
 		echo_date "请输入有效周期!XU6J03M6"
 		return
 	fi
-	if [[ -z $bilimon_mail ]]; then
+	if [[ -z "${bilimon_mail}" ]]; then
 		echo_date "请输入有效邮箱!XU6J03M6"
 		return
 	fi
-	if [[ -z $bilimon_smtp ]]; then
+	if [[ -z "${bilimon_smtp}" ]]; then
 		echo_date "请输入有效SMTP密钥!XU6J03M6"
 		return
 	fi
-	if [[ -z $bilimon_cookie ]]; then
+	if [[ -z "${bilimon_cookie}" ]]; then
 		echo_date "请输入有效B站cookie!XU6J03M6"
 		return
 	fi
-	if [ -z $bilimon_tmp ] || [ ! -d $bilimon_tmp ]; then
+	if [ -z "${bilimon_tmp}" ] || [ ! -d "${bilimon_tmp}" ]; then
 		echo_date "请输入有效缓存路径!XU6J03M6"
 		return
 	fi
@@ -161,12 +161,12 @@ trigger_once() {
 	# 开启单次触发扫描
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 0 \
-		--period "$bilimon_period" \
-		--email "$bilimon_mail" \
-		--smtp "$bilimon_smtp" \
-		--tmp "$bilimon_tmp" \
-		--cookie "$bilimon_cookie" \
-		--ck2 "$bilimon_cookie2" \
+		--period "${bilimon_period}" \
+		--email "${bilimon_mail}" \
+		--smtp "${bilimon_smtp}" \
+		--tmp "${bilimon_tmp}" \
+		--ck "${bilimon_cookie}" \
+		--ck2 "${bilimon_cookie2}" \
 		>>$LOG_FILE 2>&1 &
 }
 
@@ -175,12 +175,12 @@ trigger_clean() {
 	# 开启单次触发清理
 	nohup python /koolshare/bilimon/bilimon.py \
 		--clock 2 \
-		--period "$bilimon_period" \
-		--email "$bilimon_mail" \
-		--smtp "$bilimon_smtp" \
-		--tmp "$bilimon_tmp" \
-		--cookie "$bilimon_cookie" \
-		--ck2 "$bilimon_cookie2" \
+		--period "${bilimon_period}" \
+		--email "${bilimon_mail}" \
+		--smtp "${bilimon_smtp}" \
+		--tmp "${bilimon_tmp}" \
+		--ck "${bilimon_cookie}" \
+		--ck2 "${bilimon_cookie2}" \
 		>>$LOG_FILE 2>&1 &
 }
 
@@ -206,7 +206,7 @@ stop() {
 	if [ ! -z $pids ]; then
 		echo_date "关闭监控进程..."
 		for pid in $pids; do
-			kill "$pid"
+			kill "${pid}"
 		done
 	fi
 	fun_wan_start
@@ -269,8 +269,8 @@ watch_dogs)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	if [[ -f "$bilimon_tmp/traitors.txt" ]]; then
-		awk '{print "https://space.bilibili.com/" $0}' "$bilimon_tmp/traitors.txt" | tee -a $LOG_FILE
+	if [[ -f "${bilimon_tmp}/traitors.txt" ]]; then
+		awk '{print "https://space.bilibili.com/" $0}' "${bilimon_tmp}/traitors.txt" | tee -a $LOG_FILE
 	else
 		echo_date "当前狗库为空!" | tee -a $LOG_FILE
 	fi
@@ -289,7 +289,7 @@ esac
 
 # 重启自启时触发
 bilimon_enable=$(dbus get bilimon_enable)
-if [ "$bilimon_enable" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
+if [ "${bilimon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
 	set_lock
 	true >$LOG_FILE
 	# 初始化变量
