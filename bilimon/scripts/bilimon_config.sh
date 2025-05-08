@@ -125,7 +125,7 @@ start_bilimon() {
 	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
 
-trigger_check() {
+trigger() {
 	# 检查入参
 	if [[ -z "${bilimon_period}" ]]; then
 		echo_date "请输入有效周期!XU6J03M6"
@@ -154,34 +154,29 @@ trigger_check() {
 		echo_date "Entware 环境不可用, 请先安装 Entware 插件!XU6J03M6"
 		return
 	fi
+
+	# 开启单次触发扫描
+	nohup python /koolshare/bilimon/bilimon.py \
+		--clock $1 \
+		--period "${bilimon_period}" \
+		--email "${bilimon_mail}" \
+		--smtp "${bilimon_smtp}" \
+		--tmp "${bilimon_tmp}" \
+		--ck "${bilimon_cookie}" \
+		--ck2 "${bilimon_cookie2}" \
+		>>$LOG_FILE 2>&1 &
 }
 
 trigger_once() {
-	trigger_check
-	# 开启单次触发扫描
-	nohup python /koolshare/bilimon/bilimon.py \
-		--clock 0 \
-		--period "${bilimon_period}" \
-		--email "${bilimon_mail}" \
-		--smtp "${bilimon_smtp}" \
-		--tmp "${bilimon_tmp}" \
-		--ck "${bilimon_cookie}" \
-		--ck2 "${bilimon_cookie2}" \
-		>>$LOG_FILE 2>&1 &
+	trigger 0
 }
 
 trigger_clean() {
-	trigger_check
-	# 开启单次触发清理
-	nohup python /koolshare/bilimon/bilimon.py \
-		--clock 2 \
-		--period "${bilimon_period}" \
-		--email "${bilimon_mail}" \
-		--smtp "${bilimon_smtp}" \
-		--tmp "${bilimon_tmp}" \
-		--ck "${bilimon_cookie}" \
-		--ck2 "${bilimon_cookie2}" \
-		>>$LOG_FILE 2>&1 &
+	trigger 2
+}
+
+smtp_test() {
+	trigger 3
 }
 
 close_in_five() {
@@ -221,6 +216,7 @@ start)
 	fi
 	unset_lock
 	;;
+
 restart)
 	set_lock
 	if [ "${bilimon_enable}" == "1" ]; then
@@ -229,11 +225,13 @@ restart)
 	fi
 	unset_lock
 	;;
+
 stop)
 	set_lock
 	stop
 	unset_lock
 	;;
+
 esac
 
 case $2 in
@@ -251,6 +249,7 @@ web_submit)
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;
+
 trigger_once)
 	set_lock
 	true >$LOG_FILE
@@ -258,6 +257,7 @@ trigger_once)
 	trigger_once | tee -a $LOG_FILE
 	unset_lock
 	;;
+
 trigger_clean)
 	set_lock
 	true >$LOG_FILE
@@ -265,6 +265,15 @@ trigger_clean)
 	trigger_clean | tee -a $LOG_FILE
 	unset_lock
 	;;
+
+smtp_test)
+	set_lock
+	true >$LOG_FILE
+	http_response "$1"
+	smtp_test | tee -a $LOG_FILE
+	unset_lock
+	;;
+
 watch_dogs)
 	set_lock
 	true >$LOG_FILE
@@ -277,6 +286,7 @@ watch_dogs)
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;
+
 fix_env)
 	set_lock
 	true >$LOG_FILE
@@ -285,6 +295,7 @@ fix_env)
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;
+
 esac
 
 # 重启自启时触发

@@ -43,13 +43,10 @@
             width: 100%;
             height: 100%;
             z-index: 99;
-            /*background-color: #444F53;*/
             filter: alpha(opacity=90);
-            /*IE5 \ IE5.5 \ IE6 \ IE7*/
             background-repeat: repeat;
             visibility: hidden;
             overflow: hidden;
-            /*background: url(/images/New_ui/login_bg.png);*/
             background: rgba(68, 79, 83, 0.85) none repeat scroll 0 0 !important;
             background-position: 0 0;
             background-size: cover;
@@ -79,8 +76,6 @@
         #bilimon_feat_cookie2:focus {
             -webkit-text-security: none;
         }
-
-        /* W3C rogcss */
     </style>
     <script>
         var odm = '<% nvram_get("productid"); %>'
@@ -98,10 +93,9 @@
         }
 
         function register_event() {
-            $(".popup_bar_bg_ks").click(
-                function () {
-                    count_down = -1;
-                });
+            $(".popup_bar_bg_ks").click(function () {
+                count_down = -1;
+            });
             $(window).resize(function () {
                 if ($('.popup_bar_bg_ks').css("visibility") == "visible") {
                     document.scrollingElement.scrollTop = 0;
@@ -189,7 +183,21 @@
             dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
-            var trigger_mode = mode == 1 ? "trigger_once" : "trigger_clean";
+            var trigger_mode = "";
+            switch (mode) {
+                case 1:
+                    trigger_mode = "trigger_once";
+                    break;
+                case 2:
+                    trigger_mode = "trigger_clean";
+                    break;
+                case 3:
+                    trigger_mode = "smtp_test";
+                    break;
+                default:
+                    trigger_mode = "";
+                    break;
+            }
             var postData = { "id": id, "method": "bilimon_config.sh", "params": [trigger_mode], "fields": dbus_new };
             $.ajax({
                 type: "POST",
@@ -246,7 +254,6 @@
             for (var i = 0; i < params_chk.length; i++) {
                 dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
             }
-
             dbus_new["bilimon_period"] = E("bilimon_feat_period").value
             dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
             dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
@@ -373,6 +380,7 @@
                 }
             });
         }
+
         function show_log_pannel() {
             document.scrollingElement.scrollTop = 0;
             E("log_pannel_div").style.visibility = "visible";
@@ -386,6 +394,7 @@
             STATUS_FLAG = 1;
             get_run_log();
         }
+
         function hide_log_pannel() {
             E("log_pannel_div").style.visibility = "hidden";
             STATUS_FLAG = 0;
@@ -480,7 +489,7 @@
                                                 cellspacing="0" class="FormTable">
                                                 <thead>
                                                     <tr>
-                                                        <td colspan="2">BiliMon设定</td>
+                                                        <td colspan="2">BiliMon 设定</td>
                                                     </tr>
                                                 </thead>
                                                 <tr id="switch_tr">
@@ -511,7 +520,7 @@
                                                     <td><span id="bilimon_status"></span>
                                                         <div style="float: right;margin-right:5px;">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="show_log_pannel()">BiliMon运行日志</a>
+                                                                onclick="show_log_pannel()">BiliMon 运行日志</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -575,10 +584,10 @@
                                                 <tr id="bilimon_trigger">
                                                     <th>手动触发</th>
                                                     <td>
-                                                        <a type="button" id="bilimon_trigger" class="ks_btn"
+                                                        <a type="button" class="ks_btn bilimon_trigger"
                                                             href="javascript:void(0);" onclick="trigger(1)"
                                                             style="border:none">单轮粉丝扫描</a>
-                                                        <a type="button" id="bilimon_trigger" class="ks_btn"
+                                                        <a type="button" class="ks_btn bilimon_trigger"
                                                             href="javascript:void(0);" onclick="trigger(2)"
                                                             style="border:none">清理已注销狗</a>
                                                     </td>
@@ -586,7 +595,7 @@
                                                 <tr id="bilimon_traitor">
                                                     <th>取关狗名单</th>
                                                     <td>
-                                                        <a type="button" id="bilimon_traitor" class="ks_btn"
+                                                        <a type="button" class="ks_btn bilimon_traitor"
                                                             href="javascript:void(0);" onclick="watchdog()"
                                                             style="border:none">取关狗名单</a>
                                                     </td>
@@ -594,9 +603,12 @@
                                                 <tr id="bilimon_env">
                                                     <th>修复运行环境</th>
                                                     <td>
-                                                        <a type="button" id="bilimon_env" class="ks_btn"
+                                                        <a type="button" class="ks_btn bilimon_env"
                                                             href="javascript:void(0);" onclick="fixenv()"
                                                             style="border:none">修复运行环境</a>
+                                                        <a type="button" class="ks_btn bilimon_trigger"
+                                                            href="javascript:void(0);" onclick="trigger(3)"
+                                                            style="border:none">SMTP测试</a>
                                                     </td>
                                                 </tr>
                                             </table>

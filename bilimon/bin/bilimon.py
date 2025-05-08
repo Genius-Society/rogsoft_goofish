@@ -67,7 +67,7 @@ class BiliMon:
     def _send_email(
         self,
         content,
-        subject="按罪人名单降下终末",
+        subject="[BiliMon 插件] 按罪人名单降下终末",
         title="监测到取关狗",
         smtp_server="smtp.qq.com",
         smtp_port=587,
@@ -77,7 +77,7 @@ class BiliMon:
         <html>
             <body>
                 <h1>{title}</h1><br>
-                [BiliMon 插件] {content}
+                {content}
             </body>
         </html>
         """
@@ -322,6 +322,12 @@ class BiliMon:
                 self._upd_all_fans()
             elif int(args.clock) == 2:
                 self._clean_all_traitors()
+            elif int(args.clock) == 3:
+                self._send_email(
+                    "邮件发送成功!",
+                    subject="[BiliMon 插件] 邮件发送测试",
+                    title="测试 SMTP 模块",
+                )
 
             self._upd_log("XU6J03M6")
 
