@@ -167,18 +167,6 @@ trigger() {
 		>>$LOG_FILE 2>&1 &
 }
 
-trigger_once() {
-	trigger 0
-}
-
-trigger_clean() {
-	trigger 2
-}
-
-smtp_test() {
-	trigger 3
-}
-
 close_in_five() {
 	dbus set bilimon_enable=0
 	echo_date $1
@@ -254,7 +242,7 @@ trigger_once)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	trigger_once | tee -a $LOG_FILE
+	trigger 0 | tee -a $LOG_FILE
 	unset_lock
 	;;
 
@@ -262,7 +250,7 @@ trigger_clean)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	trigger_clean | tee -a $LOG_FILE
+	trigger 2 | tee -a $LOG_FILE
 	unset_lock
 	;;
 
@@ -270,7 +258,7 @@ smtp_test)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	smtp_test | tee -a $LOG_FILE
+	trigger 3 | tee -a $LOG_FILE
 	unset_lock
 	;;
 
