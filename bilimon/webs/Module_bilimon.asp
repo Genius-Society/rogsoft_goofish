@@ -131,22 +131,22 @@
                 }
             }
             if (dbus["bilimon_period"]) {
-                E("bilimon_feat_period").value = dbus["bilimon_period"]
+                E("bilimon_feat_period").value = dbus["bilimon_period"];
             }
             if (dbus["bilimon_mail"]) {
-                E("bilimon_feat_mail").value = dbus["bilimon_mail"]
+                E("bilimon_feat_mail").value = dbus["bilimon_mail"];
             }
             if (dbus["bilimon_smtp"]) {
-                E("bilimon_feat_smtp").value = dbus["bilimon_smtp"]
+                E("bilimon_feat_smtp").value = dbus["bilimon_smtp"];
             }
             if (dbus["bilimon_tmp"]) {
-                E("bilimon_feat_tmp").value = dbus["bilimon_tmp"]
+                E("bilimon_feat_tmp").value = dbus["bilimon_tmp"];
             }
             if (dbus["bilimon_cookie"]) {
-                E("bilimon_feat_cookie").value = dbus["bilimon_cookie"]
+                E("bilimon_feat_cookie").value = dbus["bilimon_cookie"];
             }
             if (dbus["bilimon_cookie2"]) {
-                E("bilimon_feat_cookie2").value = dbus["bilimon_cookie2"]
+                E("bilimon_feat_cookie2").value = dbus["bilimon_cookie2"];
             }
         }
 
@@ -302,10 +302,10 @@
                 hideWBLoadingBar();
             }
             if (count_down < 0) {
-                E("ok_button1").value = "手动关闭"
+                E("ok_button1").value = "手动关闭";
                 return false;
             }
-            E("ok_button1").value = "自动关闭(" + count_down + ")"
+            E("ok_button1").value = "自动关闭(" + count_down + ")";
             --count_down;
             setTimeout("count_down_close();", 1000);
         }
