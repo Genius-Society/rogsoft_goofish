@@ -190,12 +190,12 @@
             if (trigger_mode != "") {
                 get_log(1);
                 var dbus_new = {};
-                dbus_new["bilimon_period"] = E("bilimon_feat_period").value
-                dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
-                dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
-                dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
-                dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
-                dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value
+                dbus_new["bilimon_period"] = E("bilimon_feat_period").value;
+                dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value;
+                dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value;
+                dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value;
+                dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value;
+                dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value;
                 E("bilimon_apply").disabled = true;
                 var id = parseInt(Math.random() * 100000000);
                 var postData = { "id": id, "method": "bilimon_config.sh", "params": [trigger_mode], "fields": dbus_new };
@@ -215,7 +215,7 @@
         function watchdog() {
             get_log(1);
             var dbus_new = {};
-            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
+            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value;
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["watch_dogs"], "fields": dbus_new };
@@ -234,7 +234,7 @@
         function fixenv() {
             get_log(1);
             var dbus_new = {};
-            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
+            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value;
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["fix_env"], "fields": dbus_new };
@@ -255,12 +255,12 @@
             for (var i = 0; i < params_chk.length; i++) {
                 dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
             }
-            dbus_new["bilimon_period"] = E("bilimon_feat_period").value
-            dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
-            dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
-            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
-            dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
-            dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value
+            dbus_new["bilimon_period"] = E("bilimon_feat_period").value;
+            dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value;
+            dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value;
+            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value;
+            dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value;
+            dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value;
             E("bilimon_apply").disabled = true;
             var id = parseInt(Math.random() * 100000000);
             var postData = { "id": id, "method": "bilimon_config.sh", "params": ["web_submit"], "fields": dbus_new };
