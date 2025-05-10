@@ -173,16 +173,6 @@
         }
 
         function trigger(mode) {
-            get_log(1);
-            var dbus_new = {};
-            dbus_new["bilimon_period"] = E("bilimon_feat_period").value
-            dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
-            dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
-            dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
-            dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
-            dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value
-            E("bilimon_apply").disabled = true;
-            var id = parseInt(Math.random() * 100000000);
             var trigger_mode = "";
             switch (mode) {
                 case 1:
@@ -195,20 +185,31 @@
                     trigger_mode = "smtp_test";
                     break;
                 default:
-                    trigger_mode = "";
                     break;
             }
-            var postData = { "id": id, "method": "bilimon_config.sh", "params": [trigger_mode], "fields": dbus_new };
-            $.ajax({
-                type: "POST",
-                url: "/_api/",
-                data: JSON.stringify(postData),
-                dataType: "json",
-                success: function (response) {
-                    get_log(1);
-                    E("bilimon_apply").disabled = false;
-                }
-            });
+            if (trigger_mode != "") {
+                get_log(1);
+                var dbus_new = {};
+                dbus_new["bilimon_period"] = E("bilimon_feat_period").value
+                dbus_new["bilimon_mail"] = E("bilimon_feat_mail").value
+                dbus_new["bilimon_smtp"] = E("bilimon_feat_smtp").value
+                dbus_new["bilimon_tmp"] = E("bilimon_feat_tmp").value
+                dbus_new["bilimon_cookie"] = E("bilimon_feat_cookie").value
+                dbus_new["bilimon_cookie2"] = E("bilimon_feat_cookie2").value
+                E("bilimon_apply").disabled = true;
+                var id = parseInt(Math.random() * 100000000);
+                var postData = { "id": id, "method": "bilimon_config.sh", "params": [trigger_mode], "fields": dbus_new };
+                $.ajax({
+                    type: "POST",
+                    url: "/_api/",
+                    data: JSON.stringify(postData),
+                    dataType: "json",
+                    success: function (response) {
+                        get_log(1);
+                        E("bilimon_apply").disabled = false;
+                    }
+                });
+            }
         }
 
         function watchdog() {
