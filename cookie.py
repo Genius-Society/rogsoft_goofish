@@ -17,8 +17,8 @@ CHROME_URL = f"https://genius-society.asuscomm.com:81/d/archive/mirrors/{CHROME}
 def download_file(url: str, folder_path=f"./{TMP_DIR}"):
     if not os.path.exists(folder_path):  # 确保文件夹存在, 如果不存在则创建
         os.makedirs(folder_path)
-
-    file_name = url.split("/")[-1]  # 解析文件名
+    # 解析文件名
+    file_name = url.split("/")[-1]
     file_path = os.path.join(folder_path, file_name)  # 文件的完整路径
     response = requests.get(url, stream=True)  # 下载文件
     total_size = int(response.headers.get("content-length", 0))
