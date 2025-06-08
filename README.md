@@ -5,7 +5,7 @@
 
 监控B站粉丝动向: 取关狗死全家! 推荐 UP 在 1K 粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
 
-![](./bilimon/res/icon-bilimon.png)
+[![](./bilimon/res/icon-bilimon.png)](https://github.com/Genius-Society/bilimon)
 
 ## Code download
 ```bash

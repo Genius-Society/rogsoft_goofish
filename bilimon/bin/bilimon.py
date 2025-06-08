@@ -274,8 +274,7 @@ class BiliMon:
         if now_hour > 7 and now_hour < 23:
             self._upd_all_fans()
         else:
-            self._clean_all_traitors()
-            self._upd_log("当前处于免打扰时间段, 仅清理取关狗")
+            self._upd_log("当前处于免打扰时间段...")
 
     def _upd_log(self, txt):
         if int(args.clock) == 1:
