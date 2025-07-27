@@ -127,7 +127,10 @@
                                                         <div style="float: right;margin-top:5px;margin-right:5px;">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="get_log(1)"
-                                                                style="cursor: pointer;margin-left:5px;border:none">查看日志</a>
+                                                                style="cursor: pointer;margin-left:5px;border:none">启动日志</a>
+                                                            <a type="button" class="ks_btn wemediamon_env"
+                                                                href="javascript:void(0);" onclick="fixenv()"
+                                                                style="border:none">环境修复</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -136,7 +139,7 @@
                                                     <td><span id="wemediamon_status"></span>
                                                         <div style="float: right;margin-right:5px;">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="show_log_pannel()">WeMediaMon 运行日志</a>
+                                                                onclick="show_log_pannel()">运行日志</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -162,6 +165,11 @@
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
                                                             value="">
+                                                        <div style="float: right;margin-right:5px;">
+                                                            <a type="button" class="ks_btn wemediamon_trigger"
+                                                                href="javascript:void(0);" onclick="trigger(3)"
+                                                                style="border:none">邮件测试</a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -173,15 +181,12 @@
                                                             autocapitalize="off">
                                                     </td>
                                                 </tr>
-                                                <tr id="wemediamon_env">
-                                                    <th>修复运行环境</th>
+                                                <tr id="wemediamon_period">
+                                                    <th>刷新周期(小时)<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <a type="button" class="ks_btn wemediamon_env"
-                                                            href="javascript:void(0);" onclick="fixenv()"
-                                                            style="border:none">修复运行环境</a>
-                                                        <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick="trigger(3)"
-                                                            style="border:none">SMTP测试</a>
+                                                        <input style="width:62px;" type="number" class="input_ss_table"
+                                                            id="wemediamon_feat_period" name="wemediamon_feat_period"
+                                                            min="1" max="8765" value="2">
                                                     </td>
                                                 </tr>
                                             </table>
@@ -210,20 +215,18 @@
                                             <table id="table_basic" width="100%" border="0" align="center"
                                                 cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th>B站Cookie</th>
+                                                    <th>BiliMon开关</th>
                                                     <td>
-                                                        <textarea style="width:453px;height:auto;"
-                                                            class="input_ss_table" id="wemediamon_bili_ck"
-                                                            name="wemediamon_bili_ck" maxlength="2048" rows="12"
-                                                            autocorrect="off" autocapitalize="off"></textarea>
+                                                        <input type="checkbox" id="bili_on" onchange="show_hide_el()">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>刷新周期(小时)<span style="color: red;"> * </span></th>
+                                                    <th>B站Cookie<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input style="width:62px;" type="number" class="input_ss_table"
-                                                            id="wemediamon_feat_period" name="wemediamon_feat_period"
-                                                            min="1" max="8765" value="2">
+                                                        <textarea style="width:453px;height:auto;"
+                                                            class="input_ss_table" id="bili_ck" name="bili_ck"
+                                                            maxlength="2048" rows="12" autocorrect="off"
+                                                            autocapitalize="off" placeholder=""></textarea>
                                                     </td>
                                                 </tr>
                                                 <tr id="wemediamon_trigger">
@@ -242,7 +245,7 @@
                                                     <td>
                                                         <a type="button" class="ks_btn wemediamon_traitor"
                                                             href="javascript:void(0);" onclick="watchdog()"
-                                                            style="border:none">取关狗名单</a>
+                                                            style="border:none">查看取关狗名单</a>
                                                         <a type="button" class="ks_btn wemediamon_trigger"
                                                             href="javascript:void(0);" onclick="trigger(2)"
                                                             style="border:none">清理已注销狗</a>
