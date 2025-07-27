@@ -199,7 +199,7 @@
                                                         <input onclick="tabSelect(2)" class="show show-btn2"
                                                             type="button" value="GitHub" />
                                                         <input onclick="tabSelect(3)" class="show show-btn3"
-                                                            type="button" value="cnblog" />
+                                                            type="button" value="cnblogs" />
                                                         <input onclick="tabSelect(4)" class="show show-btn4"
                                                             type="button" value="itch.io" />
                                                     </td>
@@ -212,16 +212,9 @@
                                                 <tr>
                                                     <th>B站Cookie</th>
                                                     <td>
-                                                        <span id="cookie1">账号1<span style="color: red;"> *
-                                                            </span></span>
                                                         <textarea style="width:453px;height:auto;"
                                                             class="input_ss_table" id="wemediamon_feat_cookie"
                                                             name="wemediamon_feat_cookie" maxlength="2048" rows="12"
-                                                            autocorrect="off" autocapitalize="off"></textarea>
-                                                        <span id="cookie2">账号2</span>
-                                                        <textarea style="width:453px;height:auto;"
-                                                            class="input_ss_table" id="wemediamon_feat_cookie2"
-                                                            name="wemediamon_feat_cookie2" maxlength="2048" rows="12"
                                                             autocorrect="off" autocapitalize="off"></textarea>
                                                     </td>
                                                 </tr>

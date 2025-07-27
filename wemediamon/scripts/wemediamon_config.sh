@@ -118,9 +118,8 @@ start_wemediamon() {
 		--email "${wemediamon_mail}" \
 		--smtp "${wemediamon_smtp}" \
 		--tmp "${wemediamon_tmp}" \
-		--ck "${wemediamon_cookie}" \
-		--ck2 "${wemediamon_cookie2}" \
-		>>"/tmp/upload/wemediamon_run_log.txt" 2>&1 &
+		--ck "${wemediamon_cookie}" \ 
+	>>"/tmp/upload/wemediamon_run_log.txt" 2>&1 &
 
 	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
@@ -162,9 +161,8 @@ trigger() {
 		--email "${wemediamon_mail}" \
 		--smtp "${wemediamon_smtp}" \
 		--tmp "${wemediamon_tmp}" \
-		--ck "${wemediamon_cookie}" \
-		--ck2 "${wemediamon_cookie2}" \
-		>>$LOG_FILE 2>&1 &
+		--ck "${wemediamon_cookie}" \ 
+	>>$LOG_FILE 2>&1 &
 }
 
 close_in_five() {
@@ -297,7 +295,6 @@ if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v gre
 	wemediamon_smtp=$(dbus get wemediamon_smtp)
 	wemediamon_tmp=$(dbus get wemediamon_tmp)
 	wemediamon_cookie=$(dbus get wemediamon_cookie)
-	wemediamon_cookie2=$(dbus get wemediamon_cookie2)
 	# 开启 WeMediaMon
 	start_wemediamon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE

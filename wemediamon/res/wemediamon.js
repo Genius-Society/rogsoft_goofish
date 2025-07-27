@@ -65,9 +65,6 @@ function conf2obj() {
 	if (dbus["wemediamon_cookie"]) {
 		E("wemediamon_feat_cookie").value = dbus["wemediamon_cookie"];
 	}
-	if (dbus["wemediamon_cookie2"]) {
-		E("wemediamon_feat_cookie2").value = dbus["wemediamon_cookie2"];
-	}
 }
 
 function get_status() {
@@ -115,7 +112,6 @@ function trigger(mode) {
 		dbus_new["wemediamon_smtp"] = E("wemediamon_feat_smtp").value;
 		dbus_new["wemediamon_tmp"] = E("wemediamon_feat_tmp").value;
 		dbus_new["wemediamon_cookie"] = E("wemediamon_feat_cookie").value;
-		dbus_new["wemediamon_cookie2"] = E("wemediamon_feat_cookie2").value;
 		E("wemediamon_apply").disabled = true;
 		var id = parseInt(Math.random() * 100000000);
 		var postData = { "id": id, "method": "wemediamon_config.sh", "params": [trigger_mode], "fields": dbus_new };
@@ -180,7 +176,6 @@ function save() {
 	dbus_new["wemediamon_smtp"] = E("wemediamon_feat_smtp").value;
 	dbus_new["wemediamon_tmp"] = E("wemediamon_feat_tmp").value;
 	dbus_new["wemediamon_cookie"] = E("wemediamon_feat_cookie").value;
-	dbus_new["wemediamon_cookie2"] = E("wemediamon_feat_cookie2").value;
 	E("wemediamon_apply").disabled = true;
 	var id = parseInt(Math.random() * 100000000);
 	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["web_submit"], "fields": dbus_new };
