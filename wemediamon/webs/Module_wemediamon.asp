@@ -14,12 +14,11 @@
     <link rel="stylesheet" type="text/css" href="form_style.css" />
     <link rel="stylesheet" type="text/css" href="css/element.css">
     <link rel="stylesheet" type="text/css" href="/res/softcenter.css">
-    <link rel="stylesheet" type="text/css" href="/js/table/table.css">
+    <link rel="stylesheet" type="text/css" href="/res/fancyss.css">
     <link rel="stylesheet" type="text/css" href="/res/layer/theme/default/layer.css">
     <script language="JavaScript" type="text/javascript" src="/js/jquery.js"></script>
     <script type="text/javascript" src="/res/Browser.js"></script>
     <script type="text/javascript" src="/res/softcenter.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/js/table/table.js"></script>
     <script type="text/javascript" src="/state.js"></script>
     <script type="text/javascript" src="/general.js"></script>
     <script type="text/javascript" src="/popup.js"></script>

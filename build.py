@@ -31,7 +31,8 @@ def get_or_create():
 
 
 def pack_folder(module_name: str):
-    subprocess.run(["7z", "a", "-ttar", f"{module_name}.tar", module_name], check=True)
+    subprocess.run(
+        ["7z", "a", "-ttar", f"{module_name}.tar", module_name], check=True)
     subprocess.run(
         ["7z", "a", "-tgzip", f"{module_name}.tar.gz", f"{module_name}.tar"],
         check=True,
