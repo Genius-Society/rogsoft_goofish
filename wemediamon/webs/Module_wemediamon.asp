@@ -14,10 +14,12 @@
     <link rel="stylesheet" type="text/css" href="form_style.css" />
     <link rel="stylesheet" type="text/css" href="css/element.css">
     <link rel="stylesheet" type="text/css" href="/res/softcenter.css">
+    <link rel="stylesheet" type="text/css" href="/js/table/table.css">
     <link rel="stylesheet" type="text/css" href="/res/layer/theme/default/layer.css">
     <script language="JavaScript" type="text/javascript" src="/js/jquery.js"></script>
     <script type="text/javascript" src="/res/Browser.js"></script>
     <script type="text/javascript" src="/res/softcenter.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/js/table/table.js"></script>
     <script type="text/javascript" src="/state.js"></script>
     <script type="text/javascript" src="/general.js"></script>
     <script type="text/javascript" src="/popup.js"></script>
@@ -405,6 +407,36 @@
             tabtitle[tabtitle.length - 1] = new Array("", "WeMediaMon");
             tablink[tablink.length - 1] = new Array("", "Module_wemediamon.asp");
         }
+
+        function tabSelect(w) {
+            for (var i = 0; i <= 10; i++) {
+                $('.show-btn' + i).removeClass('active');
+                $('#tablet_' + i).hide();
+            }
+            $('.show-btn' + w).addClass('active');
+            $('#tablet_' + w).show();
+        }
+
+        $(".show-btn0").click(
+            function () {
+                tabSelect(0);
+            });
+        $(".show-btn1").click(
+            function () {
+                tabSelect(1);
+            });
+        $(".show-btn2").click(
+            function () {
+                tabSelect(2);
+            });
+        $(".show-btn3").click(
+            function () {
+                tabSelect(3);
+            });
+        $(".show-btn4").click(
+            function () {
+                tabSelect(4);
+            });
     </script>
 </head>
 
@@ -482,7 +514,7 @@
                                         </div>
                                         <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
                                         <div class="SimpleNote">
-                                            <li>B站粉丝监控工具 WeMediaMon</li>
+                                            <li>自媒体粉丝监控工具 WeMediaMon</li>
                                             <li style="color: #FC0;">请设置虚拟内存后再使用</li>
                                         </div>
                                         <div id="wemediamon_main">
@@ -526,14 +558,6 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>刷新周期(小时)<span style="color: red;"> * </span></th>
-                                                    <td>
-                                                        <input style="width:62px;" type="number" class="input_ss_table"
-                                                            id="wemediamon_feat_period" name="wemediamon_feat_period" min="1"
-                                                            max="8765" value="2">
-                                                    </td>
-                                                </tr>
-                                                <tr>
                                                     <th>提示邮箱(QQ/Foxmail)<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input style="width:300px;" type="password"
@@ -566,6 +590,42 @@
                                                             autocapitalize="off">
                                                     </td>
                                                 </tr>
+                                                <tr id="wemediamon_env">
+                                                    <th>修复运行环境</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn wemediamon_env"
+                                                            href="javascript:void(0);" onclick="fixenv()"
+                                                            style="border:none">修复运行环境</a>
+                                                        <a type="button" class="ks_btn wemediamon_trigger"
+                                                            href="javascript:void(0);" onclick="trigger(3)"
+                                                            style="border:none">SMTP测试</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="tablets">
+                                            <table style="margin:10px 0px 0px 0px;border-collapse:collapse" width="100%"
+                                                height="37px">
+                                                <tr>
+                                                    <td cellpadding="0" cellspacing="0" style="padding:0" border="1"
+                                                        bordercolor="#222">
+                                                        <input id="show_btn0" class="show-btn0" style="cursor:pointer"
+                                                            type="button" value="B站" />
+                                                        <input id="show_btn1" class="show-btn1" style="cursor:pointer"
+                                                            type="button" value="HuggingFace" />
+                                                        <input id="show_btn2" class="show-btn2" style="cursor:pointer"
+                                                            type="button" value="GitHub" />
+                                                        <input id="show_btn3" class="show-btn3" style="cursor:pointer"
+                                                            type="button" value="博客园" />
+                                                        <input id="show_btn4" class="show-btn4" style="cursor:pointer"
+                                                            type="button" value="itch.io" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="tablet_0" style="display: none;">
+                                            <table id="table_basic" width="100%" border="0" align="center"
+                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
                                                     <th>B站Cookie</th>
                                                     <td>
@@ -580,6 +640,14 @@
                                                             class="input_ss_table" id="wemediamon_feat_cookie2"
                                                             name="wemediamon_feat_cookie2" maxlength="2048" rows="12"
                                                             autocorrect="off" autocapitalize="off"></textarea>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>刷新周期(小时)<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <input style="width:62px;" type="number" class="input_ss_table"
+                                                            id="wemediamon_feat_period" name="wemediamon_feat_period"
+                                                            min="1" max="8765" value="2">
                                                     </td>
                                                 </tr>
                                                 <tr id="wemediamon_trigger">
@@ -601,22 +669,33 @@
                                                             style="border:none">取关狗名单</a>
                                                     </td>
                                                 </tr>
-                                                <tr id="wemediamon_env">
-                                                    <th>修复运行环境</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn wemediamon_env"
-                                                            href="javascript:void(0);" onclick="fixenv()"
-                                                            style="border:none">修复运行环境</a>
-                                                        <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick="trigger(3)"
-                                                            style="border:none">SMTP测试</a>
-                                                    </td>
-                                                </tr>
                                             </table>
                                         </div>
+
+                                        <div id="tablet_1" style="display: none;">
+                                            <table id="table_basic" width="100%" border="0" align="center"
+                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                            </table>
+                                        </div>
+                                        <div id="tablet_2" style="display: none;">
+                                            <table id="table_basic" width="100%" border="0" align="center"
+                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                            </table>
+                                        </div>
+                                        <div id="tablet_3" style="display: none;">
+                                            <table id="table_basic" width="100%" border="0" align="center"
+                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                            </table>
+                                        </div>
+                                        <div id="tablet_4" style="display: none;">
+                                            <table id="table_basic" width="100%" border="0" align="center"
+                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                            </table>
+                                        </div>
+
                                         <div class="apply_gen">
-                                            <input class="button_gen" id="wemediamon_apply" onClick="save()" type="button"
-                                                value="提交" />
+                                            <input class="button_gen" id="wemediamon_apply" onClick="save()"
+                                                type="button" value="提交" />
                                         </div>
                                     </td>
                                 </tr>
