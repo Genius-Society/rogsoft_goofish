@@ -14,7 +14,7 @@ dbus remove wemediamon_mail
 dbus remove wemediamon_period
 dbus remove wemediamon_smtp
 dbus remove wemediamon_tmp
-dbus remove wemediamon_cookie
+dbus remove wemediamon_bili_ck
 
 dbus remove wemediamon_version
 dbus remove softcenter_module_wemediamon_description

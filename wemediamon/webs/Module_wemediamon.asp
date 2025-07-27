@@ -213,8 +213,8 @@
                                                     <th>B站Cookie</th>
                                                     <td>
                                                         <textarea style="width:453px;height:auto;"
-                                                            class="input_ss_table" id="wemediamon_feat_cookie"
-                                                            name="wemediamon_feat_cookie" maxlength="2048" rows="12"
+                                                            class="input_ss_table" id="wemediamon_bili_ck"
+                                                            name="wemediamon_bili_ck" maxlength="2048" rows="12"
                                                             autocorrect="off" autocapitalize="off"></textarea>
                                                     </td>
                                                 </tr>
@@ -230,19 +230,22 @@
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn wemediamon_trigger"
+                                                            href="javascript:void(0);" onclick=""
+                                                            style="border:none">Cookie有效测试</a>
+                                                        <a type="button" class="ks_btn wemediamon_trigger"
                                                             href="javascript:void(0);" onclick="trigger(1)"
                                                             style="border:none">单轮粉丝扫描</a>
-                                                        <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick="trigger(2)"
-                                                            style="border:none">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                                 <tr id="wemediamon_traitor">
-                                                    <th>取关狗名单</th>
+                                                    <th>管理取关狗</th>
                                                     <td>
                                                         <a type="button" class="ks_btn wemediamon_traitor"
                                                             href="javascript:void(0);" onclick="watchdog()"
                                                             style="border:none">取关狗名单</a>
+                                                        <a type="button" class="ks_btn wemediamon_trigger"
+                                                            href="javascript:void(0);" onclick="trigger(2)"
+                                                            style="border:none">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                             </table>

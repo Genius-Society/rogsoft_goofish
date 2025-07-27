@@ -79,7 +79,7 @@ start_wemediamon() {
 	if [[ -z "${wemediamon_smtp}" ]]; then
 		close_in_five "请输入有效SMTP密钥!"
 	fi
-	if [[ -z "${wemediamon_cookie}" ]]; then
+	if [[ -z "${wemediamon_bili_ck}" ]]; then
 		close_in_five "请输入有效B站cookie!"
 	fi
 	if [ -z "${wemediamon_tmp}" ]; then
@@ -118,7 +118,7 @@ start_wemediamon() {
 		--email "${wemediamon_mail}" \
 		--smtp "${wemediamon_smtp}" \
 		--tmp "${wemediamon_tmp}" \
-		--ck "${wemediamon_cookie}" \ 
+		--ck "${wemediamon_bili_ck}" \ 
 	>>"/tmp/upload/wemediamon_run_log.txt" 2>&1 &
 
 	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
@@ -138,7 +138,7 @@ trigger() {
 		echo_date "请输入有效SMTP密钥!XU6J03M6"
 		return
 	fi
-	if [[ -z "${wemediamon_cookie}" ]]; then
+	if [[ -z "${wemediamon_bili_ck}" ]]; then
 		echo_date "请输入有效B站cookie!XU6J03M6"
 		return
 	fi
@@ -161,7 +161,7 @@ trigger() {
 		--email "${wemediamon_mail}" \
 		--smtp "${wemediamon_smtp}" \
 		--tmp "${wemediamon_tmp}" \
-		--ck "${wemediamon_cookie}" \ 
+		--ck "${wemediamon_bili_ck}" \ 
 	>>$LOG_FILE 2>&1 &
 }
 
@@ -294,7 +294,7 @@ if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v gre
 	wemediamon_mail=$(dbus get wemediamon_mail)
 	wemediamon_smtp=$(dbus get wemediamon_smtp)
 	wemediamon_tmp=$(dbus get wemediamon_tmp)
-	wemediamon_cookie=$(dbus get wemediamon_cookie)
+	wemediamon_bili_ck=$(dbus get wemediamon_bili_ck)
 	# 开启 WeMediaMon
 	start_wemediamon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE

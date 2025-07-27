@@ -43,13 +43,11 @@ a:focus {
 	border-width: 0.5px;
 }
 
-#wemediamon_feat_cookie,
-#wemediamon_feat_cookie2 {
+#wemediamon_bili_ck {
 	-webkit-text-security: square;
 }
 
-#wemediamon_feat_cookie:focus,
-#wemediamon_feat_cookie2:focus {
+#wemediamon_bili_ck:focus {
 	-webkit-text-security: none;
 }
 
