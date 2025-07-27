@@ -14,15 +14,16 @@ from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
-# 创建 ArgumentParser 对象
-parser = argparse.ArgumentParser(description="WeMediaMon configuration script.")
-
 START_MONITOR = 0
 TEST_SMTP = 1
 UPD_BILI_FANS = 2
 UPD_BILI_BLACKS = 3
 UPD_HF_FANS = 4
+UPD_GIT_FANS = 5
+# TODO:
 
+# 创建 ArgumentParser 对象
+parser = argparse.ArgumentParser(description="WeMediaMon config script.")
 # 添加参数
 parser.add_argument("--cmd", type=int)
 parser.add_argument("--period", type=int)
@@ -277,14 +278,15 @@ class BiliMon:
 
 class HFMon:
     def __init__(self):
-        self.hf_api = HfApi()
-        self.target: str = args.hftag
         self.hf_domain = "https://huggingface.co"
-        self.cache = f"{args.tmp}/hf_followers.json"
-        self.tag_users, self.tag_orgs = self._parse_tags()
         self.header = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537"
         }
+        self.hf_api = HfApi()
+        self.target: str = args.hftag
+        self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
+        self.cache = f"{self.tmpdir}/hf_followers.json"
+        self.tag_users, self.tag_orgs = self._parse_tags()
 
     def _parse_tags(self):
         username = self.target.split("/")[0]
@@ -379,12 +381,80 @@ class HFMon:
         upd_log(logs)
 
 
+class GitHubMon:
+    def __init__(self):
+        self.tags = args.gitag.split(";")
+        self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
+        self.cache = f"{self.tmpdir}/github_followers.json"
+
+    def _get_followers(self, user: str):
+        response = requests.get(f"https://api.github.com/users/{user}/followers")
+        response.raise_for_status()
+        if response.status_code == 200:
+            fans = response.json()
+            followers = {}
+            for follower in fans:
+                followers[str(follower["id"])] = str(follower["login"])
+
+            return followers
+
+        else:
+            raise ConnectionError(response.status_code)
+
+    def _compare_data(self, prev_data: dict, data: dict):
+        logs = ""
+        for tag in prev_data:
+            if tag in data:
+                diff = set(prev_data[tag].keys()) - set(data[tag].keys())
+                if diff:
+                    for id in diff:
+                        dog = prev_data[tag][id]
+                        me = tag.split("/")[-1]
+                        logs += f"\n Dog <a href='https://github.com/{dog}'>{dog}</a> unfollowed <a href='https://github.com/{me}'>{me}</a> ! \n"
+
+        if logs:
+            send_email(logs)
+
+        return logs
+
+    def upd_fans(self):
+        prev_data, data = {}, {}
+        if os.path.exists(self.cache):
+            with open(self.cache, "r") as json_file:
+                prev_data = json.load(json_file)
+
+        for tag in tqdm(self.tags, desc="Getting current followers"):
+            data[tag] = self._get_followers(tag)
+
+        if data == prev_data:
+            logs += "\n No data changed. \n"
+        else:
+            logs += self._compare_data(prev_data, data)
+            with open(self.cache, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+
+            logs += "\n Data has been updated! \n"
+
+
+class CnblogsMon:
+    def __init__(self):  # TODO:
+        return
+
+
+class ItchMon:
+    def __init__(self):  # TODO:
+        return
+
+
 def update():
     if args.bilick:
         BiliMon().upd_fans()
 
     if args.hftag:
         HFMon().upd_fans()
+
+    if args.gitag:
+        GitHubMon().upd_fans()
 
     # TODO:
 
@@ -414,6 +484,11 @@ if __name__ == "__main__":
 
         elif args.cmd == UPD_HF_FANS:
             HFMon().upd_fans()
+
+        elif args.cmd == UPD_GIT_FANS:
+            GitHubMon().upd_fans()
+
+        # TODO:
 
     except Exception as e:
         send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
