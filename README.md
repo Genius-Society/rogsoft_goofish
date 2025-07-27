@@ -5,25 +5,25 @@
 
 监控B站粉丝动向: 取关狗死全家! 推荐 UP 在 1K 粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
 
-[![](./bilimon/res/icon-bilimon.png)](https://github.com/Genius-Society/bilimon)
+[![](./wemediamon/res/icon-wemediamon.png)](https://github.com/Genius-Society/wemediamon)
 
 ## Code download
 ```bash
-git clone git@gitee.com:Genius-Society/bilimon.git
-cd bilimon
+git clone git@gitee.com:Genius-Society/wemediamon.git
+cd wemediamon
 ```
 
 ## Environment
 ```bash
 conda create -n py310 python=3.10 -y
 conda activate py310
-pip install -r ./bilimon/bin/requirements.txt
+pip install -r ./wemediamon/bin/requirements.txt
 ```
 
 ## Build
 ```bash
 python build.py
-# 将生成的 bilimon.tar.gz 包上传至软件中心离线安装页面进行安装
+# 将生成的 wemediamon.tar.gz 包上传至软件中心离线安装页面进行安装
 ```
 
 ## Requirement

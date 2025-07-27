@@ -1,3 +1,3 @@
 #!/bin/bash
 
-find "./bilimon" -type f -name "*.sh" -exec sed -i 's/\r$//' {} \;
+find "./wemediamon" -type f -name "*.sh" -exec sed -i 's/\r$//' {} \;

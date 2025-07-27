@@ -14,22 +14,22 @@ from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
 # 创建 ArgumentParser 对象
-parser = argparse.ArgumentParser(description="BiliMon configuration script.")
+parser = argparse.ArgumentParser(description="WeMediaMon configuration script.")
 
 # 添加参数
 parser.add_argument("--clock", type=int, help="1=monitor on, 0=trigger once")
-parser.add_argument("--period", type=int, help="Specify the period for BiliMon.")
-parser.add_argument("--email", type=str, help="Specify the email address for BiliMon.")
-parser.add_argument("--smtp", type=str, help="Specify the SMTP server for BiliMon.")
-parser.add_argument("--tmp", type=str, help="Specify the temporary folder for BiliMon.")
-parser.add_argument("--ck", type=str, help="Specify the cookie for BiliMon.")
-parser.add_argument("--ck2", type=str, help="Specify the second cookie for BiliMon.")
+parser.add_argument("--period", type=int, help="Specify the period for WeMediaMon.")
+parser.add_argument("--email", type=str, help="Specify the email address for WeMediaMon.")
+parser.add_argument("--smtp", type=str, help="Specify the SMTP server for WeMediaMon.")
+parser.add_argument("--tmp", type=str, help="Specify the temporary folder for WeMediaMon.")
+parser.add_argument("--ck", type=str, help="Specify the cookie for WeMediaMon.")
+parser.add_argument("--ck2", type=str, help="Specify the second cookie for WeMediaMon.")
 
 # 解析命令行参数
 args = parser.parse_args()
 
 
-class BiliMon:
+class WeMediaMon:
     def __init__(self, ck: str = args.ck, db="fans.json"):
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
@@ -67,7 +67,7 @@ class BiliMon:
     def _send_email(
         self,
         content,
-        subject="[BiliMon 插件] 按罪人名单降下终末",
+        subject="[WeMediaMon 插件] 按罪人名单降下终末",
         title="监测到取关狗",
         smtp_server="smtp.qq.com",
         smtp_port=587,
@@ -278,7 +278,7 @@ class BiliMon:
 
     def _upd_log(self, txt):
         if int(args.clock) == 1:
-            with open("/tmp/upload/bilimon_run_log.txt", "a", encoding="utf-8") as file:
+            with open("/tmp/upload/wemediamon_run_log.txt", "a", encoding="utf-8") as file:
                 file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n")
         else:
             print(txt)
@@ -324,7 +324,7 @@ class BiliMon:
             elif int(args.clock) == 3:
                 self._send_email(
                     "邮件发送成功!",
-                    subject="[BiliMon 插件] 邮件发送测试",
+                    subject="[WeMediaMon 插件] 邮件发送测试",
                     title="测试 SMTP 模块",
                 )
 
@@ -337,4 +337,4 @@ class BiliMon:
 
 
 if __name__ == "__main__":
-    BiliMon().start()
+    WeMediaMon().start()

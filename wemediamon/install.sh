@@ -5,7 +5,7 @@ DIR=$(
 	cd $(dirname $0)
 	pwd
 )
-module=bilimon
+module=wemediamon
 ROG_86U=0
 BUILDNO=$(nvram get buildno)
 EXT_NU=$(nvram get extendno)
@@ -75,7 +75,7 @@ if [ "${MODEL}" == "TUF-AX3000" ]; then
 fi
 
 # 关闭进程
-pids=$(ps | grep "python" | grep "bilimon.py" | awk '{print $1}')
+pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
 if [ ! -z $pids ]; then
 	echo_date "关闭当前进程..."
 	for pid in $pids; do
@@ -84,12 +84,12 @@ if [ ! -z $pids ]; then
 fi
 
 # 安装插件
-mkdir -p /koolshare/bilimon/
-cp -rf /tmp/bilimon/bin/* /koolshare/bilimon/
-cp -rf /tmp/bilimon/scripts/* /koolshare/scripts/
-cp -rf /tmp/bilimon/webs/* /koolshare/webs/
-cp -rf /tmp/bilimon/res/* /koolshare/res/
-cp -rf /tmp/bilimon/uninstall.sh /koolshare/scripts/uninstall_bilimon.sh
+mkdir -p /koolshare/wemediamon/
+cp -rf /tmp/wemediamon/bin/* /koolshare/wemediamon/
+cp -rf /tmp/wemediamon/scripts/* /koolshare/scripts/
+cp -rf /tmp/wemediamon/webs/* /koolshare/webs/
+cp -rf /tmp/wemediamon/res/* /koolshare/res/
+cp -rf /tmp/wemediamon/uninstall.sh /koolshare/scripts/uninstall_wemediamon.sh
 
 if [ "$ROG" == "1" ]; then
 	echo_date "安装 ROG 皮肤!"
@@ -104,17 +104,17 @@ else
 	fi
 fi
 
-chmod +x /koolshare/scripts/bilimon_config.sh
-chmod +x /koolshare/scripts/bilimon_status.sh
-chmod +x /koolshare/scripts/uninstall_bilimon.sh
+chmod +x /koolshare/scripts/wemediamon_config.sh
+chmod +x /koolshare/scripts/wemediamon_status.sh
+chmod +x /koolshare/scripts/uninstall_wemediamon.sh
 
 # 离线安装用
-dbus set bilimon_version="$(cat $DIR/version)"
-dbus set softcenter_module_bilimon_version="$(cat $DIR/version)"
-dbus set softcenter_module_bilimon_description="B站粉丝监控工具"
-dbus set softcenter_module_bilimon_install="1"
-dbus set softcenter_module_bilimon_name="bilimon"
-dbus set softcenter_module_bilimon_title="BiliMon"
+dbus set wemediamon_version="$(cat $DIR/version)"
+dbus set softcenter_module_wemediamon_version="$(cat $DIR/version)"
+dbus set softcenter_module_wemediamon_description="B站粉丝监控工具"
+dbus set softcenter_module_wemediamon_install="1"
+dbus set softcenter_module_wemediamon_name="wemediamon"
+dbus set softcenter_module_wemediamon_title="WeMediaMon"
 
 # 判断 Entware 是否已安装
 if [ -d "/opt" ]; then
@@ -124,13 +124,13 @@ if [ -d "/opt" ]; then
 	opkg update
 	opkg install python3-pip
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-	pip install --cache-dir /koolshare/bilimon/.cache -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	pip install --cache-dir /koolshare/wemediamon/.cache -r /koolshare/wemediamon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 	pip list
-	rm -rf /koolshare/bilimon/.cache
-	echo_date "BiliMon 插件安装完毕!"
-	sh /koolshare/scripts/bilimon_config.sh
+	rm -rf /koolshare/wemediamon/.cache
+	echo_date "WeMediaMon 插件安装完毕!"
+	sh /koolshare/scripts/wemediamon_config.sh
 else
-	echo_date "BiliMon 插件安装完毕, 但未检测到 Entware 环境, 请补充安装部署 Entware 插件!"
+	echo_date "WeMediaMon 插件安装完毕, 但未检测到 Entware 环境, 请补充安装部署 Entware 插件!"
 fi
 
 # 完成

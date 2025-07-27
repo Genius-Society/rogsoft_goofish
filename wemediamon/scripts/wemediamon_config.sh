@@ -1,9 +1,9 @@
 #!/bin/sh
 
 source /koolshare/scripts/base.sh
-eval $(dbus export bilimon)
-LOG_FILE=/tmp/upload/bilimon_log.txt
-LOCK_FILE=/var/lock/bilimon.lock
+eval $(dbus export wemediamon)
+LOG_FILE=/tmp/upload/wemediamon_log.txt
+LOCK_FILE=/var/lock/wemediamon.lock
 alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 export PATH=$PATH:/opt/bin/
 
@@ -30,15 +30,15 @@ sync_ntp() {
 }
 
 fun_wan_start() {
-	if [ "${bilimon_enable}" == "1" ]; then
-		if [ ! -L "/koolshare/init.d/M71bilimon.sh" ]; then
+	if [ "${wemediamon_enable}" == "1" ]; then
+		if [ ! -L "/koolshare/init.d/M71wemediamon.sh" ]; then
 			echo_date "添加开机启动..."
-			ln -sf /koolshare/scripts/bilimon_config.sh /koolshare/init.d/M71bilimon.sh
+			ln -sf /koolshare/scripts/wemediamon_config.sh /koolshare/init.d/M71wemediamon.sh
 		fi
 	else
-		if [ -L "/koolshare/init.d/M71bilimon.sh" ]; then
+		if [ -L "/koolshare/init.d/M71wemediamon.sh" ]; then
 			echo_date "删除开机启动..."
-			rm -rf /koolshare/init.d/M71bilimon.sh >/dev/null 2>&1
+			rm -rf /koolshare/init.d/M71wemediamon.sh >/dev/null 2>&1
 		fi
 	fi
 }
@@ -50,10 +50,10 @@ install_env() {
 	opkg update
 	opkg install python3-pip
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-	pip install --cache-dir /koolshare/bilimon/.cache -r /koolshare/bilimon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	pip install --cache-dir /koolshare/wemediamon/.cache -r /koolshare/wemediamon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 	echo "修复完毕! 当前 pypi 列表如下:"
 	pip list
-	rm -rf /koolshare/bilimon/.cache
+	rm -rf /koolshare/wemediamon/.cache
 }
 
 # 自动修复路由器重启导致的盘符变化
@@ -68,31 +68,31 @@ fix_path() {
 	done
 }
 
-start_bilimon() {
+start_wemediamon() {
 	# 检查入参
-	if [[ -z "${bilimon_period}" ]]; then
+	if [[ -z "${wemediamon_period}" ]]; then
 		close_in_five "请输入有效周期!"
 	fi
-	if [[ -z "${bilimon_mail}" ]]; then
+	if [[ -z "${wemediamon_mail}" ]]; then
 		close_in_five "请输入有效邮箱!"
 	fi
-	if [[ -z "${bilimon_smtp}" ]]; then
+	if [[ -z "${wemediamon_smtp}" ]]; then
 		close_in_five "请输入有效SMTP密钥!"
 	fi
-	if [[ -z "${bilimon_cookie}" ]]; then
+	if [[ -z "${wemediamon_cookie}" ]]; then
 		close_in_five "请输入有效B站cookie!"
 	fi
-	if [ -z "${bilimon_tmp}" ]; then
+	if [ -z "${wemediamon_tmp}" ]; then
 		close_in_five "请输入有效缓存路径!"
 	fi
 
-	if [ ! -d "${bilimon_tmp}" ]; then
+	if [ ! -d "${wemediamon_tmp}" ]; then
 		# 修复重启导致的缓存目录盘符变化
 		echo_date "检查缓存路径..."
-		fixed_bilimon_tmp=$(fix_path $bilimon_tmp)
-		if [ $fixed_bilimon_tmp != $bilimon_tmp ] && [ -d $fixed_bilimon_tmp ]; then
-			bilimon_tmp=$fixed_bilimon_tmp
-			dbus set bilimon_tmp=$bilimon_tmp
+		fixed_wemediamon_tmp=$(fix_path $wemediamon_tmp)
+		if [ $fixed_wemediamon_tmp != $wemediamon_tmp ] && [ -d $fixed_wemediamon_tmp ]; then
+			wemediamon_tmp=$fixed_wemediamon_tmp
+			dbus set wemediamon_tmp=$wemediamon_tmp
 			echo_date "缓存路径已自动修复!"
 		else
 			close_in_five "请输入有效缓存路径!"
@@ -100,7 +100,7 @@ start_bilimon() {
 	fi
 
 	# 插件开启的时候同步一次时间
-	if [ "${bilimon_enable}" == "1" -a -n "$(which ntpclient)" ]; then
+	if [ "${wemediamon_enable}" == "1" -a -n "$(which ntpclient)" ]; then
 		sync_ntp
 	fi
 
@@ -111,39 +111,39 @@ start_bilimon() {
 	fi
 
 	# 开启周期监控
-	rm -rf "/tmp/upload/bilimon_run_log.txt"
-	nohup python /koolshare/bilimon/bilimon.py \
+	rm -rf "/tmp/upload/wemediamon_run_log.txt"
+	nohup python /koolshare/wemediamon/wemediamon.py \
 		--clock 1 \
-		--period "${bilimon_period}" \
-		--email "${bilimon_mail}" \
-		--smtp "${bilimon_smtp}" \
-		--tmp "${bilimon_tmp}" \
-		--ck "${bilimon_cookie}" \
-		--ck2 "${bilimon_cookie2}" \
-		>>"/tmp/upload/bilimon_run_log.txt" 2>&1 &
+		--period "${wemediamon_period}" \
+		--email "${wemediamon_mail}" \
+		--smtp "${wemediamon_smtp}" \
+		--tmp "${wemediamon_tmp}" \
+		--ck "${wemediamon_cookie}" \
+		--ck2 "${wemediamon_cookie2}" \
+		>>"/tmp/upload/wemediamon_run_log.txt" 2>&1 &
 
-	echo_date "BiliMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
+	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
 
 trigger() {
 	# 检查入参
-	if [[ -z "${bilimon_period}" ]]; then
+	if [[ -z "${wemediamon_period}" ]]; then
 		echo_date "请输入有效周期!XU6J03M6"
 		return
 	fi
-	if [[ -z "${bilimon_mail}" ]]; then
+	if [[ -z "${wemediamon_mail}" ]]; then
 		echo_date "请输入有效邮箱!XU6J03M6"
 		return
 	fi
-	if [[ -z "${bilimon_smtp}" ]]; then
+	if [[ -z "${wemediamon_smtp}" ]]; then
 		echo_date "请输入有效SMTP密钥!XU6J03M6"
 		return
 	fi
-	if [[ -z "${bilimon_cookie}" ]]; then
+	if [[ -z "${wemediamon_cookie}" ]]; then
 		echo_date "请输入有效B站cookie!XU6J03M6"
 		return
 	fi
-	if [ -z "${bilimon_tmp}" ] || [ ! -d "${bilimon_tmp}" ]; then
+	if [ -z "${wemediamon_tmp}" ] || [ ! -d "${wemediamon_tmp}" ]; then
 		echo_date "请输入有效缓存路径!XU6J03M6"
 		return
 	fi
@@ -156,19 +156,19 @@ trigger() {
 	fi
 
 	# 开启单次触发扫描
-	nohup python /koolshare/bilimon/bilimon.py \
+	nohup python /koolshare/wemediamon/wemediamon.py \
 		--clock $1 \
-		--period "${bilimon_period}" \
-		--email "${bilimon_mail}" \
-		--smtp "${bilimon_smtp}" \
-		--tmp "${bilimon_tmp}" \
-		--ck "${bilimon_cookie}" \
-		--ck2 "${bilimon_cookie2}" \
+		--period "${wemediamon_period}" \
+		--email "${wemediamon_mail}" \
+		--smtp "${wemediamon_smtp}" \
+		--tmp "${wemediamon_tmp}" \
+		--ck "${wemediamon_cookie}" \
+		--ck2 "${wemediamon_cookie2}" \
 		>>$LOG_FILE 2>&1 &
 }
 
 close_in_five() {
-	dbus set bilimon_enable=0
+	dbus set wemediamon_enable=0
 	echo_date $1
 	echo_date "插件将在5秒后自动关闭!!"
 	local i=5
@@ -185,7 +185,7 @@ close_in_five() {
 
 stop() {
 	# 关闭监控进程
-	pids=$(ps | grep "python" | grep "bilimon.py" | awk '{print $1}')
+	pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
 	if [ ! -z $pids ]; then
 		echo_date "关闭监控进程..."
 		for pid in $pids; do
@@ -198,18 +198,18 @@ stop() {
 case $1 in
 start)
 	set_lock
-	if [ "${bilimon_enable}" == "1" ]; then
-		logger "[软件中心]: 启动 BiliMon !"
-		start_bilimon
+	if [ "${wemediamon_enable}" == "1" ]; then
+		logger "[软件中心]: 启动 WeMediaMon !"
+		start_wemediamon
 	fi
 	unset_lock
 	;;
 
 restart)
 	set_lock
-	if [ "${bilimon_enable}" == "1" ]; then
+	if [ "${wemediamon_enable}" == "1" ]; then
 		stop
-		start_bilimon
+		start_wemediamon
 	fi
 	unset_lock
 	;;
@@ -227,12 +227,12 @@ web_submit)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	if [ "${bilimon_enable}" == "1" ]; then
+	if [ "${wemediamon_enable}" == "1" ]; then
 		stop | tee -a $LOG_FILE
-		start_bilimon | tee -a $LOG_FILE
+		start_wemediamon | tee -a $LOG_FILE
 	else
 		stop | tee -a $LOG_FILE
-		echo_date "BiliMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $LOG_FILE
+		echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $LOG_FILE
 	fi
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
@@ -266,8 +266,8 @@ watch_dogs)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	if [[ -f "${bilimon_tmp}/traitors.txt" ]]; then
-		awk '{print "https://space.bilibili.com/" $0}' "${bilimon_tmp}/traitors.txt" | tee -a $LOG_FILE
+	if [[ -f "${wemediamon_tmp}/traitors.txt" ]]; then
+		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_tmp}/traitors.txt" | tee -a $LOG_FILE
 	else
 		echo_date "当前狗库为空!" | tee -a $LOG_FILE
 	fi
@@ -287,19 +287,19 @@ fix_env)
 esac
 
 # 重启自启时触发
-bilimon_enable=$(dbus get bilimon_enable)
-if [ "${bilimon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
+wemediamon_enable=$(dbus get wemediamon_enable)
+if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
 	set_lock
 	true >$LOG_FILE
 	# 初始化变量
-	bilimon_period=$(dbus get bilimon_period)
-	bilimon_mail=$(dbus get bilimon_mail)
-	bilimon_smtp=$(dbus get bilimon_smtp)
-	bilimon_tmp=$(dbus get bilimon_tmp)
-	bilimon_cookie=$(dbus get bilimon_cookie)
-	bilimon_cookie2=$(dbus get bilimon_cookie2)
-	# 开启 BiliMon
-	start_bilimon | tee -a $LOG_FILE
+	wemediamon_period=$(dbus get wemediamon_period)
+	wemediamon_mail=$(dbus get wemediamon_mail)
+	wemediamon_smtp=$(dbus get wemediamon_smtp)
+	wemediamon_tmp=$(dbus get wemediamon_tmp)
+	wemediamon_cookie=$(dbus get wemediamon_cookie)
+	wemediamon_cookie2=$(dbus get wemediamon_cookie2)
+	# 开启 WeMediaMon
+	start_wemediamon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 fi
