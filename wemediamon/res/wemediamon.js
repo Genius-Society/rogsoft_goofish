@@ -330,6 +330,11 @@ function tabSelect(w) {
 	$('#tablet_' + w).show();
 }
 
-function show_hide_el() {
-	console.log("Show / hide triggered!");
+function show_hide_el(w) {
+	if ($('#check_' + w).is(':checked')) {
+		$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
+	}
+	else {
+		$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
+	}
 }

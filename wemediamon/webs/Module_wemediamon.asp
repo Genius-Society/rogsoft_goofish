@@ -212,12 +212,13 @@
                                             </table>
                                         </div>
                                         <div id="tablet_0">
-                                            <table id="table_basic" width="100%" border="0" align="center"
-                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                            <table id="table_0" width="100%" border="0" align="center" cellpadding="4"
+                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
                                                     <th>BiliMon开关</th>
                                                     <td>
-                                                        <input type="checkbox" id="bili_on" onchange="show_hide_el()">
+                                                        <input type="checkbox" id="check_0" onchange="show_hide_el(0)"
+                                                            checked>
                                                     </td>
                                                 </tr>
                                                 <tr>
