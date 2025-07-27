@@ -9,6 +9,7 @@ import requests
 import schedule
 from tqdm import tqdm
 from datetime import datetime
+from huggingface_hub import HfApi
 from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
@@ -16,106 +17,100 @@ from bilibili_api import ResponseCodeException, Credential, user, sync
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="WeMediaMon configuration script.")
 
+START_MONITOR = 0
+TEST_SMTP = 1
+UPD_BILI_FANS = 2
+UPD_BILI_BLACKS = 3
+UPD_HF_FANS = 4
+
 # 添加参数
-parser.add_argument("--clock", type=int, help="1=monitor on, 0=trigger once")
-parser.add_argument("--period", type=int, help="Specify the period for WeMediaMon.")
-parser.add_argument("--email", type=str, help="Specify the email address for WeMediaMon.")
-parser.add_argument("--smtp", type=str, help="Specify the SMTP server for WeMediaMon.")
-parser.add_argument("--tmp", type=str, help="Specify the temporary folder for WeMediaMon.")
-parser.add_argument("--ck", type=str, help="Specify the cookie for WeMediaMon.")
-parser.add_argument("--ck2", type=str, help="Specify the second cookie for WeMediaMon.")
+parser.add_argument("--cmd", type=int)
+parser.add_argument("--period", type=int)
+parser.add_argument("--email", type=str)
+parser.add_argument("--smtp", type=str)
+parser.add_argument("--tmp", type=str)
+parser.add_argument("--bilick", type=str)
+parser.add_argument("--hftag", type=str)
+parser.add_argument("--gitag", type=str)
+parser.add_argument("--cnblokie", type=str)
+parser.add_argument("--itck", type=str)
 
 # 解析命令行参数
 args = parser.parse_args()
 
 
-class WeMediaMon:
-    def __init__(self, ck: str = args.ck, db="fans.json"):
+def upd_log(txt, mode=args.cmd):
+    if mode == START_MONITOR:
+        with open("/tmp/upload/wemediamon_run_log.txt", "a", encoding="utf-8") as file:
+            file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n")
+    else:
+        print(txt)
+
+
+def send_email(
+    content,
+    subject="[WeMediaMon 插件] 测试邮件",
+    title="SMTP有效性检测",
+    smtp_server="smtp.qq.com",
+    smtp_port=587,
+    email=args.email,
+    smtp=args.smtp,
+):
+    # 邮件内容
+    body = f"""
+    <html>
+        <body>
+            <h1>{title}</h1><br>
+            {content}
+        </body>
+    </html>
+    """
+    # 构建邮件
+    msg = MIMEText(body, "html", "utf-8")
+    msg["Subject"] = Header(subject, "utf-8")
+    msg["From"] = email
+    msg["To"] = email
+    try:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(email, smtp)
+            server.sendmail(email, [msg["To"]], msg.as_string())
+
+        upd_log("邮件发送成功!")
+
+    except smtplib.SMTPException as e:
+        if e.smtp_code == -1:
+            upd_log("邮件发送成功!")
+        else:
+            upd_log(f"邮件发送失败: {e}")
+
+
+class BiliMon:
+    def __init__(self):
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
-        self.blacks = f"{self.tmpdir}/traitors.txt"
-        self.email = args.email
-        self.smtp = args.smtp
-        self._set_cfg(ck, db)
-
-    def _set_cfg(self, ck: str, db: str):
-        self.dbfile = f"{self.tmpdir}/{db}"
-        self._parse_cookie(ck)
+        self.dbfile = f"{self.tmpdir}/bili_followers.json"
+        self.blacks = f"{self.tmpdir}/bili_blacklist.txt"
+        self._parse_cookie(args.ck)
 
     def _parse_cookie(self, ck: str):
-        try:
-            self.uid = ck.split("DedeUserID=")[1].split(";")[0]
-            self.sessdata = ck.split("SESSDATA=")[1].split(";")[0]
-            self.bili_jct = ck.split("bili_jct=")[1].split(";")[0]
-            self.buvid3 = ck.split("buvid3=")[1].split(";")[0]
-            self.ck = ck
-            self.credential = Credential(
-                sessdata=self.sessdata,
-                bili_jct=self.bili_jct,
-                buvid3=self.buvid3,
-            )
-
-        except Exception as e:
-            self._send_email(
-                f"请确保 {self.uid} cookie 存在且内容有效: {e}",
-                subject="cookie 内容缺失或内容无效",
-                title="cookie 解析异常",
-            )
-            self._upd_log("XU6J03M6")
-            exit()
-
-    def _send_email(
-        self,
-        content,
-        subject="[WeMediaMon 插件] 按罪人名单降下终末",
-        title="监测到取关狗",
-        smtp_server="smtp.qq.com",
-        smtp_port=587,
-    ):
-        # 邮件内容
-        body = f"""
-        <html>
-            <body>
-                <h1>{title}</h1><br>
-                {content}
-            </body>
-        </html>
-        """
-        # 构建邮件
-        msg = MIMEText(body, "html", "utf-8")
-        msg["Subject"] = Header(subject, "utf-8")
-        msg["From"] = self.email
-        msg["To"] = self.email
-        try:
-            with smtplib.SMTP(smtp_server, smtp_port) as server:
-                server.starttls()
-                server.login(self.email, self.smtp)
-                server.sendmail(self.email, [msg["To"]], msg.as_string())
-
-            self._upd_log("邮件发送成功!")
-
-        except smtplib.SMTPException as e:
-            if e.smtp_code == -1:
-                self._upd_log("邮件发送成功!")
-            else:
-                self._upd_log(f"邮件发送失败: {e}")
+        self.uid = ck.split("DedeUserID=")[1].split(";")[0]
+        self.sessdata = ck.split("SESSDATA=")[1].split(";")[0]
+        self.bili_jct = ck.split("bili_jct=")[1].split(";")[0]
+        self.buvid3 = ck.split("buvid3=")[1].split(";")[0]
+        self.ck = ck
+        self.credential = Credential(
+            sessdata=self.sessdata,
+            bili_jct=self.bili_jct,
+            buvid3=self.buvid3,
+        )
 
     def _txt2lst(self):
-        try:
-            with open(self.blacks, "r", encoding="utf-8") as file:
-                lines = file.readlines()
-            # 去掉每行末尾的换行符
-            lines = [line.strip() for line in lines]
-            return list(set(lines))
-
-        except Exception as e:
-            self._send_email(
-                f"读取文件时出错: {e}",
-                subject=f"{self.blacks} 内容缺失或内容无效",
-                title="txt 解析异常",
-            )
-            self._upd_log("XU6J03M6")
-            exit()
+        with open(self.blacks, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+        # 去掉每行末尾的换行符
+        lines = [line.strip() for line in lines]
+        return list(set(lines))
 
     def _save_traitors(self, traitors: list):
         with open(self.blacks, "w", encoding="utf-8") as file:
@@ -145,17 +140,13 @@ class WeMediaMon:
 
             else:
                 msg = json_data["message"]
-                self._upd_log(msg)
-                self._send_email(
-                    msg,
-                    subject=f"可能 {self.uid} 需要重新手动扫码登陆",
-                    title=f"错误代码: {json_data['code']}",
+                upd_log(msg)
+                raise PermissionError(
+                    f"可能 {self.uid} 需要重新手动扫码登陆, 错误代码: {json_data['code']}"
                 )
-                self._upd_log("XU6J03M6")
-                exit()
 
         except requests.exceptions.RequestException as e:
-            self._upd_log(f"错误: {e}, 重试中...")
+            upd_log(f"错误: {e}, 重试中...")
             return self._get_fans(page)
 
     def _get_followers(self):
@@ -219,7 +210,7 @@ class WeMediaMon:
                 indent=4,
             )
 
-        self._upd_log(f"{self.dbfile} 已更新!")
+        upd_log(f"{self.dbfile} 已更新!")
 
     def _filter_unfollows(self, unfollows):
         real_unfollows, out1000 = [], {}
@@ -231,7 +222,7 @@ class WeMediaMon:
 
         return real_unfollows, out1000
 
-    def _upd_fans(self):
+    def upd_fans(self):
         old_fans = []
         if os.path.exists(self.dbfile):
             with open(self.dbfile, "r", encoding="utf-8") as file:
@@ -239,7 +230,7 @@ class WeMediaMon:
 
         new_fans: dict = self._get_followers()
         while not new_fans:
-            self._upd_log(f"获取 {self.uid} 粉丝列表失败, 重试中...")
+            upd_log(f"获取 {self.uid} 粉丝列表失败, 重试中...")
             new_fans = self._get_followers()
 
         if new_fans != old_fans:
@@ -259,52 +250,22 @@ class WeMediaMon:
 
                 if content:
                     self._add_traitors(traitors)
-                    self._send_email(content)
+                    send_email(content)
 
             else:
-                self._upd_log(f"暂未发现取关 {self.uid} 者")
+                upd_log(f"暂未发现取关 {self.uid} 者")
 
             self._upd_json(new_fans, out1000)
 
         else:
-            self._upd_log(f"暂未发现取关 {self.uid} 者")
+            upd_log(f"暂未发现取关 {self.uid} 者")
 
-    def _upd(self):
-        now_hour = datetime.now().hour
-        if now_hour > 7 and now_hour < 23:
-            self._upd_all_fans()
-        else:
-            self._upd_log("当前处于免打扰时间段...")
-
-    def _upd_log(self, txt):
-        if int(args.clock) == 1:
-            with open("/tmp/upload/wemediamon_run_log.txt", "a", encoding="utf-8") as file:
-                file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n")
-        else:
-            print(txt)
-
-    def _hour_monitor(self, period=2):
-        self._upd()
-        self._upd_log(f"监控开启中...每 {period} 小时触发一次")
-        schedule.every(period).hours.do(self._upd)
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-
-    def _upd_all_fans(self):
-        self._set_cfg(str(args.ck).strip(), "fans.json")
-        self._upd_fans()
-        ck2 = str(args.ck2).strip()
-        if ck2:
-            self._set_cfg(ck2, "fans2.json")
-            self._upd_fans()
-
-    def _clean_all_traitors(self):
+    def clean_all_traitors(self):
         cleaned_traitors = []
         traitors = self._txt2lst()
         for traitor in tqdm(traitors, desc="清理已注销的取关狗"):
             if self._is_deleted(traitor):
-                print(f"取关狗 {traitor} 已被清理!")
+                upd_log(f"取关狗 {traitor} 已被清理!")
             else:
                 cleaned_traitors.append(traitor)
 
@@ -313,28 +274,148 @@ class WeMediaMon:
         if cleaned_traitors:
             self._save_traitors(cleaned_traitors)
 
-    def start(self):
-        try:
-            if int(args.clock) == 1:
-                self._hour_monitor(period=args.period)
-            elif int(args.clock) == 0:
-                self._upd_all_fans()
-            elif int(args.clock) == 2:
-                self._clean_all_traitors()
-            elif int(args.clock) == 3:
-                self._send_email(
-                    "邮件发送成功!",
-                    subject="[WeMediaMon 插件] 邮件发送测试",
-                    title="测试 SMTP 模块",
-                )
 
-            self._upd_log("XU6J03M6")
+class HFMon:
+    def __init__(self):
+        self.hf_api = HfApi()
+        self.target: str = args.hftag
+        self.hf_domain = "https://huggingface.co"
+        self.cache = f"{args.tmp}/hf_followers.json"
+        self.tag_users, self.tag_orgs = self._parse_tags()
+        self.header = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537"
+        }
 
-        except Exception as e:
-            self._upd_log(f"运行错误: {e}, 重试中...")
-            time.sleep(1)
-            self.start()
+    def _parse_tags(self):
+        username = self.target.split("/")[0]
+        following_users = [username]
+        followings = self.hf_api.list_user_following(username)
+        for following in followings:
+            following_users.append(following.username)
+
+        following_orgs = []
+        response = requests.get(f"{self.hf_domain}/api/users/{username}/following/orgs")
+        response.raise_for_status()
+        if response.status_code == 200:
+            orgs = response.json()
+            for org in orgs:
+                following_orgs.append(org["name"])
+        else:
+            raise ConnectionError(response.status_code)
+
+        return following_users, following_orgs
+
+    def _get_followers(self, tag_type: str, tag: str):
+        response = requests.get(f"{self.hf_domain}/api/{tag_type}s/{tag}/followers")
+        response.raise_for_status()
+        if response.status_code == 200:
+            fans = response.json()
+            followers = {}
+            for follower in fans:
+                followers[str(follower["_id"])] = str(follower["user"])
+
+            return followers
+
+        else:
+            raise ConnectionError(response.status_code)
+
+    def _compare_data(self, prev_data: dict, data: dict):
+        logs = ""
+        for tag in prev_data:
+            if tag in data:
+                diff = set(prev_data[tag].keys()) - set(data[tag].keys())
+                if diff:
+                    for id in diff:
+                        dog = prev_data[tag][id]
+                        me = tag.split("/")[-1]
+                        logs += f"\n Dog <a href='{self.hf_domain}/{dog}'>{dog}</a> unfollowed <a href='{self.hf_domain}/{me}'>{me}</a> ! \n"
+
+        if logs:
+            send_email(logs)
+
+        return logs
+
+    def _get_spaces(self, username: str):
+        sleepings, errors = [], []
+        spaces = self.hf_api.list_spaces(author=username)
+        for space in spaces:
+            status = self.hf_api.get_space_runtime(space.id).stage
+            if status == "SLEEPING":
+                sleepings.append(space.id)
+            elif "ERROR" in status:
+                errors.append(f"{self.hf_domain}/spaces/{space.id}")
+
+        return sleepings, errors
+
+    def _activate_space(self, space_id: str):
+        static = self.hf_api.space_info(space_id).sdk == "static"
+        response = requests.get(
+            f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
+            headers=self.header,
+        )
+        response.raise_for_status()
+
+    def upd_fans(self):
+        prev_data, data = {}, {}
+        if os.path.exists(self.cache):
+            with open(self.cache, "r") as json_file:
+                prev_data = json.load(json_file)
+
+        for user in tqdm(self.tag_users, desc="Loading user followers"):
+            data[user] = self._get_followers("user", user)
+
+        for org in tqdm(self.tag_orgs, desc="Loading organization followers"):
+            data[org] = self._get_followers("organization", org)
+
+        if data == prev_data:
+            logs += "\n No data changed. \n"
+        else:
+            logs += self._compare_data(prev_data, data)
+            with open(self.cache, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+
+            logs += "\n Data has been updated! \n"
+
+        upd_log(logs)
+
+
+def update():
+    if args.bilick:
+        BiliMon().upd_fans()
+
+    if args.hftag:
+        HFMon().upd_fans()
+
+    # TODO:
+
+
+def start_monitor(period=args.period):
+    update()
+    upd_log(f"监控开启中...每 {period} 小时触发一次")
+    schedule.every(period).hours.do(update)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
 
 if __name__ == "__main__":
-    WeMediaMon().start()
+    try:
+        if args.cmd == START_MONITOR:
+            start_monitor()
+
+        elif args.cmd == TEST_SMTP:
+            send_email()
+
+        elif args.cmd == UPD_BILI_FANS:
+            BiliMon().upd_fans()
+
+        elif args.cmd == UPD_BILI_BLACKS:
+            BiliMon().clean_all_traitors()
+
+        elif args.cmd == UPD_HF_FANS:
+            HFMon().upd_fans()
+
+    except Exception as e:
+        send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
+
+    upd_log("XU6J03M6")
