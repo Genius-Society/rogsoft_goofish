@@ -111,7 +111,7 @@ chmod +x /koolshare/scripts/uninstall_wemediamon.sh
 # 离线安装用
 dbus set wemediamon_version="$(cat $DIR/version)"
 dbus set softcenter_module_wemediamon_version="$(cat $DIR/version)"
-dbus set softcenter_module_wemediamon_description="B站粉丝监控工具"
+dbus set softcenter_module_wemediamon_description="自媒体粉丝监控工具"
 dbus set softcenter_module_wemediamon_install="1"
 dbus set softcenter_module_wemediamon_name="wemediamon"
 dbus set softcenter_module_wemediamon_title="WeMediaMon"
