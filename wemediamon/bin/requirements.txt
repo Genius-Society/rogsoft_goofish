@@ -1,3 +1,4 @@
 requests
 schedule
+huggingface_hub
 bilibili-api-python==16.3
