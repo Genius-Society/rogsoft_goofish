@@ -70,3 +70,8 @@ a:focus {
 	border: 1px solid #2f3a3e;
 	background: #2f3a3e !important;
 }
+
+.ks_btn {
+	border: none;
+	cursor: pointer;
+}

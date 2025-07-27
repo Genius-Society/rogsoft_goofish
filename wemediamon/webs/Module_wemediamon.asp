@@ -126,11 +126,9 @@
                                                         </div>
                                                         <div style="float: right;margin-top:5px;margin-right:5px;">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="get_log(1)"
-                                                                style="cursor: pointer;margin-left:5px;border:none">启动日志</a>
+                                                                onclick="get_log(1)" style="margin-left:5px">启动日志</a>
                                                             <a type="button" class="ks_btn wemediamon_env"
-                                                                href="javascript:void(0);" onclick="fixenv()"
-                                                                style="border:none">环境修复</a>
+                                                                href="javascript:void(0);" onclick="fixenv()">环境修复</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -140,6 +138,8 @@
                                                         <div style="float: right;margin-right:5px;">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="show_log_pannel()">运行日志</a>
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="show_log_pannel()">控制面板</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -167,8 +167,7 @@
                                                             value="">
                                                         <div style="float: right;margin-right:5px;">
                                                             <a type="button" class="ks_btn wemediamon_trigger"
-                                                                href="javascript:void(0);" onclick="trigger(3)"
-                                                                style="border:none">邮件测试</a>
+                                                                href="javascript:void(0);" onclick="trigger(3)">邮件测试</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -235,22 +234,18 @@
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick=""
-                                                            style="border:none">Cookie有效测试</a>
+                                                            href="javascript:void(0);" onclick="">Cookie有效测试</a>
                                                         <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick="trigger(1)"
-                                                            style="border:none">单轮粉丝扫描</a>
+                                                            href="javascript:void(0);" onclick="trigger(1)">单轮粉丝扫描</a>
                                                     </td>
                                                 </tr>
                                                 <tr id="wemediamon_traitor">
                                                     <th>管理取关狗</th>
                                                     <td>
                                                         <a type="button" class="ks_btn wemediamon_traitor"
-                                                            href="javascript:void(0);" onclick="watchdog()"
-                                                            style="border:none">查看取关狗名单</a>
+                                                            href="javascript:void(0);" onclick="watchdog()">查看取关狗名单</a>
                                                         <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick="trigger(2)"
-                                                            style="border:none">清理已注销狗</a>
+                                                            href="javascript:void(0);" onclick="trigger(2)">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -278,8 +273,9 @@
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick="trigger(1)"
-                                                            style="border:none">单轮粉丝扫描</a>
+                                                            href="javascript:void(0);" onclick="trigger(1)">单轮粉丝扫描</a>
+                                                        <a type="button" class="ks_btn wemediamon_trigger"
+                                                            href="javascript:void(0);" onclick="trigger(1)">激活休眠仓库</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -307,8 +303,7 @@
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn wemediamon_trigger"
-                                                            href="javascript:void(0);" onclick="trigger(1)"
-                                                            style="border:none">单轮粉丝扫描</a>
+                                                            href="javascript:void(0);" onclick="trigger(1)">单轮粉丝扫描</a>
                                                     </td>
                                                 </tr>
                                             </table>
