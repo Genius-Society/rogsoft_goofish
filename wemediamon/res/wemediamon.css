@@ -66,7 +66,7 @@ a:focus {
 }
 
 #tablets .show:hover,
-.active {
+#tablets .active {
 	border: 1px solid #2f3a3e;
-	background: #2f3a3e;
+	background: #2f3a3e !important;
 }
