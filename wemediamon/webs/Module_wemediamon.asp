@@ -227,7 +227,8 @@
                                                         <textarea style="width:453px;height:auto;"
                                                             class="input_ss_table" id="bili_ck" name="bili_ck"
                                                             maxlength="2048" rows="12" autocorrect="off"
-                                                            autocapitalize="off" placeholder=""></textarea>
+                                                            autocapitalize="off"
+                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
                                                 <tr id="wemediamon_trigger">
@@ -255,13 +256,61 @@
                                             </table>
                                         </div>
                                         <div id="tablet_1" style="display: none;">
-                                            <table id="table_basic" width="100%" border="0" align="center"
-                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                            <table id="table_1" width="100%" border="0" align="center" cellpadding="4"
+                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                                <tr>
+                                                    <th>HFMon开关</th>
+                                                    <td>
+                                                        <input type="checkbox" id="check_1" onchange="show_hide_el(1)"
+                                                            checked>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>监控目标<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <input style="width:300px;" type="text" class="input_ss_table"
+                                                            id="hf_tags" name="hf_tags" maxlength="100" value=""
+                                                            autocorrect="off" autocapitalize="off"
+                                                            placeholder="目前仅能填写一个用户名">
+                                                    </td>
+                                                </tr>
+                                                <tr id="wemediamon_trigger">
+                                                    <th>手动触发</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn wemediamon_trigger"
+                                                            href="javascript:void(0);" onclick="trigger(1)"
+                                                            style="border:none">单轮粉丝扫描</a>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </div>
                                         <div id="tablet_2" style="display: none;">
-                                            <table id="table_basic" width="100%" border="0" align="center"
-                                                cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                            <table id="table_2" width="100%" border="0" align="center" cellpadding="4"
+                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                                <tr>
+                                                    <th>GitHubMon开关</th>
+                                                    <td>
+                                                        <input type="checkbox" id="check_2" onchange="show_hide_el(2)"
+                                                            checked>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>监控目标<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <input style="width:300px;" type="text" class="input_ss_table"
+                                                            id="hf_tags" name="hf_tags" maxlength="100" value=""
+                                                            autocorrect="off" autocapitalize="off"
+                                                            placeholder="target1;target2;...">
+                                                    </td>
+                                                </tr>
+                                                <tr id="wemediamon_trigger">
+                                                    <th>手动触发</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn wemediamon_trigger"
+                                                            href="javascript:void(0);" onclick="trigger(1)"
+                                                            style="border:none">单轮粉丝扫描</a>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </div>
                                         <div id="tablet_3" style="display: none;">
