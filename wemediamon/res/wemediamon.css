@@ -51,7 +51,7 @@ a:focus {
 	-webkit-text-security: none;
 }
 
-#tablets .show {
+#tablets input[type="button"] {
 	font-size: 10pt;
 	color: #fff;
 	padding: 10px 3.75px;
@@ -65,7 +65,7 @@ a:focus {
 	cursor: pointer;
 }
 
-#tablets .show:hover,
+#tablets input[type="button"]:hover,
 #tablets .active {
 	border: 1px solid #2f3a3e;
 	background: #2f3a3e !important;

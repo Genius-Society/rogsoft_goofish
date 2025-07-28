@@ -125,7 +125,7 @@
                                                 </tr>
                                                 <tr>
                                                     <th>运行状态</th>
-                                                    <td><span id="wemediamon_status"></span>
+                                                    <td><span id="status"></span>
                                                         <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="show_log_pannel()">运行日志</a>
@@ -181,16 +181,16 @@
                                             <table width="100%" height="37px">
                                                 <tr>
                                                     <td cellpadding="0" cellspacing="0" border="1" bordercolor="#222">
-                                                        <input onclick="tabSelect(0)" class="show show-btn0 active"
+                                                        <input onclick="tabSelect(0)" class="show-btn0 active"
                                                             type="button" value="bilibili" />
-                                                        <input onclick="tabSelect(1)" class="show show-btn1"
-                                                            type="button" value="HuggingFace" />
-                                                        <input onclick="tabSelect(2)" class="show show-btn2"
-                                                            type="button" value="GitHub" />
-                                                        <input onclick="tabSelect(3)" class="show show-btn3"
-                                                            type="button" value="cnblogs" />
-                                                        <input onclick="tabSelect(4)" class="show show-btn4"
-                                                            type="button" value="itch.io" />
+                                                        <input onclick="tabSelect(1)" class="show-btn1" type="button"
+                                                            value="HuggingFace" />
+                                                        <input onclick="tabSelect(2)" class="show-btn2" type="button"
+                                                            value="GitHub" />
+                                                        <input onclick="tabSelect(3)" class="show-btn3" type="button"
+                                                            value="cnblogs" />
+                                                        <input onclick="tabSelect(4)" class="show-btn4" type="button"
+                                                            value="itch.io" />
                                                     </td>
                                                 </tr>
                                             </table>

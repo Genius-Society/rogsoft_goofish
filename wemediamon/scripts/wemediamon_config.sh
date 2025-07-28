@@ -267,6 +267,9 @@ if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v gre
 	wemediamon_smtp=$(dbus get wemediamon_smtp)
 	wemediamon_cache=$(dbus get wemediamon_cache)
 	wemediamon_bilick=$(dbus get wemediamon_bilick)
+	wemediamon_hftag=$(dbus get wemediamon_hftag)
+	wemediamon_gitags=$(dbus get wemediamon_gitags)
+
 	# 开启 WeMediaMon
 	start_wemediamon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE

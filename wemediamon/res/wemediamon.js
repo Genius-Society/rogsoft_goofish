@@ -90,7 +90,7 @@ function get_status() {
 		dataType: "json",
 		success: function (response) {
 			if (response.result) {
-				E("wemediamon_status").innerHTML = response.result;
+				E("status").innerHTML = response.result;
 				setTimeout("get_status();", 5000);
 			}
 		},
@@ -185,7 +185,7 @@ function trigger(cmd) {
 			data: JSON.stringify(postData),
 			dataType: "json",
 			success: function (_) {
-				get_log("WEB_SUBMIT" == cmd);
+				get_log("WEB_SUBMIT" != cmd);
 				E("apply").disabled = false;
 			}
 		});
