@@ -1,7 +1,3 @@
-var odm = '<% nvram_get("productid"); %>'
-var lan_ipaddr = "<% nvram_get(lan_ipaddr); %>"
-var params_chk = ['wemediamon_enable'];
-var params_inp = [];
 var refresh_flag;
 var count_down;
 var _responseLen;
@@ -30,26 +26,43 @@ function register_event() {
 }
 
 function conf2obj() {
-	for (var i = 0; i < params_chk.length; i++) {
-		if (dbus[params_chk[i]]) {
-			E(params_chk[i]).checked = dbus[params_chk[i]] != "0";
+	$('input[type="checkbox"][id]').each(function (_, el) {
+		var id = $(el).attr("id");
+		if (id && dbus["wemediamon_" + id]) {
+			E(id).checked = (dbus["wemediamon_" + id] != "0");
 		}
+	});
+
+	$('input[type="text"][id]').each(function (_, el) {
+		var id = $(el).attr("id");
+		if (id && dbus["wemediamon_" + id]) {
+			E(id).value = dbus["wemediamon_" + id];
+		}
+	});
+}
+
+function obj2conf(cmd) {
+	var dbus_new = {};
+	if (cmd == "WEB_SUBMIT") {
+		$('input[type="checkbox"][id]').each(function (_, el) {
+			var id = $(el).attr("id");
+			if (id) {
+				dbus_new["wemediamon_" + id] = E(id).checked ? '1' : '0';
+			}
+		});
 	}
-	if (dbus["wemediamon_period"]) {
-		E("period").value = dbus["wemediamon_period"];
+	else {
+		get_log(1);
 	}
-	if (dbus["wemediamon_email"]) {
-		E("email").value = dbus["wemediamon_email"];
-	}
-	if (dbus["wemediamon_smtp"]) {
-		E("smtp").value = dbus["wemediamon_smtp"];
-	}
-	if (dbus["wemediamon_cache"]) {
-		E("cache").value = dbus["wemediamon_cache"];
-	}
-	if (dbus["wemediamon_bilick"]) {
-		E("bilick").value = dbus["wemediamon_bilick"];
-	}
+
+	$('input[type="text"][id]').each(function (_, el) {
+		var id = $(el).attr("id");
+		if (id) {
+			dbus_new["wemediamon_" + id] = E(id).value;;
+		}
+	});
+
+	return dbus_new;
 }
 
 function get_dbus_data() {
@@ -162,13 +175,7 @@ function get_run_log() {
 
 function trigger(cmd) {
 	if (cmd) {
-		get_log(1);
-		var dbus_new = {};
-		dbus_new["wemediamon_period"] = E("period").value;
-		dbus_new["wemediamon_email"] = E("email").value;
-		dbus_new["wemediamon_smtp"] = E("smtp").value;
-		dbus_new["wemediamon_cache"] = E("cache").value;
-		dbus_new["wemediamon_bilick"] = E("bilick").value;
+		var dbus_new = obj2conf(cmd);
 		E("apply").disabled = true;
 		var id = parseInt(Math.random() * 100000000);
 		var postData = { "id": id, "method": "wemediamon_config.sh", "params": [cmd], "fields": dbus_new };
@@ -178,36 +185,11 @@ function trigger(cmd) {
 			data: JSON.stringify(postData),
 			dataType: "json",
 			success: function (_) {
-				get_log(1);
+				get_log("WEB_SUBMIT" == cmd);
 				E("apply").disabled = false;
 			}
 		});
 	}
-}
-
-function save() {
-	var dbus_new = {};
-	for (var i = 0; i < params_chk.length; i++) {
-		dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
-	}
-	dbus_new["wemediamon_period"] = E("period").value;
-	dbus_new["wemediamon_email"] = E("email").value;
-	dbus_new["wemediamon_smtp"] = E("smtp").value;
-	dbus_new["wemediamon_cache"] = E("cache").value;
-	dbus_new["wemediamon_bilick"] = E("bilick").value;
-	E("apply").disabled = true;
-	var id = parseInt(Math.random() * 100000000);
-	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["WEB_SUBMIT"], "fields": dbus_new };
-	$.ajax({
-		type: "POST",
-		url: "/_api/",
-		data: JSON.stringify(postData),
-		dataType: "json",
-		success: function (_) {
-			E("apply").disabled = false;
-			get_log();
-		}
-	});
 }
 
 function showWBLoadingBar() {

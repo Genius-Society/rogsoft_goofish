@@ -132,7 +132,7 @@ a:focus {
 	white-space: break-spaces;
 }
 
-#stop_log {
+.stop_log {
 	margin-left: 10px;
 }
 
@@ -152,7 +152,7 @@ a:focus {
 	float: left;
 }
 
-#wemediamon_enable {
+#enable {
 	display: none;
 }
 

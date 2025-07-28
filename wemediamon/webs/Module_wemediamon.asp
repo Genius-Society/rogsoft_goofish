@@ -55,7 +55,7 @@
                     </div>
                     <div id="ok_button" class="apply_gen">
                         <input class="button_gen" type="button" onclick="hide_log_pannel()" value="返回主界面">
-                        <input type="checkbox" id="stop_log">
+                        <input type="checkbox" class="stop_log">
                         <lable>&nbsp;暂停日志刷新</lable>
                     </div>
                 </td>
@@ -105,9 +105,8 @@
                                                     <th>开关</th>
                                                     <td colspan="2">
                                                         <div class="switch_field">
-                                                            <label for="wemediamon_enable">
-                                                                <input id="wemediamon_enable" class="switch"
-                                                                    type="checkbox">
+                                                            <label for="enable">
+                                                                <input id="enable" class="switch" type="checkbox">
                                                                 <div class="switch_container">
                                                                     <div class="switch_bar"></div>
                                                                     <div class="switch_circle transition_style">
@@ -318,8 +317,8 @@
                                         </div>
 
                                         <div class="apply_gen">
-                                            <input class="button_gen" id="apply" onClick="save()" type="button"
-                                                value="提交" />
+                                            <input class="button_gen" id="apply" onclick="trigger('WEB_SUBMIT')"
+                                                type="button" value="提交" />
                                         </div>
                                     </td>
                                 </tr>
