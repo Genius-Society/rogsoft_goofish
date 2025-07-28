@@ -1,7 +1,7 @@
 import os
+import json
 import math
 import time
-import json
 import random
 import smtplib
 import argparse
@@ -14,14 +14,15 @@ from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
+
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="WeMediaMon config script.")
 # 添加参数
-parser.add_argument("--cmd", type=str)
-parser.add_argument("--period", type=int, default=2)
-parser.add_argument("--email", type=str, default="")
-parser.add_argument("--smtp", type=str, default="")
-parser.add_argument("--cache", type=str, default="")
+parser.add_argument("--cmd", type=str, required=True)
+parser.add_argument("--period", type=int, default=2, required=True)
+parser.add_argument("--email", type=str, default="", required=True)
+parser.add_argument("--smtp", type=str, default="", required=True)
+parser.add_argument("--cache", type=str, default="", required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--hftag", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
@@ -30,6 +31,9 @@ parser.add_argument("--itck", type=str, default="")
 
 # 解析命令行参数
 args = parser.parse_args()
+
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
 
 
 def upd_log(txt, mode=args.cmd):
@@ -41,7 +45,7 @@ def upd_log(txt, mode=args.cmd):
 
 
 def send_email(
-    content,
+    content="邮件发送成功!",
     subject="[WeMediaMon 插件] 测试邮件",
     title="SMTP有效性检测",
     smtp_server="smtp.qq.com",
@@ -80,11 +84,9 @@ def send_email(
 
 class BiliMon:
     def __init__(self):
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
-        self.dbfile = f"{self.tmpdir}/bili_followers.json"
-        self.blacks = f"{self.tmpdir}/bili_blacklist.txt"
-        self._parse_cookie(args.ck)
+        self.dbfile = f"{CACHE_PATH}/bili_followers.json"
+        self.blacks = f"{CACHE_PATH}/bili_blacklist.txt"
+        self._parse_cookie(args.bilick)
 
     def _parse_cookie(self, ck: str):
         self.uid = ck.split("DedeUserID=")[1].split(";")[0]
@@ -119,7 +121,7 @@ class BiliMon:
         try:
             response = requests.get(
                 f"https://api.bilibili.com/x/relation/followers?vmid={self.uid}&pn={page}",
-                headers={"User-Agent": self.ua, "Cookie": self.ck},
+                headers={"User-Agent": USER_AGENT, "Cookie": self.ck},
             )  # 使用 requests 库下载 JSON 数据
             response.raise_for_status()  # 检查是否成功获取数据
             json_data = response.json()  # 使用 json 库解析 JSON 数据
@@ -271,13 +273,10 @@ class BiliMon:
 class HFMon:
     def __init__(self):
         self.hf_domain = "https://huggingface.co"
-        self.header = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537"
-        }
+        self.header = {"User-Agent": CACHE_PATH}
         self.hf_api = HfApi()
         self.target: str = args.hftag
-        self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
-        self.cache = f"{self.tmpdir}/hf_followers.json"
+        self.cache = f"{CACHE_PATH}/hf_followers.json"
         self.tag_users, self.tag_orgs = self._parse_tags()
 
     def _parse_tags(self):
@@ -376,8 +375,7 @@ class HFMon:
 class GitHubMon:
     def __init__(self):
         self.tags = args.gitags.split(";")
-        self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
-        self.cache = f"{self.tmpdir}/github_followers.json"
+        self.cache = f"{CACHE_PATH}/github_followers.json"
 
     def _get_followers(self, user: str):
         response = requests.get(f"https://api.github.com/users/{user}/followers")

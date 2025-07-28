@@ -57,7 +57,23 @@ install_env() {
 	rm -rf /koolshare/wemediamon/.cache
 }
 
+init_vars() {
+	wemediamon_period=$(dbus get wemediamon_period)
+	wemediamon_email=$(dbus get wemediamon_email)
+	wemediamon_smtp=$(dbus get wemediamon_smtp)
+	wemediamon_cache=$(dbus get wemediamon_cache)
+	wemediamon_bilimon=$(dbus get wemediamon_bilimon)
+	wemediamon_bilick=$(dbus get wemediamon_bilick)
+	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
+	wemediamon_hftag=$(dbus get wemediamon_hftag)
+	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
+	wemediamon_gitags=$(dbus get wemediamon_gitags)
+	wemediamon_cnblon=$(dbus get wemediamon_cnblon)
+	wemediamon_itchion=$(dbus get wemediamon_itchion)
+}
+
 check_params() {
+	init_vars
 	# 检查入参
 	if [[ -z "${wemediamon_period}" ]]; then
 		close_in_five "请输入有效周期!"
@@ -259,19 +275,7 @@ if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v gre
 	set_lock
 	true >$LOG_FILE
 	# 初始化变量
-	wemediamon_period=$(dbus get wemediamon_period)
-	wemediamon_email=$(dbus get wemediamon_email)
-	wemediamon_smtp=$(dbus get wemediamon_smtp)
-	wemediamon_cache=$(dbus get wemediamon_cache)
-	wemediamon_bilimon=$(dbus get wemediamon_bilimon)
-	wemediamon_bilick=$(dbus get wemediamon_bilick)
-	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
-	wemediamon_hftag=$(dbus get wemediamon_hftag)
-	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
-	wemediamon_gitags=$(dbus get wemediamon_gitags)
-	wemediamon_cnblon=$(dbus get wemediamon_cnblon)
-	wemediamon_itchion=$(dbus get wemediamon_itchion)
-
+	init_vars
 	# 开启 WeMediaMon
 	start_wemediamon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE
