@@ -75,3 +75,154 @@ a:focus {
 	border: none;
 	cursor: pointer;
 }
+
+#LoadingBar {
+	z-index: 200;
+}
+
+#loading_block_title {
+	margin: 10px auto;
+	margin-left: 10px;
+	width: 85%;
+	font-size: 12pt;
+}
+
+#loading_block_spilt {
+	margin: 10px 0 10px 5px;
+}
+
+#log_content {
+	border: 1px solid #000;
+	width: 99%;
+	font-family: 'Lucida Console';
+	font-size: 11px;
+	background: transparent;
+	color: #FFFFFF;
+	outline: none;
+	padding-left: 3px;
+	padding-right: 22px;
+	overflow-x: hidden
+}
+
+#ok_button {
+	background: #000;
+	visibility: hidden;
+}
+
+#log_pannel_div {
+	z-index: 200;
+}
+
+#log_pannel_table {
+	width: 960px;
+}
+
+#log_content {
+	border: 1px solid #000;
+	width: 99%;
+	font-family: 'Lucida Console';
+	font-size: 11px;
+	background: transparent;
+	color: #FFFFFF;
+	outline: none;
+	padding-left: 5px;
+	padding-right: 22px;
+	line-height: 1.3;
+	overflow-x: hidden;
+	white-space: break-spaces;
+}
+
+#ok_button {
+	background: #000;
+}
+
+#stop_log {
+	margin-left: 10px;
+}
+
+.splitLine {
+	margin: 10px 0 10px 5px;
+}
+
+#return_btn {
+	cursor: pointer;
+	position: absolute;
+	margin-left: -30px;
+	margin-top: -25px;
+}
+
+.switch_field {
+	display: table-cell;
+	float: left;
+}
+
+#wemediamon_enable {
+	display: none;
+}
+
+#period {
+	width: 62px;
+}
+
+#tablets table {
+	margin: 10px 0px 0px 0px;
+	border-collapse: collapse;
+}
+
+#tablets td {
+	padding: 0;
+}
+
+#bilick {
+	width: 453px;
+	height: auto;
+}
+
+#cache,
+#hf_tags,
+#gitags,
+#email,
+#smtp {
+	width: 300px;
+}
+
+#log_info {
+	text-align: center;
+	font-size: 18px;
+	color: #99FF00;
+	padding: 10px;
+	font-weight: bold;
+}
+
+#running_log {
+	margin-left: 15px;
+	margin-right: 15px;
+	margin-top: 10px;
+	outline: 1px solid #3c3c3c;
+	overflow: hidden;
+}
+
+#return_center {
+	float: right;
+	width: 15px;
+	height: 25px;
+	margin-top: -20px;
+}
+
+#switch_btn {
+	float: right;
+	margin-top: 5px;
+	margin-right: 5px;
+}
+
+#smtp_btn {
+	float: right;
+	margin-right: 5px;
+}
+
+#log_container {
+	margin-left: 15px;
+	margin-right: 15px;
+	margin-top: 10px;
+	overflow: hidden;
+}

@@ -16,6 +16,7 @@ from bilibili_api import ResponseCodeException, Credential, user, sync
 
 START_MONITOR = 0
 TEST_SMTP = 1
+TEST_BILI_CK = 6
 UPD_BILI_FANS = 2
 UPD_BILI_BLACKS = 3
 UPD_HF_FANS = 4

@@ -51,19 +51,19 @@ function conf2obj() {
 		}
 	}
 	if (dbus["wemediamon_period"]) {
-		E("wemediamon_feat_period").value = dbus["wemediamon_period"];
+		E("period").value = dbus["wemediamon_period"];
 	}
 	if (dbus["wemediamon_mail"]) {
-		E("wemediamon_feat_mail").value = dbus["wemediamon_mail"];
+		E("email").value = dbus["wemediamon_mail"];
 	}
 	if (dbus["wemediamon_smtp"]) {
-		E("wemediamon_feat_smtp").value = dbus["wemediamon_smtp"];
+		E("smtp").value = dbus["wemediamon_smtp"];
 	}
 	if (dbus["wemediamon_tmp"]) {
-		E("wemediamon_feat_tmp").value = dbus["wemediamon_tmp"];
+		E("cache").value = dbus["wemediamon_tmp"];
 	}
 	if (dbus["wemediamon_bili_ck"]) {
-		E("bili_ck").value = dbus["wemediamon_bili_ck"];
+		E("bilick").value = dbus["wemediamon_bili_ck"];
 	}
 }
 
@@ -107,12 +107,12 @@ function trigger(mode) {
 	if (trigger_mode != "") {
 		get_log(1);
 		var dbus_new = {};
-		dbus_new["wemediamon_period"] = E("wemediamon_feat_period").value;
-		dbus_new["wemediamon_mail"] = E("wemediamon_feat_mail").value;
-		dbus_new["wemediamon_smtp"] = E("wemediamon_feat_smtp").value;
-		dbus_new["wemediamon_tmp"] = E("wemediamon_feat_tmp").value;
-		dbus_new["wemediamon_bili_ck"] = E("bili_ck").value;
-		E("wemediamon_apply").disabled = true;
+		dbus_new["wemediamon_period"] = E("period").value;
+		dbus_new["wemediamon_mail"] = E("email").value;
+		dbus_new["wemediamon_smtp"] = E("smtp").value;
+		dbus_new["wemediamon_tmp"] = E("cache").value;
+		dbus_new["wemediamon_bili_ck"] = E("bilick").value;
+		E("apply").disabled = true;
 		var id = parseInt(Math.random() * 100000000);
 		var postData = { "id": id, "method": "wemediamon_config.sh", "params": [trigger_mode], "fields": dbus_new };
 		$.ajax({
@@ -122,7 +122,7 @@ function trigger(mode) {
 			dataType: "json",
 			success: function (_) {
 				get_log(1);
-				E("wemediamon_apply").disabled = false;
+				E("apply").disabled = false;
 			}
 		});
 	}
@@ -131,8 +131,8 @@ function trigger(mode) {
 function watchdog() {
 	get_log(1);
 	var dbus_new = {};
-	dbus_new["wemediamon_tmp"] = E("wemediamon_feat_tmp").value;
-	E("wemediamon_apply").disabled = true;
+	dbus_new["wemediamon_tmp"] = E("cache").value;
+	E("apply").disabled = true;
 	var id = parseInt(Math.random() * 100000000);
 	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["watch_dogs"], "fields": dbus_new };
 	$.ajax({
@@ -142,7 +142,7 @@ function watchdog() {
 		dataType: "json",
 		success: function (_) {
 			get_log(1);
-			E("wemediamon_apply").disabled = false;
+			E("apply").disabled = false;
 		}
 	});
 }
@@ -150,8 +150,8 @@ function watchdog() {
 function fixenv() {
 	get_log(1);
 	var dbus_new = {};
-	dbus_new["wemediamon_tmp"] = E("wemediamon_feat_tmp").value;
-	E("wemediamon_apply").disabled = true;
+	dbus_new["wemediamon_cache"] = E("cache").value;
+	E("apply").disabled = true;
 	var id = parseInt(Math.random() * 100000000);
 	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["fix_env"], "fields": dbus_new };
 	$.ajax({
@@ -161,7 +161,7 @@ function fixenv() {
 		dataType: "json",
 		success: function (_) {
 			get_log(1);
-			E("wemediamon_apply").disabled = false;
+			E("apply").disabled = false;
 		}
 	});
 }
@@ -171,12 +171,12 @@ function save() {
 	for (var i = 0; i < params_chk.length; i++) {
 		dbus_new[params_chk[i]] = E(params_chk[i]).checked ? '1' : '0';
 	}
-	dbus_new["wemediamon_period"] = E("wemediamon_feat_period").value;
-	dbus_new["wemediamon_mail"] = E("wemediamon_feat_mail").value;
-	dbus_new["wemediamon_smtp"] = E("wemediamon_feat_smtp").value;
-	dbus_new["wemediamon_tmp"] = E("wemediamon_feat_tmp").value;
-	dbus_new["wemediamon_bili_ck"] = E("bili_ck").value;
-	E("wemediamon_apply").disabled = true;
+	dbus_new["wemediamon_period"] = E("period").value;
+	dbus_new["wemediamon_email"] = E("email").value;
+	dbus_new["wemediamon_smtp"] = E("smtp").value;
+	dbus_new["wemediamon_cache"] = E("cache").value;
+	dbus_new["wemediamon_bilick"] = E("bilick").value;
+	E("apply").disabled = true;
 	var id = parseInt(Math.random() * 100000000);
 	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["web_submit"], "fields": dbus_new };
 	$.ajax({
@@ -185,7 +185,7 @@ function save() {
 		data: JSON.stringify(postData),
 		dataType: "json",
 		success: function (_) {
-			E("wemediamon_apply").disabled = false;
+			E("apply").disabled = false;
 			get_log();
 		}
 	});
@@ -271,7 +271,7 @@ function get_run_log() {
 		async: true,
 		cache: false,
 		success: function (response) {
-			var retArea = E("log_content_wemediamon");
+			var retArea = E("log_content");
 			if (_responseLen == response.length) {
 				noChange++;
 			} else {
@@ -284,14 +284,14 @@ function get_run_log() {
 			}
 			retArea.value = response;
 
-			if (E("wemediamon_stop_log").checked == false) {
+			if (E("stop_log").checked == false) {
 				retArea.scrollTop = retArea.scrollHeight;
 			}
 			_responseLen = response.length;
 		},
 		error: function (_) {
 			E("log_pannel_title").innerHTML = "暂无日志信息 ...";
-			E("log_content_wemediamon").value = "日志文件为空, 请关闭本窗口!";
+			E("log_content").value = "日志文件为空, 请关闭本窗口!";
 			setTimeout("get_run_log();", 5000);
 		}
 	});
@@ -331,7 +331,7 @@ function tabSelect(w) {
 }
 
 function show_hide_el(w) {
-	if ($('#check_' + w).is(':checked')) {
+	if ($('.check_' + w).is(':checked')) {
 		$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
 	}
 	else {
