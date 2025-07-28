@@ -14,9 +14,7 @@ function init() {
 }
 
 function register_event() {
-	$(".popup_bar_bg_ks").click(function () {
-		count_down = -1;
-	});
+	$(".popup_bar_bg_ks").click(function () { count_down = -1; });
 	$(window).resize(function () {
 		if ($('.popup_bar_bg_ks').css("visibility") == "visible") {
 			document.scrollingElement.scrollTop = 0;
@@ -27,20 +25,6 @@ function register_event() {
 			var log_h_offset = (page_h - log_h) / 2;
 			var log_w_offset = (page_w - log_w) / 2 + 90;
 			$('#loadingBarBlock').offset({ top: log_h_offset, left: log_w_offset });
-		}
-	});
-}
-
-function get_dbus_data() {
-	$.ajax({
-		type: "GET",
-		url: "/_api/wemediamon",
-		dataType: "json",
-		async: false,
-		success: function (data) {
-			dbus = data.result[0];
-			conf2obj();
-			register_event();
 		}
 	});
 }
@@ -66,6 +50,20 @@ function conf2obj() {
 	if (dbus["wemediamon_bilick"]) {
 		E("bilick").value = dbus["wemediamon_bilick"];
 	}
+}
+
+function get_dbus_data() {
+	$.ajax({
+		type: "GET",
+		url: "/_api/wemediamon",
+		dataType: "json",
+		async: false,
+		success: function (data) {
+			dbus = data.result[0];
+			conf2obj();
+			register_event();
+		}
+	});
 }
 
 function get_status() {
@@ -163,7 +161,7 @@ function get_run_log() {
 }
 
 function trigger(cmd) {
-	if (cmd != "") {
+	if (cmd) {
 		get_log(1);
 		var dbus_new = {};
 		dbus_new["wemediamon_period"] = E("period").value;
@@ -199,7 +197,7 @@ function save() {
 	dbus_new["wemediamon_bilick"] = E("bilick").value;
 	E("apply").disabled = true;
 	var id = parseInt(Math.random() * 100000000);
-	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["web_submit"], "fields": dbus_new };
+	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["WEB_SUBMIT"], "fields": dbus_new };
 	$.ajax({
 		type: "POST",
 		url: "/_api/",

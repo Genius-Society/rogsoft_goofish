@@ -79,24 +79,12 @@ start_wemediamon() {
 	if [[ -z "${wemediamon_smtp}" ]]; then
 		close_in_five "请输入有效SMTP密钥!"
 	fi
-	if [[ -z "${wemediamon_bilick}" ]]; then
-		close_in_five "请输入有效B站cookie!"
-	fi
 	if [ -z "${wemediamon_cache}" ]; then
 		close_in_five "请输入有效缓存路径!"
 	fi
 
-	if [ ! -d "${wemediamon_cache}" ]; then
-		# 修复重启导致的缓存目录盘符变化
-		echo_date "检查缓存路径..."
-		fixed_wemediamon_cache=$(fix_path $wemediamon_cache)
-		if [ $fixed_wemediamon_cache != $wemediamon_cache ] && [ -d $fixed_wemediamon_cache ]; then
-			wemediamon_cache=$fixed_wemediamon_cache
-			dbus set wemediamon_cache=$wemediamon_cache
-			echo_date "缓存路径已自动修复!"
-		else
-			close_in_five "请输入有效缓存路径!"
-		fi
+	if [[ -z "${wemediamon_bilick}" ]]; then
+		close_in_five "请输入有效B站cookie!"
 	fi
 
 	# 插件开启的时候同步一次时间
@@ -113,12 +101,12 @@ start_wemediamon() {
 	# 开启周期监控
 	rm -rf "/tmp/upload/wemediamon_run_log.txt"
 	nohup python /koolshare/wemediamon/wemediamon.py \
-		--clock 1 \
+		--cmd 1 \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
-		--tmp "${wemediamon_cache}" \
-		--ck "${wemediamon_bilick}" \ 
+		--cache "${wemediamon_cache}" \
+		--bilick "${wemediamon_bilick}" \ 
 	>>"/tmp/upload/wemediamon_run_log.txt" 2>&1 &
 
 	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
@@ -156,12 +144,12 @@ trigger() {
 
 	# 开启单次触发扫描
 	nohup python /koolshare/wemediamon/wemediamon.py \
-		--clock $1 \
+		--cmd $1 \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
-		--tmp "${wemediamon_cache}" \
-		--ck "${wemediamon_bilick}" \ 
+		--cache "${wemediamon_cache}" \
+		--bilick "${wemediamon_bilick}" \ 
 	>>$LOG_FILE 2>&1 &
 }
 
@@ -221,7 +209,7 @@ stop)
 esac
 
 case $2 in
-web_submit)
+WEB_SUBMIT)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
@@ -236,36 +224,21 @@ web_submit)
 	unset_lock
 	;;
 
-trigger_once)
+FIX_ENV)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	trigger 0 | tee -a $LOG_FILE
+	install_env | tee -a $LOG_FILE
+	echo XU6J03M6 | tee -a $LOG_FILE
 	unset_lock
 	;;
 
-trigger_clean)
-	set_lock
-	true >$LOG_FILE
-	http_response "$1"
-	trigger 2 | tee -a $LOG_FILE
-	unset_lock
-	;;
-
-smtp_test)
-	set_lock
-	true >$LOG_FILE
-	http_response "$1"
-	trigger 3 | tee -a $LOG_FILE
-	unset_lock
-	;;
-
-watch_dogs)
+SEE_BILI_BLACKS)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
 	if [[ -f "${wemediamon_cache}/traitors.txt" ]]; then
-		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/traitors.txt" | tee -a $LOG_FILE
+		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt" | tee -a $LOG_FILE
 	else
 		echo_date "当前狗库为空!" | tee -a $LOG_FILE
 	fi
@@ -273,12 +246,11 @@ watch_dogs)
 	unset_lock
 	;;
 
-fix_env)
+*)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	install_env | tee -a $LOG_FILE
-	echo XU6J03M6 | tee -a $LOG_FILE
+	trigger "$2" | tee -a $LOG_FILE
 	unset_lock
 	;;
 
