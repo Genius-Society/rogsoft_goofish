@@ -3,6 +3,7 @@
 source /koolshare/scripts/base.sh
 eval $(dbus export wemediamon)
 LOG_FILE=/tmp/upload/wemediamon_log.txt
+RUN_LOG=/tmp/upload/wemediamon_run_log.txt
 LOCK_FILE=/var/lock/wemediamon.lock
 alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 export PATH=$PATH:/opt/bin/
@@ -56,19 +57,7 @@ install_env() {
 	rm -rf /koolshare/wemediamon/.cache
 }
 
-# 自动修复路由器重启导致的盘符变化
-fix_path() {
-	for dir in /mnt/*/; do
-		if [ -d "${dir}" ]; then
-			sub=$(echo "$1" | cut -d'/' -f4-)
-			if [ ! -z $sub ] [ -d "${dir}${sub}" ]; then
-				echo "${dir}${sub}"
-			fi
-		fi
-	done
-}
-
-start_wemediamon() {
+check_params() {
 	# 检查入参
 	if [[ -z "${wemediamon_period}" ]]; then
 		close_in_five "请输入有效周期!"
@@ -83,9 +72,33 @@ start_wemediamon() {
 		close_in_five "请输入有效缓存路径!"
 	fi
 
-	if [[ -z "${wemediamon_bilick}" ]]; then
-		close_in_five "请输入有效B站cookie!"
+	if [ "${wemediamon_bilimon}" == "1" ]; then
+		if [[ -z "${wemediamon_bilick}" ]]; then
+			close_in_five "请输入有效B站cookie!"
+		fi
+	else
+		wemediamon_bilick=""
 	fi
+
+	if [ "${wemediamon_hfmon}" == "1" ]; then
+		if [[ -z "${wemediamon_hftag}" ]]; then
+			close_in_five "请输入有效抱脸用户名!"
+		fi
+	else
+		wemediamon_hftag=""
+	fi
+
+	if [ "${wemediamon_gitmon}" == "1" ]; then
+		if [[ -z "${wemediamon_gitags}" ]]; then
+			close_in_five "请输入有效GitHub目标列表!"
+		fi
+	else
+		wemediamon_gitags=""
+	fi
+}
+
+start_wemediamon() {
+	check_params
 
 	# 插件开启的时候同步一次时间
 	if [ "${wemediamon_enable}" == "1" -a -n "$(which ntpclient)" ]; then
@@ -99,41 +112,23 @@ start_wemediamon() {
 	fi
 
 	# 开启周期监控
-	rm -rf "/tmp/upload/wemediamon_run_log.txt"
+	rm -rf $RUN_LOG
 	nohup python /koolshare/wemediamon/wemediamon.py \
-		--cmd 1 \
+		--cmd "START_MONITOR" \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
-		--bilick "${wemediamon_bilick}" \ 
-	>>"/tmp/upload/wemediamon_run_log.txt" 2>&1 &
+		--bilick "${wemediamon_bilick}" \
+		--hftag "${wemediamon_hftag}" \
+		--gitags "${wemediamon_gitags}" \
+		>>$RUN_LOG 2>&1 &
 
 	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
 
 trigger() {
-	# 检查入参
-	if [[ -z "${wemediamon_period}" ]]; then
-		echo_date "请输入有效周期!XU6J03M6"
-		return
-	fi
-	if [[ -z "${wemediamon_email}" ]]; then
-		echo_date "请输入有效邮箱!XU6J03M6"
-		return
-	fi
-	if [[ -z "${wemediamon_smtp}" ]]; then
-		echo_date "请输入有效SMTP密钥!XU6J03M6"
-		return
-	fi
-	if [[ -z "${wemediamon_bilick}" ]]; then
-		echo_date "请输入有效B站cookie!XU6J03M6"
-		return
-	fi
-	if [ -z "${wemediamon_cache}" ] || [ ! -d "${wemediamon_cache}" ]; then
-		echo_date "请输入有效缓存路径!XU6J03M6"
-		return
-	fi
+	check_params
 
 	# 检查运行环境
 	echo_date "检查 Entware 环境..."
@@ -149,8 +144,10 @@ trigger() {
 		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
-		--bilick "${wemediamon_bilick}" \ 
-	>>$LOG_FILE 2>&1 &
+		--bilick "${wemediamon_bilick}" \
+		--hftag "${wemediamon_hftag}" \
+		--gitags "${wemediamon_gitags}" \
+		>>$LOG_FILE 2>&1 &
 }
 
 close_in_five() {
@@ -237,7 +234,7 @@ SEE_BILI_BLACKS)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	if [[ -f "${wemediamon_cache}/traitors.txt" ]]; then
+	if [[ -f "${wemediamon_cache}/bili_blacklist.txt" ]]; then
 		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt" | tee -a $LOG_FILE
 	else
 		echo_date "当前狗库为空!" | tee -a $LOG_FILE
@@ -266,9 +263,14 @@ if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v gre
 	wemediamon_email=$(dbus get wemediamon_email)
 	wemediamon_smtp=$(dbus get wemediamon_smtp)
 	wemediamon_cache=$(dbus get wemediamon_cache)
+	wemediamon_bilimon=$(dbus get wemediamon_bilimon)
 	wemediamon_bilick=$(dbus get wemediamon_bilick)
+	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
 	wemediamon_hftag=$(dbus get wemediamon_hftag)
+	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
 	wemediamon_gitags=$(dbus get wemediamon_gitags)
+	wemediamon_cnblon=$(dbus get wemediamon_cnblon)
+	wemediamon_itchion=$(dbus get wemediamon_itchion)
 
 	# 开启 WeMediaMon
 	start_wemediamon | tee -a $LOG_FILE

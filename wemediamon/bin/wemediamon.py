@@ -14,37 +14,26 @@ from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
-START_MONITOR = 0
-TEST_SMTP = 1
-TEST_BILI_CK = 6
-UPD_BILI_FANS = 2
-UPD_BILI_BLACKS = 3
-UPD_HF_FANS = 4
-UPD_GIT_FANS = 5
-ACTIVE_HF_REPOS = 6
-FIX_ENV = 7
-SEE_BILI_BLACKS = 8
-
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="WeMediaMon config script.")
 # 添加参数
-parser.add_argument("--cmd", type=int)
-parser.add_argument("--period", type=int)
-parser.add_argument("--email", type=str)
-parser.add_argument("--smtp", type=str)
-parser.add_argument("--tmp", type=str)
-parser.add_argument("--bilick", type=str)
-parser.add_argument("--hftag", type=str)
-parser.add_argument("--gitags", type=str)
-parser.add_argument("--cnblokie", type=str)
-parser.add_argument("--itck", type=str)
+parser.add_argument("--cmd", type=str)
+parser.add_argument("--period", type=int, default=2)
+parser.add_argument("--email", type=str, default="")
+parser.add_argument("--smtp", type=str, default="")
+parser.add_argument("--cache", type=str, default="")
+parser.add_argument("--bilick", type=str, default="")
+parser.add_argument("--hftag", type=str, default="")
+parser.add_argument("--gitags", type=str, default="")
+parser.add_argument("--cnblokie", type=str, default="")
+parser.add_argument("--itck", type=str, default="")
 
 # 解析命令行参数
 args = parser.parse_args()
 
 
 def upd_log(txt, mode=args.cmd):
-    if mode == START_MONITOR:
+    if mode == "START_MONITOR":
         with open("/tmp/upload/wemediamon_run_log.txt", "a", encoding="utf-8") as file:
             file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n")
     else:
@@ -475,25 +464,27 @@ def start_monitor(period=args.period):
 
 if __name__ == "__main__":
     try:
-        if args.cmd == START_MONITOR:
+        if args.cmd == "START_MONITOR":
             start_monitor()
 
-        elif args.cmd == TEST_SMTP:
+        elif args.cmd == "TEST_SMTP":
             send_email()
 
-        elif args.cmd == UPD_BILI_FANS:
+        elif args.cmd == "UPD_BILI_FANS":
             BiliMon().upd_fans()
 
-        elif args.cmd == UPD_BILI_BLACKS:
+        elif args.cmd == "UPD_BILI_BLACKS":
             BiliMon().clean_all_traitors()
 
-        elif args.cmd == UPD_HF_FANS:
+        elif args.cmd == "UPD_HF_FANS":
             HFMon().upd_fans()
 
-        elif args.cmd == UPD_GIT_FANS:
+        elif args.cmd == "UPD_GIT_FANS":
             GitHubMon().upd_fans()
 
-        # TODO:
+        else:
+            upd_log(args.cmd)
+            # TODO:
 
     except Exception as e:
         send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")

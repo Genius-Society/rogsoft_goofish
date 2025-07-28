@@ -1,4 +1,4 @@
+bilibili-api-python==16.3
+huggingface_hub==0.31.4
 requests
 schedule
-huggingface_hub
-bilibili-api-python==16.3

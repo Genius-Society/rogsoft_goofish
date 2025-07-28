@@ -39,6 +39,20 @@ function conf2obj() {
 			E(id).value = dbus["wemediamon_" + id];
 		}
 	});
+
+	$('input[type="password"][id]').each(function (_, el) {
+		var id = $(el).attr("id");
+		if (id && dbus["wemediamon_" + id]) {
+			E(id).value = dbus["wemediamon_" + id];
+		}
+	});
+
+	$('textarea[name]').each(function (_, el) {
+		var id = $(el).attr("id");
+		if (id && dbus["wemediamon_" + id]) {
+			E(id).value = dbus["wemediamon_" + id];
+		}
+	});
 }
 
 function obj2conf(cmd) {
@@ -56,6 +70,20 @@ function obj2conf(cmd) {
 	}
 
 	$('input[type="text"][id]').each(function (_, el) {
+		var id = $(el).attr("id");
+		if (id) {
+			dbus_new["wemediamon_" + id] = E(id).value;;
+		}
+	});
+
+	$('input[type="password"][id]').each(function (_, el) {
+		var id = $(el).attr("id");
+		if (id) {
+			dbus_new["wemediamon_" + id] = E(id).value;;
+		}
+	});
+
+	$('textarea[name]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id) {
 			dbus_new["wemediamon_" + id] = E(id).value;;
