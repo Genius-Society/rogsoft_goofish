@@ -73,26 +73,26 @@ start_wemediamon() {
 	if [[ -z "${wemediamon_period}" ]]; then
 		close_in_five "请输入有效周期!"
 	fi
-	if [[ -z "${wemediamon_mail}" ]]; then
+	if [[ -z "${wemediamon_email}" ]]; then
 		close_in_five "请输入有效邮箱!"
 	fi
 	if [[ -z "${wemediamon_smtp}" ]]; then
 		close_in_five "请输入有效SMTP密钥!"
 	fi
-	if [[ -z "${wemediamon_bili_ck}" ]]; then
+	if [[ -z "${wemediamon_bilick}" ]]; then
 		close_in_five "请输入有效B站cookie!"
 	fi
-	if [ -z "${wemediamon_tmp}" ]; then
+	if [ -z "${wemediamon_cache}" ]; then
 		close_in_five "请输入有效缓存路径!"
 	fi
 
-	if [ ! -d "${wemediamon_tmp}" ]; then
+	if [ ! -d "${wemediamon_cache}" ]; then
 		# 修复重启导致的缓存目录盘符变化
 		echo_date "检查缓存路径..."
-		fixed_wemediamon_tmp=$(fix_path $wemediamon_tmp)
-		if [ $fixed_wemediamon_tmp != $wemediamon_tmp ] && [ -d $fixed_wemediamon_tmp ]; then
-			wemediamon_tmp=$fixed_wemediamon_tmp
-			dbus set wemediamon_tmp=$wemediamon_tmp
+		fixed_wemediamon_cache=$(fix_path $wemediamon_cache)
+		if [ $fixed_wemediamon_cache != $wemediamon_cache ] && [ -d $fixed_wemediamon_cache ]; then
+			wemediamon_cache=$fixed_wemediamon_cache
+			dbus set wemediamon_cache=$wemediamon_cache
 			echo_date "缓存路径已自动修复!"
 		else
 			close_in_five "请输入有效缓存路径!"
@@ -115,10 +115,10 @@ start_wemediamon() {
 	nohup python /koolshare/wemediamon/wemediamon.py \
 		--clock 1 \
 		--period "${wemediamon_period}" \
-		--email "${wemediamon_mail}" \
+		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
-		--tmp "${wemediamon_tmp}" \
-		--ck "${wemediamon_bili_ck}" \ 
+		--tmp "${wemediamon_cache}" \
+		--ck "${wemediamon_bilick}" \ 
 	>>"/tmp/upload/wemediamon_run_log.txt" 2>&1 &
 
 	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
@@ -130,7 +130,7 @@ trigger() {
 		echo_date "请输入有效周期!XU6J03M6"
 		return
 	fi
-	if [[ -z "${wemediamon_mail}" ]]; then
+	if [[ -z "${wemediamon_email}" ]]; then
 		echo_date "请输入有效邮箱!XU6J03M6"
 		return
 	fi
@@ -138,11 +138,11 @@ trigger() {
 		echo_date "请输入有效SMTP密钥!XU6J03M6"
 		return
 	fi
-	if [[ -z "${wemediamon_bili_ck}" ]]; then
+	if [[ -z "${wemediamon_bilick}" ]]; then
 		echo_date "请输入有效B站cookie!XU6J03M6"
 		return
 	fi
-	if [ -z "${wemediamon_tmp}" ] || [ ! -d "${wemediamon_tmp}" ]; then
+	if [ -z "${wemediamon_cache}" ] || [ ! -d "${wemediamon_cache}" ]; then
 		echo_date "请输入有效缓存路径!XU6J03M6"
 		return
 	fi
@@ -158,10 +158,10 @@ trigger() {
 	nohup python /koolshare/wemediamon/wemediamon.py \
 		--clock $1 \
 		--period "${wemediamon_period}" \
-		--email "${wemediamon_mail}" \
+		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
-		--tmp "${wemediamon_tmp}" \
-		--ck "${wemediamon_bili_ck}" \ 
+		--tmp "${wemediamon_cache}" \
+		--ck "${wemediamon_bilick}" \ 
 	>>$LOG_FILE 2>&1 &
 }
 
@@ -264,8 +264,8 @@ watch_dogs)
 	set_lock
 	true >$LOG_FILE
 	http_response "$1"
-	if [[ -f "${wemediamon_tmp}/traitors.txt" ]]; then
-		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_tmp}/traitors.txt" | tee -a $LOG_FILE
+	if [[ -f "${wemediamon_cache}/traitors.txt" ]]; then
+		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/traitors.txt" | tee -a $LOG_FILE
 	else
 		echo_date "当前狗库为空!" | tee -a $LOG_FILE
 	fi
@@ -291,10 +291,10 @@ if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v gre
 	true >$LOG_FILE
 	# 初始化变量
 	wemediamon_period=$(dbus get wemediamon_period)
-	wemediamon_mail=$(dbus get wemediamon_mail)
+	wemediamon_email=$(dbus get wemediamon_email)
 	wemediamon_smtp=$(dbus get wemediamon_smtp)
-	wemediamon_tmp=$(dbus get wemediamon_tmp)
-	wemediamon_bili_ck=$(dbus get wemediamon_bili_ck)
+	wemediamon_cache=$(dbus get wemediamon_cache)
+	wemediamon_bilick=$(dbus get wemediamon_bilick)
 	# 开启 WeMediaMon
 	start_wemediamon | tee -a $LOG_FILE
 	echo XU6J03M6 | tee -a $LOG_FILE

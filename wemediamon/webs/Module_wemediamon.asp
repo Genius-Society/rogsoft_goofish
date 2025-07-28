@@ -37,7 +37,7 @@
                             autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
                     </div>
                     <div id="ok_button" class="apply_gen">
-                        <input id="ok_button1" class="button_gen" type="button" onclick="hideWBLoadingBar()" value="确定">
+                        <input id="ok_btn" class="button_gen" type="button" onclick="hideWBLoadingBar()" value="确定">
                     </div>
                 </td>
             </tr>
@@ -86,7 +86,7 @@
                                             <img id="return_btn" onclick="reload_Soft_Center();" align="right"
                                                 title="返回软件中心" src="/images/backprev.png"
                                                 onMouseOver="this.src='/images/backprevclick.png'"
-                                                onMouseOut="this.src='/images/backprev.png'"></img>
+                                                onMouseOut="this.src='/images/backprev.png'">
                                         </div>
                                         <div class="splitLine"></div>
                                         <div class="SimpleNote">
@@ -120,18 +120,18 @@
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="get_log(1)" style="margin-left:5px">启动日志</a>
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="fixenv()">环境修复</a>
+                                                                onclick="trigger('FIX_ENV')">环境修复</a>
                                                         </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th>运行状态</th>
                                                     <td><span id="wemediamon_status"></span>
-                                                        <div style="float: right;margin-right:5px;">
+                                                        <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="show_log_pannel()">运行日志</a>
-                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="show_log_pannel()">控制面板</a>
+                                                            <a type="button" class="ks_btn"
+                                                                href="http://192.168.50.1:7860" target="_blank">控制面板</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -157,7 +157,7 @@
                                                             value="">
                                                         <div id="smtp_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="trigger(3)">邮件测试</a>
+                                                                onclick="trigger('TEST_SMTP')">邮件测试</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -220,18 +220,18 @@
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger(1)">Cookie有效测试</a>
+                                                            onclick="trigger('TEST_BILI_CK')">Cookie有效测试</a>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger(1)">单轮粉丝扫描</a>
+                                                            onclick="trigger('UPD_BILI_FANS')">单轮粉丝扫描</a>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th>管理取关狗</th>
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger(1)">查看取关狗名单</a>
+                                                            onclick="trigger('SEE_BILI_BLACKS')">查看取关狗名单</a>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger(2)">清理已注销狗</a>
+                                                            onclick="trigger('UPD_BILI_BLACKS')">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -249,18 +249,18 @@
                                                 <tr>
                                                     <th>监控目标<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input type="text" class="input_ss_table" id="hf_tags"
-                                                            name="hf_tags" maxlength="100" value="" autocorrect="off"
+                                                        <input type="text" class="input_ss_table" id="hftag"
+                                                            name="hftag" maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" placeholder="目前仅能填写一个用户名">
                                                     </td>
                                                 </tr>
-                                                <tr id=" ">
+                                                <tr>
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger(1)">单轮粉丝扫描</a>
+                                                            onclick="trigger('UPD_HF_FANS')">单轮粉丝扫描</a>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger(1)">激活休眠仓库</a>
+                                                            onclick="trigger('ACTIVE_HF_REPOS')">激活休眠仓库</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -283,11 +283,11 @@
                                                             autocapitalize="off" placeholder="target1;target2;...">
                                                     </td>
                                                 </tr>
-                                                <tr id=" ">
+                                                <tr>
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger(1)">单轮粉丝扫描</a>
+                                                            onclick="trigger('UPD_GIT_FANS')">单轮粉丝扫描</a>
                                                     </td>
                                                 </tr>
                                             </table>

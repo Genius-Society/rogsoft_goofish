@@ -10,11 +10,11 @@ rm -rf /koolshare/webs/Module_wemediamon.asp
 rm -rf /tmp/wemediamon*
 
 dbus remove wemediamon_enable
-dbus remove wemediamon_mail
+dbus remove wemediamon_email
 dbus remove wemediamon_period
 dbus remove wemediamon_smtp
-dbus remove wemediamon_tmp
-dbus remove wemediamon_bili_ck
+dbus remove wemediamon_cache
+dbus remove wemediamon_bilick
 
 dbus remove wemediamon_version
 dbus remove softcenter_module_wemediamon_description

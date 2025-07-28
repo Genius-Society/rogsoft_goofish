@@ -43,11 +43,11 @@ a:focus {
 	border-width: 0.5px;
 }
 
-#wemediamon_bili_ck {
+#bilick {
 	-webkit-text-security: square;
 }
 
-#wemediamon_bili_ck:focus {
+#bilick:focus {
 	-webkit-text-security: none;
 }
 
@@ -132,10 +132,6 @@ a:focus {
 	white-space: break-spaces;
 }
 
-#ok_button {
-	background: #000;
-}
-
 #stop_log {
 	margin-left: 10px;
 }
@@ -179,7 +175,7 @@ a:focus {
 }
 
 #cache,
-#hf_tags,
+#hftag,
 #gitags,
 #email,
 #smtp {
@@ -225,4 +221,9 @@ a:focus {
 	margin-right: 15px;
 	margin-top: 10px;
 	overflow: hidden;
+}
+
+#status_container {
+	float: right;
+	margin-right: 5px;
 }

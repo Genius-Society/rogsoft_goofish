@@ -21,7 +21,9 @@ UPD_BILI_FANS = 2
 UPD_BILI_BLACKS = 3
 UPD_HF_FANS = 4
 UPD_GIT_FANS = 5
-# TODO:
+ACTIVE_HF_REPOS = 6
+FIX_ENV = 7
+SEE_BILI_BLACKS = 8
 
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="WeMediaMon config script.")
@@ -33,7 +35,7 @@ parser.add_argument("--smtp", type=str)
 parser.add_argument("--tmp", type=str)
 parser.add_argument("--bilick", type=str)
 parser.add_argument("--hftag", type=str)
-parser.add_argument("--gitag", type=str)
+parser.add_argument("--gitags", type=str)
 parser.add_argument("--cnblokie", type=str)
 parser.add_argument("--itck", type=str)
 
@@ -384,7 +386,7 @@ class HFMon:
 
 class GitHubMon:
     def __init__(self):
-        self.tags = args.gitag.split(";")
+        self.tags = args.gitags.split(";")
         self.tmpdir = args.tmp if args.tmp[-1] != "/" else args.tmp[:-1]
         self.cache = f"{self.tmpdir}/github_followers.json"
 
@@ -436,6 +438,8 @@ class GitHubMon:
 
             logs += "\n Data has been updated! \n"
 
+        upd_log(logs)
+
 
 class CnblogsMon:
     def __init__(self):  # TODO:
@@ -454,7 +458,7 @@ def update():
     if args.hftag:
         HFMon().upd_fans()
 
-    if args.gitag:
+    if args.gitags:
         GitHubMon().upd_fans()
 
     # TODO:

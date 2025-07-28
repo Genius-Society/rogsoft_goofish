@@ -5,6 +5,7 @@ var params_inp = [];
 var refresh_flag;
 var count_down;
 var _responseLen;
+
 function init() {
 	show_menu(menu_hook);
 	get_status();
@@ -53,17 +54,17 @@ function conf2obj() {
 	if (dbus["wemediamon_period"]) {
 		E("period").value = dbus["wemediamon_period"];
 	}
-	if (dbus["wemediamon_mail"]) {
-		E("email").value = dbus["wemediamon_mail"];
+	if (dbus["wemediamon_email"]) {
+		E("email").value = dbus["wemediamon_email"];
 	}
 	if (dbus["wemediamon_smtp"]) {
 		E("smtp").value = dbus["wemediamon_smtp"];
 	}
-	if (dbus["wemediamon_tmp"]) {
-		E("cache").value = dbus["wemediamon_tmp"];
+	if (dbus["wemediamon_cache"]) {
+		E("cache").value = dbus["wemediamon_cache"];
 	}
-	if (dbus["wemediamon_bili_ck"]) {
-		E("bilick").value = dbus["wemediamon_bili_ck"];
+	if (dbus["wemediamon_bilick"]) {
+		E("bilick").value = dbus["wemediamon_bilick"];
 	}
 }
 
@@ -89,32 +90,90 @@ function get_status() {
 	});
 }
 
-function trigger(mode) {
-	var trigger_mode = "";
-	switch (mode) {
-		case 1:
-			trigger_mode = "trigger_once";
-			break;
-		case 2:
-			trigger_mode = "trigger_clean";
-			break;
-		case 3:
-			trigger_mode = "smtp_test";
-			break;
-		default:
-			break;
-	}
-	if (trigger_mode != "") {
+function get_log(flag) {
+	E("ok_button").style.visibility = "hidden";
+	showWBLoadingBar();
+	$.ajax({
+		url: '/_temp/wemediamon_log.txt',
+		type: 'GET',
+		cache: false,
+		dataType: 'text',
+		success: function (response) {
+			var retArea = E("log_content");
+			if (response.search("XU6J03M6") != -1) {
+				retArea.value = response.replace("XU6J03M6", " ");
+				E("ok_button").style.visibility = "visible";
+				retArea.scrollTop = retArea.scrollHeight;
+				if (flag == 1) {
+					count_down = -1;
+					refresh_flag = 0;
+				} else {
+					count_down = 6;
+					refresh_flag = 1;
+				}
+				count_down_close();
+				return false;
+			}
+			setTimeout("get_log(" + flag + ");", 200);
+			retArea.value = response.replace("XU6J03M6", " ");
+			retArea.scrollTop = retArea.scrollHeight;
+		},
+		error: function (_) {
+			E("loading_block_title").innerHTML = "暂无日志信息 ...";
+			E("log_content").value = "日志文件为空, 请关闭本窗口!";
+			E("ok_button").style.visibility = "visible";
+			return false;
+		}
+	});
+}
+
+function get_run_log() {
+	if (STATUS_FLAG == 0) return;
+	$.ajax({
+		url: '/_temp/wemediamon_run_log.txt',
+		type: 'GET',
+		dataType: 'html',
+		async: true,
+		cache: false,
+		success: function (response) {
+			var retArea = E("log_content");
+			if (_responseLen == response.length) {
+				noChange++;
+			} else {
+				noChange = 0;
+			}
+			if (noChange > 10) {
+				return false;
+			} else {
+				setTimeout("get_run_log();", 1500);
+			}
+			retArea.value = response;
+
+			if (E("stop_log").checked == false) {
+				retArea.scrollTop = retArea.scrollHeight;
+			}
+			_responseLen = response.length;
+		},
+		error: function (_) {
+			E("log_pannel_title").innerHTML = "暂无日志信息 ...";
+			E("log_content").value = "日志文件为空, 请关闭本窗口!";
+			setTimeout("get_run_log();", 5000);
+		}
+	});
+}
+
+function trigger(cmd) {
+	if (cmd != "") {
 		get_log(1);
 		var dbus_new = {};
 		dbus_new["wemediamon_period"] = E("period").value;
-		dbus_new["wemediamon_mail"] = E("email").value;
+		dbus_new["wemediamon_email"] = E("email").value;
 		dbus_new["wemediamon_smtp"] = E("smtp").value;
-		dbus_new["wemediamon_tmp"] = E("cache").value;
-		dbus_new["wemediamon_bili_ck"] = E("bilick").value;
+		dbus_new["wemediamon_cache"] = E("cache").value;
+		dbus_new["wemediamon_bilick"] = E("bilick").value;
 		E("apply").disabled = true;
 		var id = parseInt(Math.random() * 100000000);
-		var postData = { "id": id, "method": "wemediamon_config.sh", "params": [trigger_mode], "fields": dbus_new };
+		var postData = { "id": id, "method": "wemediamon_config.sh", "params": [cmd], "fields": dbus_new };
 		$.ajax({
 			type: "POST",
 			url: "/_api/",
@@ -126,44 +185,6 @@ function trigger(mode) {
 			}
 		});
 	}
-}
-
-function watchdog() {
-	get_log(1);
-	var dbus_new = {};
-	dbus_new["wemediamon_tmp"] = E("cache").value;
-	E("apply").disabled = true;
-	var id = parseInt(Math.random() * 100000000);
-	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["watch_dogs"], "fields": dbus_new };
-	$.ajax({
-		type: "POST",
-		url: "/_api/",
-		data: JSON.stringify(postData),
-		dataType: "json",
-		success: function (_) {
-			get_log(1);
-			E("apply").disabled = false;
-		}
-	});
-}
-
-function fixenv() {
-	get_log(1);
-	var dbus_new = {};
-	dbus_new["wemediamon_cache"] = E("cache").value;
-	E("apply").disabled = true;
-	var id = parseInt(Math.random() * 100000000);
-	var postData = { "id": id, "method": "wemediamon_config.sh", "params": ["fix_env"], "fields": dbus_new };
-	$.ajax({
-		type: "POST",
-		url: "/_api/",
-		data: JSON.stringify(postData),
-		dataType: "json",
-		success: function (_) {
-			get_log(1);
-			E("apply").disabled = false;
-		}
-	});
 }
 
 function save() {
@@ -217,84 +238,12 @@ function count_down_close() {
 		hideWBLoadingBar();
 	}
 	if (count_down < 0) {
-		E("ok_button1").value = "手动关闭";
+		E("ok_btn").value = "手动关闭";
 		return false;
 	}
-	E("ok_button1").value = "自动关闭(" + count_down + ")";
+	E("ok_btn").value = "自动关闭(" + count_down + ")";
 	--count_down;
 	setTimeout("count_down_close();", 1000);
-}
-
-function get_log(flag) {
-	E("ok_button").style.visibility = "hidden";
-	showWBLoadingBar();
-	$.ajax({
-		url: '/_temp/wemediamon_log.txt',
-		type: 'GET',
-		cache: false,
-		dataType: 'text',
-		success: function (response) {
-			var retArea = E("log_content");
-			if (response.search("XU6J03M6") != -1) {
-				retArea.value = response.replace("XU6J03M6", " ");
-				E("ok_button").style.visibility = "visible";
-				retArea.scrollTop = retArea.scrollHeight;
-				if (flag == 1) {
-					count_down = -1;
-					refresh_flag = 0;
-				} else {
-					count_down = 6;
-					refresh_flag = 1;
-				}
-				count_down_close();
-				return false;
-			}
-			setTimeout("get_log(" + flag + ");", 200);
-			retArea.value = response.replace("XU6J03M6", " ");
-			retArea.scrollTop = retArea.scrollHeight;
-		},
-		error: function (xhr) {
-			E("loading_block_title").innerHTML = "暂无日志信息 ...";
-			E("log_content").value = "日志文件为空, 请关闭本窗口!";
-			E("ok_button").style.visibility = "visible";
-			return false;
-		}
-	});
-}
-
-function get_run_log() {
-	if (STATUS_FLAG == 0) return;
-	$.ajax({
-		url: '/_temp/wemediamon_run_log.txt',
-		type: 'GET',
-		dataType: 'html',
-		async: true,
-		cache: false,
-		success: function (response) {
-			var retArea = E("log_content");
-			if (_responseLen == response.length) {
-				noChange++;
-			} else {
-				noChange = 0;
-			}
-			if (noChange > 10) {
-				return false;
-			} else {
-				setTimeout("get_run_log();", 1500);
-			}
-			retArea.value = response;
-
-			if (E("stop_log").checked == false) {
-				retArea.scrollTop = retArea.scrollHeight;
-			}
-			_responseLen = response.length;
-		},
-		error: function (_) {
-			E("log_pannel_title").innerHTML = "暂无日志信息 ...";
-			E("log_content").value = "日志文件为空, 请关闭本窗口!";
-			setTimeout("get_run_log();", 5000);
-		}
-	});
 }
 
 function show_log_pannel() {
