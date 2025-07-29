@@ -1,9 +1,9 @@
-# Bilibili relation monitor
+# WeMedia relation monitor
 [![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](./LICENSE)
-[![hf](https://img.shields.io/badge/huggingface-keep__spaces__alive-ffd21e.svg)](https://huggingface.co/spaces/kakamond/keep_spaces_alive)
+[![hf](https://img.shields.io/badge/huggingface-huggingface__tools-ffd21e.svg)](https://huggingface.co/spaces/kakamond/huggingface_tools)
 [![ms](https://img.shields.io/badge/modelscope-bili__dark__tools-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bili_dark_tools)
 
-监控自媒体粉丝动向: 取关狗死全家! 推荐 UP 在 1K 粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
+监控自媒体粉丝动向: 取关狗死全家! 推荐B站的UP在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
 
 [![](./wemediamon/res/icon-wemediamon.png)](https://github.com/Genius-Society/wemediamon)
 
@@ -29,7 +29,7 @@ python build.py
 ## Requirement
 软件中心安装 Entware 插件并部署完成
 
-## 手动获取 cookie 方法
+## 手动获取B站cookie方法
 1. 用 `VSCode` 打开工程, 选中 `cookie.py`;
 2. 在 `cookie.py` 的 `#TODO:` 处打个断点;
 3. 按 `F5` 调试 `.py` 文件, 弹出 `BiliBili` 登录页面;
@@ -37,7 +37,7 @@ python build.py
 
 注: 多账号切换获取 cookie 时推荐清理 `user_data` 文件夹而非登出, 否则会导致被登出的账号 cookie 失效
 
-## 批量私信
+## B站批量私信
 - <https://www.modelscope.cn/studios/kakamond/bili_dark_tools>
 
 ## Thanks
