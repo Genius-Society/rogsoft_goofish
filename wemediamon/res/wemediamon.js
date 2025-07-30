@@ -25,13 +25,27 @@ function register_event() {
 	});
 }
 
+function show_hide_el(w) {
+	if ($('.check_' + w).is(':checked')) {
+		$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
+	}
+	else {
+		$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
+	}
+}
+
 function conf2obj() {
+	var count = 0;
 	$('input[type="checkbox"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["wemediamon_" + id]) {
 			E(id).checked = (dbus["wemediamon_" + id] == "1");
+			count++;
 		}
 	});
+	for (var i = 0; i < count; i++) {
+		show_hide_el(i);
+	}
 
 	$('input[type="text"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
@@ -285,13 +299,4 @@ function tabSelect(w) {
 	}
 	$('.show-btn' + w).addClass('active');
 	$('#tablet_' + w).show();
-}
-
-function show_hide_el(w) {
-	if ($('.check_' + w).is(':checked')) {
-		$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
-	}
-	else {
-		$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
-	}
 }

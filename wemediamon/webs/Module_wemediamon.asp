@@ -129,8 +129,6 @@
                                                         <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="show_log_pannel()">运行日志</a>
-                                                            <a type="button" class="ks_btn"
-                                                                href="http://192.168.50.1:7860" target="_blank">控制面板</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -199,7 +197,7 @@
                                             <table id="table_0" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th>BiliMon开关</th>
+                                                    <th>B站监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_0" id="bilimon"
                                                             onchange="show_hide_el(0)">
@@ -239,7 +237,7 @@
                                             <table id="table_1" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th>HFMon开关</th>
+                                                    <th>抱脸监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_1" id="hfmon"
                                                             onchange="show_hide_el(1)">
@@ -258,8 +256,6 @@
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('UPD_HF_FANS')">单轮粉丝扫描</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('ACTIVE_HF_REPOS')">激活休眠仓库</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -268,7 +264,7 @@
                                             <table id="table_2" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th>GitHubMon开关</th>
+                                                    <th>GitHub监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_2" id="gitmon"
                                                             onchange="show_hide_el(2)">
@@ -311,6 +307,15 @@
                                                         </textarea>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <th>手动触发</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('TEST_CNBLOGS_CK')">Cookie有效测试</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_CNBLOGS_FANS')">单轮粉丝扫描</a>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </div>
                                         <div id="tablet_4" style="display: none;">
@@ -331,6 +336,15 @@
                                                             autocapitalize="off"
                                                             placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此">
                                                         </textarea>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>手动触发</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('TEST_ITCH_CK')">Cookie有效测试</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_ITCH_FANS')">单轮粉丝扫描</a>
                                                     </td>
                                                 </tr>
                                             </table>

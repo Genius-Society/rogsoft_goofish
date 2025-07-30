@@ -69,7 +69,9 @@ init_vars() {
 	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
 	wemediamon_gitags=$(dbus get wemediamon_gitags)
 	wemediamon_cnblon=$(dbus get wemediamon_cnblon)
+	wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
 	wemediamon_itchion=$(dbus get wemediamon_itchion)
+	wemediamon_itck=$(dbus get wemediamon_itck)
 }
 
 check_params() {
@@ -95,7 +97,6 @@ check_params() {
 	else
 		wemediamon_bilick=""
 	fi
-
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftag}" ]]; then
 			close_in_five "请输入有效抱脸用户名!"
@@ -103,13 +104,26 @@ check_params() {
 	else
 		wemediamon_hftag=""
 	fi
-
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
 			close_in_five "请输入有效GitHub目标列表!"
 		fi
 	else
 		wemediamon_gitags=""
+	fi
+	if [ "${wemediamon_cnblon}" == "1" ]; then
+		if [[ -z "${wemediamon_cnblokie}" ]]; then
+			close_in_five "请输入有效GitHub目标列表!"
+		fi
+	else
+		wemediamon_cnblokie=""
+	fi
+	if [ "${wemediamon_itchion}" == "1" ]; then
+		if [[ -z "${wemediamon_itck}" ]]; then
+			close_in_five "请输入有效GitHub目标列表!"
+		fi
+	else
+		wemediamon_itck=""
 	fi
 }
 
@@ -138,6 +152,8 @@ start_wemediamon() {
 		--bilick "${wemediamon_bilick}" \
 		--hftag "${wemediamon_hftag}" \
 		--gitags "${wemediamon_gitags}" \
+		--cnblokie "${wemediamon_cnblokie}" \
+		--itck "${wemediamon_itck}" \
 		>>$RUN_LOG 2>&1 &
 
 	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
@@ -163,6 +179,8 @@ trigger() {
 		--bilick "${wemediamon_bilick}" \
 		--hftag "${wemediamon_hftag}" \
 		--gitags "${wemediamon_gitags}" \
+		--cnblokie "${wemediamon_cnblokie}" \
+		--itck "${wemediamon_itck}" \
 		>>$LOG_FILE 2>&1 &
 }
 
