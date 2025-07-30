@@ -172,8 +172,6 @@ start_wemediamon() {
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
 		>>$MON_LOG 2>&1 &
-
-	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
 
 trigger() {
@@ -190,7 +188,6 @@ trigger() {
 	fi
 
 	# 开启单次触发扫描
-	rm -rf $RUN_LOG
 	nohup python /koolshare/wemediamon/wemediamon.py \
 		--cmd $1 \
 		--period "${wemediamon_period}" \
@@ -207,16 +204,16 @@ trigger() {
 
 close_in_five() {
 	dbus set wemediamon_enable=0
-	echo_date $1
-	echo_date "插件将在5秒后自动关闭!!"
+	echo_date $1 | tee -a $RUN_LOG
+	echo_date "插件将在5秒后自动关闭!!" | tee -a $RUN_LOG
 	local i=5
 	while [ $i -ge 0 ]; do
 		sleep 1
-		echo_date $i
+		echo_date $i | tee -a $RUN_LOG
 		let i--
 	done
 	stop
-	echo_date "插件已关闭!!"
+	echo_date "插件已关闭!!" | tee -a $RUN_LOG
 	unset_lock
 	exit
 }
@@ -225,12 +222,12 @@ stop() {
 	# 关闭监控进程
 	pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
 	if [ ! -z $pids ]; then
-		echo_date "关闭监控进程..."
+		echo_date "关闭监控进程..." | tee -a $RUN_LOG >>$MON_LOG
 		for pid in $pids; do
 			kill "${pid}"
 		done
 	fi
-	fun_wan_start
+	fun_wan_start | tee -a $RUN_LOG >>$MON_LOG
 }
 
 if [ $# -eq 0 ]; then
@@ -282,8 +279,9 @@ WEB_SUBMIT)
 	stop | tee -a "$MON_LOG" >>"$RUN_LOG"
 	if [ "${wemediamon_enable}" == "1" ]; then
 		start_wemediamon | tee -a "$MON_LOG" >>"$RUN_LOG"
+		echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!" | tee -a $RUN_LOG
 	else
-		echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $MON_LOG
+		echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $RUN_LOG
 	fi
 	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
@@ -315,8 +313,7 @@ SEE_BILI_BLACKS)
 	set_lock
 	true >$RUN_LOG
 	http_response "$1"
-	trigger "$2" | tee -a $RUN_LOG
-	echo XU6J03M6 | tee -a $RUN_LOG
+	trigger "$2"
 	unset_lock
 	;;
 

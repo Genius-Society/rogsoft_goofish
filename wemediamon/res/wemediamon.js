@@ -173,8 +173,8 @@ function get_run_log(flag) {
 			retArea.scrollTop = retArea.scrollHeight;
 		},
 		error: function (_) {
-			E("loading_block_title").innerHTML = "暂无日志信息 ...";
-			E("log_content").value = "日志文件为空, 请关闭本窗口!";
+			E("loading_block_title").innerHTML = "获取日志异常 ...";
+			E("log_content").value = "获取日志失败, 请关闭本窗口!";
 			E("ok_button").style.visibility = "visible";
 			return false;
 		}
@@ -203,7 +203,7 @@ function get_log() {
 			}
 			retArea.value = response;
 
-			if ($(".stop_log").eq(0).checked == false) {
+			if ($(".stop_log").eq(0)[0].checked == false) {
 				retArea.scrollTop = retArea.scrollHeight;
 			}
 			_responseLen = response.length;
@@ -228,7 +228,7 @@ function trigger(cmd) {
 			data: JSON.stringify(postData),
 			dataType: "json",
 			success: function (_) {
-				get_run_log(1);
+				get_run_log(cmd != "WEB_SUBMIT");
 				E("apply").disabled = false;
 			}
 		});

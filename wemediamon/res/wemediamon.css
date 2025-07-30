@@ -217,7 +217,8 @@ a:focus {
 	margin-right: 5px;
 }
 
-#smtp_btn {
+#smtp_btn,
+#env_btn {
 	float: right;
 	margin-right: 5px;
 }

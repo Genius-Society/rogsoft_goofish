@@ -36,12 +36,13 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
 
 
-def upd_log(txt, mode=args.cmd):
-    if mode == "START_MONITOR":
-        with open("/tmp/upload/wemediamon_log.txt", "a", encoding="utf-8") as file:
-            file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n")
-    else:
-        print(txt)
+def upd_log(txt):
+    log = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n"
+    with open("/tmp/upload/wemediamon_log.txt", "a", encoding="utf-8") as file:
+        file.write(log)
+
+    with open("/tmp/upload/wemediamon_run_log.txt", "a", encoding="utf-8") as file:
+        file.write(log)
 
 
 def send_email(
@@ -480,6 +481,10 @@ if __name__ == "__main__":
         elif args.cmd == "UPD_GIT_FANS":
             GitHubMon().upd_fans()
 
+        elif args.cmd == "TEST_BILI_CK":
+            for i in tqdm(range(5), desc="test"):
+                time.sleep(1)
+
         else:
             upd_log(args.cmd)
             # TODO:
@@ -487,4 +492,5 @@ if __name__ == "__main__":
     except Exception as e:
         send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
 
-    upd_log("XU6J03M6")
+    finally:
+        print("XU6J03M6")

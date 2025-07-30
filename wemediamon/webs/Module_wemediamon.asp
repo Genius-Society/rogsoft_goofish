@@ -56,7 +56,7 @@
                     </div>
                     <div id="mon_ok_button" class="apply_gen">
                         <input class="button_gen" type="button" onclick="hide_log_pannel()" value="返回主界面">
-                        <input type="checkbox" class="stop_log">
+                        <input type="checkbox" class="stop_log" checked>
                         <lable>&nbsp;暂停日志刷新</lable>
                     </div>
                 </td>
@@ -118,9 +118,8 @@
                                                         </div>
                                                         <div id="switch_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="get_run_log(1)">执行日志</a>
-                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="trigger('FIX_ENV')">环境修复</a>
+                                                                onclick="show_mon_log()"
+                                                                style="margin-left:5px">监控日志</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -129,8 +128,7 @@
                                                     <td><span id="status"></span>
                                                         <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="show_mon_log()"
-                                                                style="margin-left:5px">监控日志</a>
+                                                                onclick="get_run_log(1)">执行日志</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -166,6 +164,10 @@
                                                         <input type="text" class="input_ss_table" id="cache"
                                                             name="cache" maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off">
+                                                        <div id="env_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('FIX_ENV')">环境修复</a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
