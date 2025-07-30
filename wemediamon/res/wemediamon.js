@@ -29,7 +29,7 @@ function conf2obj() {
 	$('input[type="checkbox"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["wemediamon_" + id]) {
-			E(id).checked = (dbus["wemediamon_" + id] != "0");
+			E(id).checked = (dbus["wemediamon_" + id] == "1");
 		}
 	});
 

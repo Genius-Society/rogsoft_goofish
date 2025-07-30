@@ -202,7 +202,7 @@
                                                     <th>BiliMon开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_0" id="bilimon"
-                                                            onchange="show_hide_el(0)" checked>
+                                                            onchange="show_hide_el(0)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -242,7 +242,7 @@
                                                     <th>HFMon开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_1" id="hfmon"
-                                                            onchange="show_hide_el(1)" checked>
+                                                            onchange="show_hide_el(1)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -271,7 +271,7 @@
                                                     <th>GitHubMon开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_2" id="gitmon"
-                                                            onchange="show_hide_el(2)" checked>
+                                                            onchange="show_hide_el(2)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -298,7 +298,17 @@
                                                     <th>博客园监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_3" id="cnblon"
-                                                            onchange="show_hide_el(3)" checked>
+                                                            onchange="show_hide_el(3)">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>博客园Cookie<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <textarea class="input_ss_table" id="cnblokie" name="cnblokie"
+                                                            maxlength="2048" rows="12" autocorrect="off"
+                                                            autocapitalize="off"
+                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态博客园主页请求标头, 拷贝 Cookie 值至此">
+                                                        </textarea>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -310,7 +320,17 @@
                                                     <th>itch.io监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_4" id="itchion"
-                                                            onchange="show_hide_el(4)" checked>
+                                                            onchange="show_hide_el(4)">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>itch cookie<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <textarea class="input_ss_table" id="itck" name="itck"
+                                                            maxlength="2048" rows="12" autocorrect="off"
+                                                            autocapitalize="off"
+                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此">
+                                                        </textarea>
                                                     </td>
                                                 </tr>
                                             </table>
