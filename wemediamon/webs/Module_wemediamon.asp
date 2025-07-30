@@ -33,8 +33,8 @@
                     <div id="loading_block_title"></div>
                     <div id="loading_block_spilt" class="loading_block_spilt"></div>
                     <div id="log_container">
-                        <textarea cols="50" rows="25" wrap="off" readonly="readonly" id="log_content" autocomplete="off"
-                            autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                        <textarea cols="50" rows="25" wrap="off" readonly="readonly" id="run_log_content"
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
                     </div>
                     <div id="ok_button" class="apply_gen">
                         <input id="ok_btn" class="button_gen" type="button" onclick="hideWBLoadingBar()" value="确定">
@@ -47,13 +47,14 @@
         <table cellpadding="5" cellspacing="0" id="log_pannel_table" class="loadingBarBlock" align="center">
             <tr>
                 <td height="100">
-                    <div id="log_info">wemediamon日志信息</div>
-                    <div style="margin-left:15px"><i>🗒️此处展示wemediamon程序的运行日志...</i></div>
+                    <div id="log_pannel_title"></div>
+                    <div id="log_info">wemediamon监控信息</div>
+                    <div style="margin-left:15px"><i>🗒️此处展示wemediamon程序的监控日志...</i></div>
                     <div id="running_log">
                         <textarea cols="50" rows="32" wrap="off" readonly="readonly" id="log_content" autocomplete="off"
                             autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
                     </div>
-                    <div id="ok_button" class="apply_gen">
+                    <div id="mon_ok_button" class="apply_gen">
                         <input class="button_gen" type="button" onclick="hide_log_pannel()" value="返回主界面">
                         <input type="checkbox" class="stop_log">
                         <lable>&nbsp;暂停日志刷新</lable>
@@ -117,7 +118,7 @@
                                                         </div>
                                                         <div id="switch_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="get_log(1)" style="margin-left:5px">启动日志</a>
+                                                                onclick="get_run_log(1)">执行日志</a>
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="trigger('FIX_ENV')">环境修复</a>
                                                         </div>
@@ -128,7 +129,8 @@
                                                     <td><span id="status"></span>
                                                         <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="show_log_pannel()">运行日志</a>
+                                                                onclick="show_mon_log()"
+                                                                style="margin-left:5px">监控日志</a>
                                                         </div>
                                                     </td>
                                                 </tr>

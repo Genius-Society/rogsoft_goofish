@@ -109,6 +109,10 @@ a:focus {
 	visibility: hidden;
 }
 
+#mon_ok_button {
+	background: #000;
+}
+
 #log_pannel_div {
 	z-index: 200;
 }
@@ -117,7 +121,7 @@ a:focus {
 	width: 960px;
 }
 
-#log_content {
+#run_log_content {
 	border: 1px solid #000;
 	width: 99%;
 	font-family: 'Lucida Console';

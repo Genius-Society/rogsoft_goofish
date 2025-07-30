@@ -52,6 +52,18 @@ exit_install() {
 	esac
 }
 
+install_env() {
+	echo_date 已检测到 Entware 环境, 开始安装依赖包!
+	export PATH=$PATH:/opt/bin/
+	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
+	opkg update
+	opkg install python3-pip
+	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+	pip install --cache-dir /koolshare/wemediamon/.cache -r /koolshare/wemediamon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	pip list
+	rm -rf /koolshare/wemediamon/.cache
+}
+
 # 判断路由架构和平台: koolshare固件, 并且linux版本大于等于4.1
 if [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -ge "41" ]; then
 	echo_date 机型: ${MODEL} $(_get_type) 符合安装要求, 开始安装插件!
@@ -118,15 +130,7 @@ dbus set softcenter_module_wemediamon_title="WeMediaMon"
 
 # 判断 Entware 是否已安装
 if [ -d "/opt" ]; then
-	echo_date 已检测到 Entware 环境, 开始安装依赖包!
-	export PATH=$PATH:/opt/bin/
-	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
-	opkg update
-	opkg install python3-pip
-	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-	pip install --cache-dir /koolshare/wemediamon/.cache -r /koolshare/wemediamon/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-	pip list
-	rm -rf /koolshare/wemediamon/.cache
+	# install_env
 	echo_date "WeMediaMon 插件安装完毕!"
 	sh /koolshare/scripts/wemediamon_config.sh
 else

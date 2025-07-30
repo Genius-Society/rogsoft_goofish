@@ -1,6 +1,7 @@
 var refresh_flag;
 var count_down;
 var _responseLen;
+var _show_mon_log;
 
 function init() {
 	show_menu(menu_hook);
@@ -80,7 +81,7 @@ function obj2conf(cmd) {
 		});
 	}
 	else {
-		get_log(1);
+		get_run_log(1);
 	}
 
 	$('input[type="text"][id]').each(function (_, el) {
@@ -143,16 +144,16 @@ function get_status() {
 	});
 }
 
-function get_log(flag) {
+function get_run_log(flag) {
 	E("ok_button").style.visibility = "hidden";
 	showWBLoadingBar();
 	$.ajax({
-		url: '/_temp/wemediamon_log.txt',
+		url: '/_temp/wemediamon_run_log.txt',
 		type: 'GET',
 		cache: false,
 		dataType: 'text',
 		success: function (response) {
-			var retArea = E("log_content");
+			var retArea = E("run_log_content");
 			if (response.search("XU6J03M6") != -1) {
 				retArea.value = response.replace("XU6J03M6", " ");
 				E("ok_button").style.visibility = "visible";
@@ -167,7 +168,7 @@ function get_log(flag) {
 				count_down_close();
 				return false;
 			}
-			setTimeout("get_log(" + flag + ");", 200);
+			setTimeout("get_run_log(" + flag + ");", 200);
 			retArea.value = response.replace("XU6J03M6", " ");
 			retArea.scrollTop = retArea.scrollHeight;
 		},
@@ -180,10 +181,10 @@ function get_log(flag) {
 	});
 }
 
-function get_run_log() {
-	if (STATUS_FLAG == 0) return;
+function get_log() {
+	if (_show_mon_log == 0) return;
 	$.ajax({
-		url: '/_temp/wemediamon_run_log.txt',
+		url: '/_temp/wemediamon_log.txt',
 		type: 'GET',
 		dataType: 'html',
 		async: true,
@@ -198,19 +199,19 @@ function get_run_log() {
 			if (noChange > 10) {
 				return false;
 			} else {
-				setTimeout("get_run_log();", 1500);
+				setTimeout("get_log();", 1500);
 			}
 			retArea.value = response;
 
-			if (E("stop_log").checked == false) {
+			if ($(".stop_log").eq(0).checked == false) {
 				retArea.scrollTop = retArea.scrollHeight;
 			}
 			_responseLen = response.length;
 		},
 		error: function (_) {
-			E("log_pannel_title").innerHTML = "暂无日志信息 ...";
-			E("log_content").value = "日志文件为空, 请关闭本窗口!";
-			setTimeout("get_run_log();", 5000);
+			E("log_pannel_title").innerHTML = "获取日志异常 ...";
+			E("run_log_content").value = "获取日志失败, 请关闭本窗口!";
+			setTimeout("get_log();", 5000);
 		}
 	});
 }
@@ -227,7 +228,7 @@ function trigger(cmd) {
 			data: JSON.stringify(postData),
 			dataType: "json",
 			success: function (_) {
-				get_log("WEB_SUBMIT" != cmd);
+				get_run_log(1);
 				E("apply").disabled = false;
 			}
 		});
@@ -268,7 +269,7 @@ function count_down_close() {
 	setTimeout("count_down_close();", 1000);
 }
 
-function show_log_pannel() {
+function show_mon_log() {
 	document.scrollingElement.scrollTop = 0;
 	E("log_pannel_div").style.visibility = "visible";
 	var page_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -278,13 +279,13 @@ function show_log_pannel() {
 	var log_h_offset = (page_h - log_h) / 2;
 	var log_w_offset = (page_w - log_w) / 2;
 	$('#log_pannel_table').offset({ top: log_h_offset, left: log_w_offset });
-	STATUS_FLAG = 1;
-	get_run_log();
+	_show_mon_log = 1;
+	get_log();
 }
 
 function hide_log_pannel() {
 	E("log_pannel_div").style.visibility = "hidden";
-	STATUS_FLAG = 0;
+	_show_mon_log = 0;
 }
 
 function menu_hook(_, _) {

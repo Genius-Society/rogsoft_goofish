@@ -38,7 +38,7 @@ CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
 
 def upd_log(txt, mode=args.cmd):
     if mode == "START_MONITOR":
-        with open("/tmp/upload/wemediamon_run_log.txt", "a", encoding="utf-8") as file:
+        with open("/tmp/upload/wemediamon_log.txt", "a", encoding="utf-8") as file:
             file.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n")
     else:
         print(txt)

@@ -2,11 +2,27 @@
 
 source /koolshare/scripts/base.sh
 eval $(dbus export wemediamon)
-LOG_FILE=/tmp/upload/wemediamon_log.txt
+MON_LOG=/tmp/upload/wemediamon_log.txt
 RUN_LOG=/tmp/upload/wemediamon_run_log.txt
 LOCK_FILE=/var/lock/wemediamon.lock
 alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 export PATH=$PATH:/opt/bin/
+
+wemediamon_enable=$(dbus get wemediamon_enable)
+wemediamon_period=$(dbus get wemediamon_period)
+wemediamon_email=$(dbus get wemediamon_email)
+wemediamon_smtp=$(dbus get wemediamon_smtp)
+wemediamon_cache=$(dbus get wemediamon_cache)
+wemediamon_bilimon=$(dbus get wemediamon_bilimon)
+wemediamon_bilick=$(dbus get wemediamon_bilick)
+wemediamon_hfmon=$(dbus get wemediamon_hfmon)
+wemediamon_hftag=$(dbus get wemediamon_hftag)
+wemediamon_gitmon=$(dbus get wemediamon_gitmon)
+wemediamon_gitags=$(dbus get wemediamon_gitags)
+wemediamon_cnblon=$(dbus get wemediamon_cnblon)
+wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
+wemediamon_itchion=$(dbus get wemediamon_itchion)
+wemediamon_itck=$(dbus get wemediamon_itck)
 
 set_lock() {
 	exec 1000>"${LOCK_FILE}"
@@ -57,7 +73,8 @@ install_env() {
 	rm -rf /koolshare/wemediamon/.cache
 }
 
-init_vars() {
+reload_vars() {
+	wemediamon_enable=$(dbus get wemediamon_enable)
 	wemediamon_period=$(dbus get wemediamon_period)
 	wemediamon_email=$(dbus get wemediamon_email)
 	wemediamon_smtp=$(dbus get wemediamon_smtp)
@@ -75,8 +92,7 @@ init_vars() {
 }
 
 check_params() {
-	init_vars
-	# 检查入参
+	# 检查必填入参
 	if [[ -z "${wemediamon_period}" ]]; then
 		close_in_five "请输入有效周期!"
 	fi
@@ -89,41 +105,41 @@ check_params() {
 	if [ -z "${wemediamon_cache}" ]; then
 		close_in_five "请输入有效缓存路径!"
 	fi
-
+	# 检查选填入参
 	if [ "${wemediamon_bilimon}" == "1" ]; then
 		if [[ -z "${wemediamon_bilick}" ]]; then
 			close_in_five "请输入有效B站cookie!"
 		fi
 	else
-		wemediamon_bilick=""
+		wemediamon_bilick=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftag}" ]]; then
 			close_in_five "请输入有效抱脸用户名!"
 		fi
 	else
-		wemediamon_hftag=""
+		wemediamon_hftag=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
 			close_in_five "请输入有效GitHub目标列表!"
 		fi
 	else
-		wemediamon_gitags=""
+		wemediamon_gitags=''
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then
 		if [[ -z "${wemediamon_cnblokie}" ]]; then
 			close_in_five "请输入有效GitHub目标列表!"
 		fi
 	else
-		wemediamon_cnblokie=""
+		wemediamon_cnblokie=''
 	fi
 	if [ "${wemediamon_itchion}" == "1" ]; then
 		if [[ -z "${wemediamon_itck}" ]]; then
 			close_in_five "请输入有效GitHub目标列表!"
 		fi
 	else
-		wemediamon_itck=""
+		wemediamon_itck=''
 	fi
 }
 
@@ -139,12 +155,13 @@ start_wemediamon() {
 	echo_date "检查 Entware 环境..."
 	if [ ! -d "/opt" ]; then
 		close_in_five "Entware 环境不可用, 请先安装 Entware 插件!"
+	else
+		echo_date "Entware 环境可用, 开启监控中..."
 	fi
 
 	# 开启周期监控
-	rm -rf $RUN_LOG
 	nohup python /koolshare/wemediamon/wemediamon.py \
-		--cmd "START_MONITOR" \
+		--cmd 'START_MONITOR' \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
@@ -154,12 +171,13 @@ start_wemediamon() {
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
-		>>$RUN_LOG 2>&1 &
+		>>$MON_LOG 2>&1 &
 
 	echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
 }
 
 trigger() {
+	reload_vars
 	check_params
 
 	# 检查运行环境
@@ -167,9 +185,12 @@ trigger() {
 	if [ ! -d "/opt" ]; then
 		echo_date "Entware 环境不可用, 请先安装 Entware 插件!XU6J03M6"
 		return
+	else
+		echo_date "Entware 环境可用, 执行脚本中..."
 	fi
 
 	# 开启单次触发扫描
+	rm -rf $RUN_LOG
 	nohup python /koolshare/wemediamon/wemediamon.py \
 		--cmd $1 \
 		--period "${wemediamon_period}" \
@@ -181,7 +202,7 @@ trigger() {
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
-		>>$LOG_FILE 2>&1 &
+		>>$RUN_LOG 2>&1 &
 }
 
 close_in_five() {
@@ -212,9 +233,20 @@ stop() {
 	fun_wan_start
 }
 
+if [ $# -eq 0 ]; then
+	# 重启/自启时触发
+	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
+		set_lock
+		start_wemediamon | tee -a $MON_LOG # 开启 WeMediaMon
+		unset_lock
+	fi
+	exit 0
+fi
+
 case $1 in
 start)
 	set_lock
+	reload_vars
 	if [ "${wemediamon_enable}" == "1" ]; then
 		logger "[软件中心]: 启动 WeMediaMon !"
 		start_wemediamon
@@ -224,6 +256,7 @@ start)
 
 restart)
 	set_lock
+	reload_vars
 	if [ "${wemediamon_enable}" == "1" ]; then
 		stop
 		start_wemediamon
@@ -233,6 +266,7 @@ restart)
 
 stop)
 	set_lock
+	reload_vars
 	stop
 	unset_lock
 	;;
@@ -242,60 +276,48 @@ esac
 case $2 in
 WEB_SUBMIT)
 	set_lock
-	true >$LOG_FILE
+	true >$RUN_LOG
 	http_response "$1"
+	reload_vars
+	stop | tee -a "$MON_LOG" >>"$RUN_LOG"
 	if [ "${wemediamon_enable}" == "1" ]; then
-		stop | tee -a $LOG_FILE
-		start_wemediamon | tee -a $LOG_FILE
+		start_wemediamon | tee -a "$MON_LOG" >>"$RUN_LOG"
 	else
-		stop | tee -a $LOG_FILE
-		echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $LOG_FILE
+		echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $MON_LOG
 	fi
-	echo XU6J03M6 | tee -a $LOG_FILE
+	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 	;;
 
 FIX_ENV)
 	set_lock
-	true >$LOG_FILE
+	true >$RUN_LOG
 	http_response "$1"
-	install_env | tee -a $LOG_FILE
-	echo XU6J03M6 | tee -a $LOG_FILE
+	install_env | tee -a $RUN_LOG
+	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 	;;
 
 SEE_BILI_BLACKS)
 	set_lock
-	true >$LOG_FILE
+	true >$RUN_LOG
 	http_response "$1"
 	if [[ -f "${wemediamon_cache}/bili_blacklist.txt" ]]; then
-		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt" | tee -a $LOG_FILE
+		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt" | tee -a $RUN_LOG
 	else
-		echo_date "当前狗库为空!" | tee -a $LOG_FILE
+		echo_date "当前狗库为空!" | tee -a $RUN_LOG
 	fi
-	echo XU6J03M6 | tee -a $LOG_FILE
+	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 	;;
 
 *)
 	set_lock
-	true >$LOG_FILE
+	true >$RUN_LOG
 	http_response "$1"
-	trigger "$2" | tee -a $LOG_FILE
+	trigger "$2" | tee -a $RUN_LOG
+	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 	;;
 
 esac
-
-# 重启自启时触发
-wemediamon_enable=$(dbus get wemediamon_enable)
-if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep python | grep -v grep)" ]; then
-	set_lock
-	true >$LOG_FILE
-	# 初始化变量
-	init_vars
-	# 开启 WeMediaMon
-	start_wemediamon | tee -a $LOG_FILE
-	echo XU6J03M6 | tee -a $LOG_FILE
-	unset_lock
-fi
