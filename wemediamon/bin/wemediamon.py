@@ -10,7 +10,6 @@ import requests
 import schedule
 from tqdm import tqdm
 from datetime import datetime
-from huggingface_hub import HfApi
 from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
@@ -22,9 +21,9 @@ class Tee:
         self.console = sys.__stdout__
 
     def write(self, txt: str):
-        txt = txt.replace("\n", " ").strip()
-        if txt:
-            msg = datetime.now().strftime("\n[%Y-%m-%d %H:%M:%S]") + f" {txt}"
+        msg = txt.replace("\n", " ").strip()
+        if msg:
+            msg = datetime.now().strftime("\n[%Y-%m-%d %H:%M:%S]") + f" {msg}"
             self.console.write(msg)
             self.console.flush()
             if not "XU6J03M6" in msg:
@@ -318,28 +317,58 @@ class BiliMon:
 class HFMon:
     def __init__(self):
         self.hf_domain = "https://huggingface.co"
-        self.header = {"User-Agent": CACHE_PATH}
-        self.hf_api = HfApi()
+        self.header = {"User-Agent": USER_AGENT}
         self.target: str = args.hftag
         self.cache = f"{CACHE_PATH}/hf_followers.json"
         self.tag_users, self.tag_orgs = self._parse_tags()
 
+    def _list_user_following(self, username):
+        response = requests.get(
+            f"{self.hf_domain}/api/users/{username}/following",
+            headers=self.header,
+            verify=False,
+        )
+        response.raise_for_status()
+        if response.status_code == 200:
+            follows = response.json()
+            followings = {}
+            for follow in follows:
+                followings[str(follow["_id"])] = str(follow["user"])
+
+            return followings
+
+        else:
+            raise ConnectionError(response.status_code)
+
+    def _list_user_following_orgs(self, username):
+        response = requests.get(
+            f"{self.hf_domain}/api/users/{username}/following/orgs",
+            headers=self.header,
+            verify=False,
+        )
+        response.raise_for_status()
+        if response.status_code == 200:
+            follows = response.json()
+            followings = {}
+            for follow in follows:
+                followings[str(follow["_id"])] = str(follow["name"])
+
+            return followings
+
+        else:
+            raise ConnectionError(response.status_code)
+
     def _parse_tags(self):
         username = self.target
         following_users = [username]
-        followings = self.hf_api.list_user_following(username)
-        for following in followings:
-            following_users.append(following.username)
+        followings = self._list_user_following(username)
+        for _id in followings:
+            following_users.append(followings[_id])
 
         following_orgs = []
-        response = requests.get(f"{self.hf_domain}/api/users/{username}/following/orgs")
-        response.raise_for_status()
-        if response.status_code == 200:
-            orgs = response.json()
-            for org in orgs:
-                following_orgs.append(org["name"])
-        else:
-            raise ConnectionError(response.status_code)
+        followings = self._list_user_following_orgs(username)
+        for _id in followings:
+            following_orgs.append(followings[_id])
 
         return following_users, following_orgs
 
