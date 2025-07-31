@@ -200,7 +200,7 @@ start_wemediamon() {
 # 单次触发指令
 trigger() {
 	reload_vars
-	check_params
+	check_params # TODO: 若check不成功会影响监控进程
 
 	# 检查运行环境
 	echo_date "检查 Entware 环境..."

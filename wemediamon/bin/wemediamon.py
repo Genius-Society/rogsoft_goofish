@@ -24,11 +24,11 @@ class Tee:
     def write(self, txt: str):
         txt = txt.replace("\n", " ").strip()
         if txt:
-            data = datetime.now().strftime("\n[%Y-%m-%d %H:%M:%S]") + f" {txt}"
-            self.console.write(data)
+            msg = datetime.now().strftime("\n[%Y-%m-%d %H:%M:%S]") + f" {txt}"
+            self.console.write(msg)
             self.console.flush()
-            if not "XU6J03M6" in data:
-                self.log_file.write(data)
+            if not "XU6J03M6" in msg:
+                self.log_file.write(msg)
                 self.log_file.flush()
 
     def flush(self):
@@ -121,6 +121,9 @@ class BiliMon:
         )
 
     def _txt2lst(self):
+        if not os.path.exists(self.blacks):
+            return []
+
         with open(self.blacks, "r", encoding="utf-8") as file:
             lines = file.readlines()
         # 去掉每行末尾的换行符
@@ -241,6 +244,20 @@ class BiliMon:
 
         return real_unfollows, out1000
 
+    def check_login(self):
+        response = requests.get(
+            "https://api.bilibili.com/x/web-interface/nav",
+            headers={
+                "cookie": self.ck,
+                "user-agent": USER_AGENT,
+            },
+        )
+        response.raise_for_status()
+        if response.status_code == 200:
+            print(f"{response.json()}")
+        else:
+            raise ConnectionError(response.status_code)
+
     def upd_fans(self):
         old_fans = []
         if os.path.exists(self.dbfile):
@@ -282,6 +299,10 @@ class BiliMon:
     def clean_all_traitors(self):
         cleaned_traitors = []
         traitors = self._txt2lst()
+        if not traitors:
+            print("当前狗库为空!")
+            return
+
         for traitor in tqdm(traitors, desc="清理已注销的取关狗"):
             if self._is_deleted(traitor):
                 print(f"取关狗 {traitor} 已被清理!")
@@ -486,31 +507,42 @@ def start_monitor(period=args.period):
 
 if __name__ == "__main__":
     try:
-        if args.cmd == "START_MONITOR":
-            start_monitor()
+        match args.cmd:
+            case "START_MONITOR":
+                start_monitor()
 
-        elif args.cmd == "TEST_SMTP":
-            send_email()
+            case "TEST_SMTP":
+                send_email()
 
-        elif args.cmd == "UPD_BILI_FANS":
-            BiliMon().upd_fans()
+            case "TEST_BILI_CK":
+                BiliMon().check_login()
 
-        elif args.cmd == "UPD_BILI_BLACKS":
-            BiliMon().clean_all_traitors()
+            case "UPD_BILI_FANS":
+                BiliMon().upd_fans()
 
-        elif args.cmd == "UPD_HF_FANS":
-            HFMon().upd_fans()
+            case "UPD_BILI_BLACKS":
+                BiliMon().clean_all_traitors()
 
-        elif args.cmd == "UPD_GIT_FANS":
-            GitHubMon().upd_fans()
+            case "UPD_HF_FANS":
+                HFMon().upd_fans()
 
-        elif args.cmd == "TEST_BILI_CK":
-            for i in tqdm(range(5), desc="test"):
-                time.sleep(0.5)
+            case "UPD_GIT_FANS":
+                GitHubMon().upd_fans()
 
-        else:
-            print(args.cmd)
-            # TODO:
+            case "TEST_CNBLOGS_CK":
+                print(args.cmd)
+                # TODO:
+            case "UPD_CNBLOGS_FANS":
+                print(args.cmd)
+                # TODO:
+            case "TEST_ITCH_CK":
+                print(args.cmd)
+                # TODO:
+            case "UPD_ITCH_FANS":
+                print(args.cmd)
+                # TODO:
+            case _:
+                print(f"未知指令: {args.cmd}")
 
     except Exception as e:
         send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")

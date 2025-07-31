@@ -56,7 +56,7 @@
                     </div>
                     <div id="mon_ok_button" class="apply_gen">
                         <input class="button_gen" type="button" onclick="hide_log_pannel()" value="返回主界面">
-                        <input type="checkbox" class="stop_log" checked>
+                        <input type="checkbox" class="stop_log">
                         <lable>&nbsp;暂停日志刷新</lable>
                     </div>
                 </td>
