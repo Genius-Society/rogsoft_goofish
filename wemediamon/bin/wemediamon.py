@@ -8,7 +8,7 @@ import smtplib
 import argparse
 import requests
 import schedule
-from tqdm import tqdm
+from tqdm import tqdm as _tqdm
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
@@ -33,6 +33,9 @@ class Tee:
     def flush(self):
         self.console.flush()
         self.log_file.flush()
+
+    def isatty(self):
+        return True
 
     def close(self):
         self.log_file.close()
@@ -61,6 +64,11 @@ args = parser.parse_args()
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
+
+
+def tqdm(*args, **kwargs):
+    kwargs.setdefault("ascii", False)  # 强制使用 Unicode 样式
+    return _tqdm(*args, **kwargs)
 
 
 def send_email(
@@ -168,11 +176,7 @@ class BiliMon:
 
     def _get_followers(self):
         fans, pages = self._get_fans(page=1)
-        for i in tqdm(
-            range(2, pages + 1),
-            desc=f"扫描 {self.uid} 粉丝中",
-            file=sys.stdout,
-        ):
+        for i in tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} 粉丝中"):
             time.sleep(random.uniform(0.5, 1))
             followers, _ = self._get_fans(page=i)
             if followers:
