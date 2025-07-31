@@ -22,8 +22,9 @@ class Tee:
         self.console = sys.__stdout__
 
     def write(self, txt: str):
-        if txt.strip():
-            data = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n"
+        txt = txt.replace("\n", " ").strip()
+        if txt:
+            data = datetime.now().strftime("\n[%Y-%m-%d %H:%M:%S]") + f" {txt}"
             self.console.write(data)
             self.console.flush()
             if not "XU6J03M6" in data:
@@ -505,8 +506,7 @@ if __name__ == "__main__":
 
         elif args.cmd == "TEST_BILI_CK":
             for i in tqdm(range(5), desc="test"):
-                time.sleep(1)
-                print(i)
+                time.sleep(0.5)
 
         else:
             print(args.cmd)
