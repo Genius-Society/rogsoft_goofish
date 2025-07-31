@@ -325,7 +325,7 @@ class HFMon:
         self.tag_users, self.tag_orgs = self._parse_tags()
 
     def _parse_tags(self):
-        username = self.target.split("/")[0]
+        username = self.target
         following_users = [username]
         followings = self.hf_api.list_user_following(username)
         for following in followings:
@@ -385,6 +385,7 @@ class HFMon:
         for org in tqdm(self.tag_orgs, desc="Loading organization followers"):
             data[org] = self._get_followers("organization", org)
 
+        logs = ""
         if data == prev_data:
             logs += "\n No data changed. \n"
         else:
