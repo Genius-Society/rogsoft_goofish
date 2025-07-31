@@ -373,26 +373,6 @@ class HFMon:
 
         return logs
 
-    def _get_spaces(self, username: str):
-        sleepings, errors = [], []
-        spaces = self.hf_api.list_spaces(author=username)
-        for space in spaces:
-            status = self.hf_api.get_space_runtime(space.id).stage
-            if status == "SLEEPING":
-                sleepings.append(space.id)
-            elif "ERROR" in status:
-                errors.append(f"{self.hf_domain}/spaces/{space.id}")
-
-        return sleepings, errors
-
-    def _activate_space(self, space_id: str):
-        static = self.hf_api.space_info(space_id).sdk == "static"
-        response = requests.get(
-            f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
-            headers=self.header,
-        )
-        response.raise_for_status()
-
     def upd_fans(self):
         prev_data, data = {}, {}
         if os.path.exists(self.cache):
@@ -477,10 +457,22 @@ class CnblogsMon:
     def __init__(self):  # TODO:
         return
 
+    def check_login():
+        print("Check cnblogs login...")
+
+    def upd_fans():
+        print("Update cnblogs followers...")
+
 
 class ItchMon:
     def __init__(self):  # TODO:
         return
+
+    def check_login():
+        print("Check itch.io login...")
+
+    def upd_fans():
+        print("Update itch.io followers...")
 
 
 def update():
@@ -493,7 +485,11 @@ def update():
     if args.gitags:
         GitHubMon().upd_fans()
 
-    # TODO:
+    if args.cnblokie:
+        CnblogsMon().upd_fans()
+
+    if args.itck:
+        ItchMon().upd_fans()
 
 
 def start_monitor(period=args.period):
