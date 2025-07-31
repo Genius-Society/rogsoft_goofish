@@ -1,6 +1,6 @@
 # WeMedia relation monitor
 [![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](./LICENSE)
-[![hf](https://img.shields.io/badge/huggingface-huggingface__tools-ffd21e.svg)](https://huggingface.co/spaces/kakamond/huggingface_tools)
+[![hf](https://img.shields.io/badge/huggingface-huggingtools-ffd21e.svg)](https://huggingface.co/spaces/Genius-Society/huggingtools)
 [![ms](https://img.shields.io/badge/modelscope-bili__dark__tools-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bili_dark_tools)
 
 监控自媒体粉丝动向: 取关狗死全家! 推荐B站的UP在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
