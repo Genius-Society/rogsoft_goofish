@@ -183,8 +183,9 @@ start_wemediamon() {
 	fi
 
 	# 开启周期监控
+	wemediamon_cmd="START_MONITOR"
 	nohup python -u /koolshare/wemediamon/wemediamon.py \
-		--cmd 'START_MONITOR' \
+		--cmd "${wemediamon_cmd}" \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
@@ -248,7 +249,7 @@ stop() {
 
 # 重启/自启时触发
 if [ $# -eq 0 ]; then
-	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
+	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python -u /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
 		set_lock
 		start_wemediamon | tee -a $MON_LOG # 开启 WeMediaMon
 		unset_lock
