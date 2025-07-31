@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import math
 import time
@@ -14,6 +15,32 @@ from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
+
+class Tee:
+    def __init__(self, log_path: str):
+        self.log_file = open(log_path, "a", encoding="utf-8")
+        self.console = sys.__stdout__
+
+    def write(self, txt: str):
+        if txt.strip():
+            data = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n"
+            self.console.write(data)
+            self.console.flush()
+            if not "XU6J03M6" in data:
+                self.log_file.write(data)
+                self.log_file.flush()
+
+    def flush(self):
+        self.console.flush()
+        self.log_file.flush()
+
+    def close(self):
+        self.log_file.close()
+
+
+tee = Tee("/tmp/upload/wemediamon_log.txt")
+sys.stdout = tee
+sys.stderr = tee
 
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="WeMediaMon config script.")
@@ -34,15 +61,6 @@ args = parser.parse_args()
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
-
-
-def upd_log(txt):
-    log = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {txt}\n"
-    with open("/tmp/upload/wemediamon_log.txt", "a", encoding="utf-8") as file:
-        file.write(log)
-
-    with open("/tmp/upload/wemediamon_run_log.txt", "a", encoding="utf-8") as file:
-        file.write(log)
 
 
 def send_email(
@@ -74,13 +92,13 @@ def send_email(
             server.login(email, smtp)
             server.sendmail(email, [msg["To"]], msg.as_string())
 
-        upd_log("邮件发送成功!")
+        print("邮件发送成功!")
 
     except smtplib.SMTPException as e:
         if e.smtp_code == -1:
-            upd_log("邮件发送成功!")
+            print("邮件发送成功!")
         else:
-            upd_log(f"邮件发送失败: {e}")
+            print(f"邮件发送失败: {e}")
 
 
 class BiliMon:
@@ -136,18 +154,22 @@ class BiliMon:
 
             else:
                 msg = json_data["message"]
-                upd_log(msg)
+                print(msg)
                 raise PermissionError(
                     f"可能 {self.uid} 需要重新手动扫码登陆, 错误代码: {json_data['code']}"
                 )
 
         except requests.exceptions.RequestException as e:
-            upd_log(f"错误: {e}, 重试中...")
+            print(f"错误: {e}, 重试中...")
             return self._get_fans(page)
 
     def _get_followers(self):
         fans, pages = self._get_fans(page=1)
-        for i in tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} 粉丝中"):
+        for i in tqdm(
+            range(2, pages + 1),
+            desc=f"扫描 {self.uid} 粉丝中",
+            file=sys.stdout,
+        ):
             time.sleep(random.uniform(0.5, 1))
             followers, _ = self._get_fans(page=i)
             if followers:
@@ -206,7 +228,7 @@ class BiliMon:
                 indent=4,
             )
 
-        upd_log(f"{self.dbfile} 已更新!")
+        print(f"{self.dbfile} 已更新!")
 
     def _filter_unfollows(self, unfollows):
         real_unfollows, out1000 = [], {}
@@ -226,7 +248,7 @@ class BiliMon:
 
         new_fans: dict = self._get_followers()
         while not new_fans:
-            upd_log(f"获取 {self.uid} 粉丝列表失败, 重试中...")
+            print(f"获取 {self.uid} 粉丝列表失败, 重试中...")
             new_fans = self._get_followers()
 
         if new_fans != old_fans:
@@ -249,19 +271,19 @@ class BiliMon:
                     send_email(content)
 
             else:
-                upd_log(f"暂未发现取关 {self.uid} 者")
+                print(f"暂未发现取关 {self.uid} 者")
 
             self._upd_json(new_fans, out1000)
 
         else:
-            upd_log(f"暂未发现取关 {self.uid} 者")
+            print(f"暂未发现取关 {self.uid} 者")
 
     def clean_all_traitors(self):
         cleaned_traitors = []
         traitors = self._txt2lst()
         for traitor in tqdm(traitors, desc="清理已注销的取关狗"):
             if self._is_deleted(traitor):
-                upd_log(f"取关狗 {traitor} 已被清理!")
+                print(f"取关狗 {traitor} 已被清理!")
             else:
                 cleaned_traitors.append(traitor)
 
@@ -370,7 +392,7 @@ class HFMon:
 
             logs += "\n Data has been updated! \n"
 
-        upd_log(logs)
+        print(logs)
 
 
 class GitHubMon:
@@ -426,7 +448,7 @@ class GitHubMon:
 
             logs += "\n Data has been updated! \n"
 
-        upd_log(logs)
+        print(logs)
 
 
 class CnblogsMon:
@@ -454,7 +476,7 @@ def update():
 
 def start_monitor(period=args.period):
     update()
-    upd_log(f"监控开启中...每 {period} 小时触发一次")
+    print(f"监控开启中...每 {period} 小时触发一次")
     schedule.every(period).hours.do(update)
     while True:
         schedule.run_pending()
@@ -484,13 +506,11 @@ if __name__ == "__main__":
         elif args.cmd == "TEST_BILI_CK":
             for i in tqdm(range(5), desc="test"):
                 time.sleep(1)
+                print(i)
 
         else:
-            upd_log(args.cmd)
+            print(args.cmd)
             # TODO:
 
     except Exception as e:
         send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
-
-    finally:
-        print("XU6J03M6")

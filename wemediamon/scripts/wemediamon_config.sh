@@ -24,6 +24,7 @@ wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
 wemediamon_itchion=$(dbus get wemediamon_itchion)
 wemediamon_itck=$(dbus get wemediamon_itck)
 
+# 文件保护锁
 set_lock() {
 	exec 1000>"${LOCK_FILE}"
 	flock -x 1000
@@ -34,6 +35,7 @@ unset_lock() {
 	rm -rf "${LOCK_FILE}"
 }
 
+# 同步服务器时间
 sync_ntp() {
 	echo_date "尝试从ntp服务器: ntp1.aliyun.com 同步时间..."
 	ntpclient -h ntp1.aliyun.com -i3 -l -s >/tmp/ali_ntp.txt 2>&1
@@ -46,6 +48,7 @@ sync_ntp() {
 	fi
 }
 
+# 添加/删除开机启动
 fun_wan_start() {
 	if [ "${wemediamon_enable}" == "1" ]; then
 		if [ ! -L "/koolshare/init.d/M71wemediamon.sh" ]; then
@@ -60,8 +63,8 @@ fun_wan_start() {
 	fi
 }
 
-# 安装\检查运行环境
-install_env() {
+# 安装/检查运行环境
+fix_env() {
 	echo "修复 Python 运行环境..."
 	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 	opkg update
@@ -73,6 +76,7 @@ install_env() {
 	rm -rf /koolshare/wemediamon/.cache
 }
 
+# 加载dbus变量
 reload_vars() {
 	wemediamon_enable=$(dbus get wemediamon_enable)
 	wemediamon_period=$(dbus get wemediamon_period)
@@ -91,6 +95,24 @@ reload_vars() {
 	wemediamon_itck=$(dbus get wemediamon_itck)
 }
 
+# 5秒后自动关闭(仅供运行日志使用)
+close_in_five() {
+	dbus set wemediamon_enable=0
+	echo_date $1 | tee -a $RUN_LOG
+	echo_date "插件将在5秒后自动关闭!!" | tee -a $RUN_LOG
+	local i=5
+	while [ $i -ge 0 ]; do
+		sleep 1
+		echo_date $i | tee -a $RUN_LOG
+		let i--
+	done
+	stop
+	echo_date "插件已关闭!!" | tee -a $RUN_LOG
+	unset_lock
+	exit
+}
+
+# 检查入参
 check_params() {
 	# 检查必填入参
 	if [[ -z "${wemediamon_period}" ]]; then
@@ -143,6 +165,7 @@ check_params() {
 	fi
 }
 
+# 开启监控
 start_wemediamon() {
 	check_params
 
@@ -160,7 +183,7 @@ start_wemediamon() {
 	fi
 
 	# 开启周期监控
-	nohup python /koolshare/wemediamon/wemediamon.py \
+	nohup python -u /koolshare/wemediamon/wemediamon.py \
 		--cmd 'START_MONITOR' \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
@@ -171,9 +194,10 @@ start_wemediamon() {
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
-		>>$MON_LOG 2>&1 &
+		>>/dev/null 2>&1 &
 }
 
+# 单次触发指令
 trigger() {
 	reload_vars
 	check_params
@@ -181,14 +205,14 @@ trigger() {
 	# 检查运行环境
 	echo_date "检查 Entware 环境..."
 	if [ ! -d "/opt" ]; then
-		echo_date "Entware 环境不可用, 请先安装 Entware 插件!XU6J03M6"
+		echo_date "Entware 环境不可用, 请先安装 Entware 插件!"
 		return
 	else
 		echo_date "Entware 环境可用, 执行脚本中..."
 	fi
 
 	# 开启单次触发扫描
-	nohup python /koolshare/wemediamon/wemediamon.py \
+	python -u /koolshare/wemediamon/wemediamon.py \
 		--cmd $1 \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
@@ -198,40 +222,32 @@ trigger() {
 		--hftag "${wemediamon_hftag}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
-		--itck "${wemediamon_itck}" \
-		>>$RUN_LOG 2>&1 &
+		--itck "${wemediamon_itck}"
 }
 
-close_in_five() {
-	dbus set wemediamon_enable=0
-	echo_date $1 | tee -a $RUN_LOG
-	echo_date "插件将在5秒后自动关闭!!" | tee -a $RUN_LOG
-	local i=5
-	while [ $i -ge 0 ]; do
-		sleep 1
-		echo_date $i | tee -a $RUN_LOG
-		let i--
-	done
-	stop
-	echo_date "插件已关闭!!" | tee -a $RUN_LOG
-	unset_lock
-	exit
+# 查看B站取关狗
+watch_bili_dog() {
+	if [[ -f "${wemediamon_cache}/bili_blacklist.txt" ]]; then
+		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt"
+	else
+		echo_date "当前狗库为空!"
+	fi
 }
 
+# 关闭监控进程
 stop() {
-	# 关闭监控进程
 	pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
 	if [ ! -z $pids ]; then
-		echo_date "关闭监控进程..." | tee -a $RUN_LOG >>$MON_LOG
+		echo_date "关闭监控进程..."
 		for pid in $pids; do
 			kill "${pid}"
 		done
 	fi
-	fun_wan_start | tee -a $RUN_LOG >>$MON_LOG
+	fun_wan_start
 }
 
+# 重启/自启时触发
 if [ $# -eq 0 ]; then
-	# 重启/自启时触发
 	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
 		set_lock
 		start_wemediamon | tee -a $MON_LOG # 开启 WeMediaMon
@@ -240,6 +256,7 @@ if [ $# -eq 0 ]; then
 	exit 0
 fi
 
+# 网页POST触发
 case $1 in
 start)
 	set_lock
@@ -291,7 +308,7 @@ FIX_ENV)
 	set_lock
 	true >$RUN_LOG
 	http_response "$1"
-	install_env | tee -a $RUN_LOG
+	fix_env | tee -a $RUN_LOG
 	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 	;;
@@ -300,11 +317,7 @@ SEE_BILI_BLACKS)
 	set_lock
 	true >$RUN_LOG
 	http_response "$1"
-	if [[ -f "${wemediamon_cache}/bili_blacklist.txt" ]]; then
-		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt" | tee -a $RUN_LOG
-	else
-		echo_date "当前狗库为空!" | tee -a $RUN_LOG
-	fi
+	watch_bili_dog | tee -a $RUN_LOG
 	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 	;;
@@ -313,7 +326,8 @@ SEE_BILI_BLACKS)
 	set_lock
 	true >$RUN_LOG
 	http_response "$1"
-	trigger "$2"
+	trigger "$2" | tee -a $RUN_LOG
+	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 	;;
 
