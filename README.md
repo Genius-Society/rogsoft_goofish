@@ -17,7 +17,7 @@ cd wemediamon
 ```bash
 conda create -n py310 python=3.10 -y
 conda activate py310
-pip install -r ./wemediamon/bin/requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Build

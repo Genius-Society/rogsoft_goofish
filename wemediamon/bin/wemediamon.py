@@ -23,7 +23,7 @@ class Tee:
     def write(self, txt: str):
         msg = txt.replace("\n", " ").strip()
         if msg:
-            msg = datetime.now().strftime("\n[%Y-%m-%d %H:%M:%S]") + f" {msg}"
+            msg = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]") + f" {msg}\n"
             self.console.write(msg)
             self.console.flush()
             if not "XU6J03M6" in msg:

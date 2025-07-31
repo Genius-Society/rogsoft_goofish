@@ -35,16 +35,18 @@ unset_lock() {
 	rm -rf "${LOCK_FILE}"
 }
 
-# 同步服务器时间
+# 插件开启的时候同步一次时间
 sync_ntp() {
-	echo_date "尝试从ntp服务器: ntp1.aliyun.com 同步时间..."
-	ntpclient -h ntp1.aliyun.com -i3 -l -s >/tmp/ali_ntp.txt 2>&1
-	SYNC_TIME=$(cat /tmp/ali_ntp.txt | grep -E "\[ntpclient\]" | grep -Eo "[0-9]+" | head -n1)
-	if [ -n "${SYNC_TIME}" ]; then
-		SYNC_TIME=$(date +%Y/%m/%d-%X @${SYNC_TIME})
-		echo_date "完成!时间同步为: ${SYNC_TIME}"
-	else
-		echo_date "时间同步失败, 跳过!"
+	if [ "${wemediamon_enable}" == "1" -a -n "$(which ntpclient)" ]; then
+		echo_date "尝试从ntp服务器: ntp1.aliyun.com 同步时间..."
+		ntpclient -h ntp1.aliyun.com -i3 -l -s >/tmp/ali_ntp.txt 2>&1
+		SYNC_TIME=$(cat /tmp/ali_ntp.txt | grep -E "\[ntpclient\]" | grep -Eo "[0-9]+" | head -n1)
+		if [ -n "${SYNC_TIME}" ]; then
+			SYNC_TIME=$(date +%Y/%m/%d-%X @${SYNC_TIME})
+			echo_date "完成!时间同步为: ${SYNC_TIME}"
+		else
+			echo_date "时间同步失败, 跳过!"
+		fi
 	fi
 }
 
@@ -95,97 +97,89 @@ reload_vars() {
 	wemediamon_itck=$(dbus get wemediamon_itck)
 }
 
-# 5秒后自动关闭(仅供运行日志使用)
-close_in_five() {
+# 失败自动关闭(仅供运行日志使用)
+close_with_echo() {
 	dbus set wemediamon_enable=0
-	echo_date $1 | tee -a $RUN_LOG
-	echo_date "插件将在5秒后自动关闭!!" | tee -a $RUN_LOG
-	local i=5
-	while [ $i -ge 0 ]; do
-		sleep 1
-		echo_date $i | tee -a $RUN_LOG
-		let i--
-	done
+	echo_date $1
 	stop
-	echo_date "插件已关闭!!" | tee -a $RUN_LOG
+	echo_date "插件已关闭!!"
 	unset_lock
 	exit
 }
 
 # 检查入参
 check_params() {
+	reload_vars
 	# 检查必填入参
 	if [[ -z "${wemediamon_period}" ]]; then
-		close_in_five "请输入有效周期!"
+		close_with_echo "请输入有效周期!"
 	fi
 	if [[ -z "${wemediamon_email}" ]]; then
-		close_in_five "请输入有效邮箱!"
+		close_with_echo "请输入有效邮箱!"
 	fi
 	if [[ -z "${wemediamon_smtp}" ]]; then
-		close_in_five "请输入有效SMTP密钥!"
+		close_with_echo "请输入有效SMTP密钥!"
 	fi
 	if [ -z "${wemediamon_cache}" ]; then
-		close_in_five "请输入有效缓存路径!"
+		close_with_echo "请输入有效缓存路径!"
 	fi
 	# 检查选填入参
 	if [ "${wemediamon_bilimon}" == "1" ]; then
 		if [[ -z "${wemediamon_bilick}" ]]; then
-			close_in_five "请输入有效B站cookie!"
+			close_with_echo "请输入有效B站cookie!"
 		fi
 	else
 		wemediamon_bilick=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftag}" ]]; then
-			close_in_five "请输入有效抱脸用户名!"
+			close_with_echo "请输入有效抱脸用户名!"
 		fi
 	else
 		wemediamon_hftag=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
-			close_in_five "请输入有效GitHub目标列表!"
+			close_with_echo "请输入有效GitHub目标列表!"
 		fi
 	else
 		wemediamon_gitags=''
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then
 		if [[ -z "${wemediamon_cnblokie}" ]]; then
-			close_in_five "请输入有效GitHub目标列表!"
+			close_with_echo "请输入有效GitHub目标列表!"
 		fi
 	else
 		wemediamon_cnblokie=''
 	fi
 	if [ "${wemediamon_itchion}" == "1" ]; then
 		if [[ -z "${wemediamon_itck}" ]]; then
-			close_in_five "请输入有效GitHub目标列表!"
+			close_with_echo "请输入有效GitHub目标列表!"
 		fi
 	else
 		wemediamon_itck=''
 	fi
 }
 
+# 检查运行环境
+check_env() {
+	echo_date "检查 Entware 环境..."
+	if [ ! -d "/opt" ]; then
+		close_with_echo "Entware 环境不可用, 请先安装 Entware 插件!"
+	else
+		echo_date "Entware 环境可用, 执行脚本中..."
+	fi
+}
+
 # 开启监控
 start_wemediamon() {
 	check_params
-
-	# 插件开启的时候同步一次时间
-	if [ "${wemediamon_enable}" == "1" -a -n "$(which ntpclient)" ]; then
-		sync_ntp
-	fi
-
-	# 检查运行环境
-	echo_date "检查 Entware 环境..."
-	if [ ! -d "/opt" ]; then
-		close_in_five "Entware 环境不可用, 请先安装 Entware 插件!"
-	else
-		echo_date "Entware 环境可用, 开启监控中..."
-	fi
+	sync_ntp
+	check_env
 
 	# 开启周期监控
-	wemediamon_cmd="START_MONITOR"
 	nohup python -u /koolshare/wemediamon/wemediamon.py \
-		--cmd "${wemediamon_cmd}" \
+		--cmd "START_MONITOR" \
 		--period "${wemediamon_period}" \
 		--email "${wemediamon_email}" \
 		--smtp "${wemediamon_smtp}" \
@@ -199,18 +193,9 @@ start_wemediamon() {
 }
 
 # 单次触发指令
-trigger() {
-	reload_vars
+trigger_once() {
 	check_params # TODO: 若check不成功会影响监控进程
-
-	# 检查运行环境
-	echo_date "检查 Entware 环境..."
-	if [ ! -d "/opt" ]; then
-		echo_date "Entware 环境不可用, 请先安装 Entware 插件!"
-		return
-	else
-		echo_date "Entware 环境可用, 执行脚本中..."
-	fi
+	check_env
 
 	# 开启单次触发扫描
 	python -u /koolshare/wemediamon/wemediamon.py \
@@ -247,89 +232,44 @@ stop() {
 	fun_wan_start
 }
 
-# 重启/自启时触发
+# 重启/自启时触发开启 WeMediaMon
 if [ $# -eq 0 ]; then
 	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python -u /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
 		set_lock
-		start_wemediamon | tee -a $MON_LOG # 开启 WeMediaMon
+		start_wemediamon | tee -a $MON_LOG
 		unset_lock
 	fi
-	exit 0
+
+else
+	set_lock
+	true >$RUN_LOG
+	http_response "$1"
+
+	case $2 in
+	WEB_SUBMIT)
+		stop | tee -a "$MON_LOG" >>"$RUN_LOG"
+		if [ "${wemediamon_enable}" == "1" ]; then
+			start_wemediamon | tee -a "$MON_LOG" >>"$RUN_LOG"
+			echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!" | tee -a $RUN_LOG
+		else
+			echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $RUN_LOG
+		fi
+		;;
+
+	FIX_ENV)
+		fix_env | tee -a $RUN_LOG
+		;;
+
+	SEE_BILI_BLACKS)
+		watch_bili_dog | tee -a $RUN_LOG
+		;;
+
+	*)
+		trigger_once "$2" | tee -a $RUN_LOG
+		;;
+
+	esac
+
+	echo XU6J03M6 | tee -a $RUN_LOG
+	unset_lock
 fi
-
-# 网页POST触发
-case $1 in
-start)
-	set_lock
-	reload_vars
-	if [ "${wemediamon_enable}" == "1" ]; then
-		logger "[软件中心]: 启动 WeMediaMon !"
-		start_wemediamon
-	fi
-	unset_lock
-	;;
-
-restart)
-	set_lock
-	reload_vars
-	if [ "${wemediamon_enable}" == "1" ]; then
-		stop
-		start_wemediamon
-	fi
-	unset_lock
-	;;
-
-stop)
-	set_lock
-	reload_vars
-	stop
-	unset_lock
-	;;
-
-esac
-
-case $2 in
-WEB_SUBMIT)
-	set_lock
-	true >$RUN_LOG
-	http_response "$1"
-	reload_vars
-	stop | tee -a "$MON_LOG" >>"$RUN_LOG"
-	if [ "${wemediamon_enable}" == "1" ]; then
-		start_wemediamon | tee -a "$MON_LOG" >>"$RUN_LOG"
-		echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!" | tee -a $RUN_LOG
-	else
-		echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $RUN_LOG
-	fi
-	echo XU6J03M6 | tee -a $RUN_LOG
-	unset_lock
-	;;
-
-FIX_ENV)
-	set_lock
-	true >$RUN_LOG
-	http_response "$1"
-	fix_env | tee -a $RUN_LOG
-	echo XU6J03M6 | tee -a $RUN_LOG
-	unset_lock
-	;;
-
-SEE_BILI_BLACKS)
-	set_lock
-	true >$RUN_LOG
-	http_response "$1"
-	watch_bili_dog | tee -a $RUN_LOG
-	echo XU6J03M6 | tee -a $RUN_LOG
-	unset_lock
-	;;
-
-*)
-	set_lock
-	true >$RUN_LOG
-	http_response "$1"
-	trigger "$2" | tee -a $RUN_LOG
-	echo XU6J03M6 | tee -a $RUN_LOG
-	unset_lock
-	;;
-
-esac
