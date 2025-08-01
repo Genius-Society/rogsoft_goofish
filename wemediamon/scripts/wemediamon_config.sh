@@ -8,22 +8,6 @@ LOCK_FILE=/var/lock/wemediamon.lock
 alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 export PATH=$PATH:/opt/bin/
 
-wemediamon_enable=$(dbus get wemediamon_enable)
-wemediamon_period=$(dbus get wemediamon_period)
-wemediamon_email=$(dbus get wemediamon_email)
-wemediamon_smtp=$(dbus get wemediamon_smtp)
-wemediamon_cache=$(dbus get wemediamon_cache)
-wemediamon_bilimon=$(dbus get wemediamon_bilimon)
-wemediamon_bilick=$(dbus get wemediamon_bilick)
-wemediamon_hfmon=$(dbus get wemediamon_hfmon)
-wemediamon_hftag=$(dbus get wemediamon_hftag)
-wemediamon_gitmon=$(dbus get wemediamon_gitmon)
-wemediamon_gitags=$(dbus get wemediamon_gitags)
-wemediamon_cnblon=$(dbus get wemediamon_cnblon)
-wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
-wemediamon_itchion=$(dbus get wemediamon_itchion)
-wemediamon_itck=$(dbus get wemediamon_itck)
-
 # 文件保护锁
 set_lock() {
 	exec 1000>"${LOCK_FILE}"
@@ -78,8 +62,19 @@ fix_env() {
 	rm -rf /koolshare/wemediamon/.cache
 }
 
-# 加载dbus变量
-reload_vars() {
+# 失败自动关闭(仅供运行日志使用)
+close_with_echo() {
+	dbus set wemediamon_enable=0
+	echo_date $1
+	stop
+	echo_date "插件已关闭!!"
+	unset_lock
+	exit
+}
+
+# 检查入参
+check_params() {
+	# 加载dbus变量
 	wemediamon_enable=$(dbus get wemediamon_enable)
 	wemediamon_period=$(dbus get wemediamon_period)
 	wemediamon_email=$(dbus get wemediamon_email)
@@ -95,21 +90,6 @@ reload_vars() {
 	wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
 	wemediamon_itchion=$(dbus get wemediamon_itchion)
 	wemediamon_itck=$(dbus get wemediamon_itck)
-}
-
-# 失败自动关闭(仅供运行日志使用)
-close_with_echo() {
-	dbus set wemediamon_enable=0
-	echo_date $1
-	stop
-	echo_date "插件已关闭!!"
-	unset_lock
-	exit
-}
-
-# 检查入参
-check_params() {
-	reload_vars
 	# 检查必填入参
 	if [[ -z "${wemediamon_period}" ]]; then
 		close_with_echo "请输入有效周期!"
@@ -194,7 +174,7 @@ start_wemediamon() {
 
 # 单次触发指令
 trigger_once() {
-	check_params # TODO: 若check不成功会影响监控进程
+	check_params
 	check_env
 
 	# 开启单次触发扫描
@@ -232,28 +212,32 @@ stop() {
 	fun_wan_start
 }
 
-# 重启/自启时触发开启 WeMediaMon
-if [ $# -eq 0 ]; then
+start() {
+	stop
+	if [ "${wemediamon_enable}" == "1" ]; then
+		start_wemediamon
+		echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!"
+	else
+		echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!"
+	fi
+}
+
+# 自启/重启时触发开启 WeMediaMon
+if [ $# -eq 0 ] || [ $# -eq 1 ]; then
 	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python -u /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
 		set_lock
-		start_wemediamon | tee -a $MON_LOG
+		start_wemediamon
 		unset_lock
 	fi
-
-else
+# 网页传参命令触发
+elif [ $# -eq 2 ]; then
 	set_lock
 	true >$RUN_LOG
 	http_response "$1"
 
 	case $2 in
 	WEB_SUBMIT)
-		stop | tee -a "$MON_LOG" >>"$RUN_LOG"
-		if [ "${wemediamon_enable}" == "1" ]; then
-			start_wemediamon | tee -a "$MON_LOG" >>"$RUN_LOG"
-			echo_date "WeMediaMon 插件启动完毕, 本窗口将在 5s 内自动关闭!" | tee -a $RUN_LOG
-		else
-			echo_date "WeMediaMon 已经停止运行, 本窗口将再 5s 后关闭!" | tee -a $RUN_LOG
-		fi
+		start | tee -a $RUN_LOG
 		;;
 
 	FIX_ENV)

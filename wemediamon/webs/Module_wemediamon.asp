@@ -33,7 +33,7 @@
                     <div id="loading_block_title"></div>
                     <div id="loading_block_spilt" class="loading_block_spilt"></div>
                     <div id="log_container">
-                        <textarea cols="50" rows="25" wrap="off" readonly="readonly" id="run_log_content"
+                        <textarea cols="50" rows="25" wrap="soft" readonly="readonly" id="run_log_content"
                             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
                     </div>
                     <div id="ok_button" class="apply_gen">
@@ -51,8 +51,8 @@
                     <div id="log_info">wemediamon监控信息</div>
                     <div style="margin-left:15px"><i>🗒️此处展示wemediamon程序的监控日志...</i></div>
                     <div id="running_log">
-                        <textarea cols="50" rows="32" wrap="off" readonly="readonly" id="log_content" autocomplete="off"
-                            autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                        <textarea cols="50" rows="32" wrap="soft" readonly="readonly" id="log_content"
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
                     </div>
                     <div id="mon_ok_button" class="apply_gen">
                         <input class="button_gen" type="button" onclick="hide_log_pannel()" value="返回主界面">

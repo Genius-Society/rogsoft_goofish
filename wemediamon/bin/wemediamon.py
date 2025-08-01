@@ -46,13 +46,13 @@ sys.stdout = tee
 sys.stderr = tee
 
 # 创建 ArgumentParser 对象
-parser = argparse.ArgumentParser(description="WeMediaMon config script.")
+parser = argparse.ArgumentParser(description="WeMediaMon config script")
 # 添加参数
 parser.add_argument("--cmd", type=str, required=True)
 parser.add_argument("--period", type=int, default=2, required=True)
-parser.add_argument("--email", type=str, default="", required=True)
-parser.add_argument("--smtp", type=str, default="", required=True)
-parser.add_argument("--cache", type=str, default="", required=True)
+parser.add_argument("--email", type=str, required=True)
+parser.add_argument("--smtp", type=str, required=True)
+parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--hftag", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
@@ -61,13 +61,13 @@ parser.add_argument("--itck", type=str, default="")
 
 # 解析命令行参数
 args = parser.parse_args()
-
+# print(args)
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
 
 
-def tqdm(*args, **kwargs):
-    kwargs.setdefault("ascii", False)  # 强制使用 Unicode 样式
+def tqdm(*args, **kwargs):  # 强制使用 Unicode 样式
+    kwargs.setdefault("ascii", False)
     return _tqdm(*args, **kwargs)
 
 
@@ -147,11 +147,14 @@ class BiliMon:
         merged_traitors = list(set(old_traitors + traitors))
         self._save_traitors(merged_traitors)
 
-    def _get_fans(self, page):
+    def _get_fans(self, page, trytime=3):
         try:
             response = requests.get(
                 f"https://api.bilibili.com/x/relation/followers?vmid={self.uid}&pn={page}",
-                headers={"User-Agent": USER_AGENT, "Cookie": self.ck},
+                headers={
+                    "User-Agent": USER_AGENT,
+                    "Cookie": self.ck,
+                },
             )  # 使用 requests 库下载 JSON 数据
             response.raise_for_status()  # 检查是否成功获取数据
             json_data = response.json()  # 使用 json 库解析 JSON 数据
@@ -164,15 +167,17 @@ class BiliMon:
                 return (fans, math.ceil(json_data["data"]["total"] / 50))
 
             else:
-                msg = json_data["message"]
-                print(msg)
+                print(json_data["message"])
                 raise PermissionError(
                     f"可能 {self.uid} 需要重新手动扫码登陆, 错误代码: {json_data['code']}"
                 )
 
         except requests.exceptions.RequestException as e:
             print(f"错误: {e}, 重试中...")
-            return self._get_fans(page)
+            time.sleep(random.uniform(4.5, 5))
+            trytime -= 1
+            if trytime > 0:
+                return self._get_fans(page, trytime)
 
     def _get_followers(self):
         fans, pages = self._get_fans(page=1)
@@ -257,7 +262,9 @@ class BiliMon:
         )
         response.raise_for_status()
         if response.status_code == 200:
-            print(f"{response.json()}")
+            isLogin = response.json()["data"]["isLogin"]
+            print(("已" if isLogin else "未") + "登录B站")
+
         else:
             raise ConnectionError(response.status_code)
 
@@ -330,7 +337,6 @@ class HFMon:
         response = requests.get(
             f"{self.hf_domain}/api/users/{username}/following",
             headers=self.header,
-            verify=False,
         )
         response.raise_for_status()
         if response.status_code == 200:
@@ -348,7 +354,6 @@ class HFMon:
         response = requests.get(
             f"{self.hf_domain}/api/users/{username}/following/orgs",
             headers=self.header,
-            verify=False,
         )
         response.raise_for_status()
         if response.status_code == 200:
@@ -491,10 +496,10 @@ class CnblogsMon:
     def __init__(self):  # TODO:
         return
 
-    def check_login():
+    def check_login(self):
         print("Check cnblogs login...")
 
-    def upd_fans():
+    def upd_fans(self):
         print("Update cnblogs followers...")
 
 
@@ -502,10 +507,10 @@ class ItchMon:
     def __init__(self):  # TODO:
         return
 
-    def check_login():
+    def check_login(self):
         print("Check itch.io login...")
 
-    def upd_fans():
+    def upd_fans(self):
         print("Update itch.io followers...")
 
 
@@ -560,17 +565,17 @@ if __name__ == "__main__":
                 GitHubMon().upd_fans()
 
             case "TEST_CNBLOGS_CK":
-                print(args.cmd)
-                # TODO:
+                CnblogsMon().check_login()
+
             case "UPD_CNBLOGS_FANS":
-                print(args.cmd)
-                # TODO:
+                CnblogsMon().upd_fans()
+
             case "TEST_ITCH_CK":
-                print(args.cmd)
-                # TODO:
+                ItchMon().check_login()
+
             case "UPD_ITCH_FANS":
-                print(args.cmd)
-                # TODO:
+                ItchMon().upd_fans()
+
             case _:
                 print(f"未知指令: {args.cmd}")
 

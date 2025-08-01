@@ -43,11 +43,15 @@ a:focus {
 	border-width: 0.5px;
 }
 
-#bilick {
+#bilick,
+#cnblokie,
+#itck {
 	-webkit-text-security: square;
 }
 
-#bilick:focus {
+#bilick:focus,
+#cnblokie:focus,
+#itck:focus {
 	-webkit-text-security: none;
 }
 
