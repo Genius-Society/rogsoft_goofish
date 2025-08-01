@@ -63,7 +63,7 @@ parser.add_argument("--itck", type=str, default="")
 # 解析命令行参数
 args = parser.parse_args()
 # print(args)
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
 CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
 
 
@@ -662,7 +662,14 @@ class ItchMon:
     def __init__(self):
         self.domain = "https://itch.io"
         self.cache = f"{CACHE_PATH}/itch_followers.json"
-        self.header = {"user-agent": USER_AGENT, "cookie": args.itck}
+        self.header = {
+            "accept-language": "zh-CN,zh;q=0.9",
+            "connection": "keep-alive",
+            "cookie": args.itck,
+            "host": self.domain.replace("https://", ""),
+            "referer": f"{self.domain}/dashboard",
+            "user-agent": USER_AGENT,
+        }
 
     def _list_followers(self):
         fans = {}
