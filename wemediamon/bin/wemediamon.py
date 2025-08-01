@@ -603,6 +603,9 @@ class CnblogsMon:
                     uid = self._parse_fans(href)
                     fans[uid] = username
 
+        else:
+            raise PermissionError("博客园登录状态失效, 请更新cookie!")
+
         return fans
 
     def _compare_data(self, prev_data: dict, data: dict):
@@ -625,11 +628,12 @@ class CnblogsMon:
         response.raise_for_status()
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "html.parser")
-            blog_lnk = soup.find("a", id="user_nav_blog_link")["href"]
-            self.username = blog_lnk.split("cnblogs.com/")[-1][:-1]
-            if self.username:
-                print("已登录博客园")
-                return True
+            blog_lnk = soup.find("a", id="user_nav_blog_link")
+            if blog_lnk:
+                self.username = blog_lnk["href"].split("cnblogs.com/")[-1][:-1]
+                if self.username:
+                    print("已登录博客园")
+                    return True
 
         print("未登录博客园")
         return False
@@ -655,14 +659,76 @@ class CnblogsMon:
 
 
 class ItchMon:
-    def __init__(self):  # TODO:
-        return
+    def __init__(self):
+        self.domain = "https://itch.io"
+        self.cache = f"{CACHE_PATH}/itch_followers.json"
+        self.header = {"user-agent": USER_AGENT, "cookie": args.itck}
+
+    def _list_followers(self):
+        fans = {}
+        isLogin, response_txt = self.check_login()
+        if isLogin:
+            soup = BeautifulSoup(response_txt, "html.parser")
+            fan_lnks = soup.find("div", class_="followers_list").find_all(
+                "a", attrs={"data-user_id": True}
+            )
+            for a in fan_lnks:
+                username = a["data-follow_url"].split("/g/")[-1].split("/-/")[0]
+                uid = a["data-user_id"]
+                fans[uid] = username
+
+        else:
+            raise PermissionError("itch.io登录状态失效, 请更新cookie!")
+
+        return fans
+
+    def _compare_data(self, prev_data: dict, data: dict):
+        logs = ""
+        diff = set(prev_data.keys()) - set(data.keys())
+        for id in diff:
+            dog = prev_data[id]
+            logs += (
+                f"<br>狗<a href='{self.domain}/profile/{dog}'>{dog}</a>取关了我!<br>"
+            )
+
+        if logs:
+            send_email(logs)
+
+        return logs
 
     def check_login(self):
-        print("Check itch.io login...")
+        response = requests.get(f"{self.domain}/my-followers", headers=self.header)
+        response.raise_for_status()
+        if response.status_code == 200:
+            if response.history:
+                print("未登录itch.io")
+                return False, ""
+
+            else:
+                print("已登录itch.io")
+                return True, response.text
+
+        else:
+            raise ConnectionError(response.status_code)
 
     def upd_fans(self):
-        print("Update itch.io followers...")
+        prev_data = {}
+        if os.path.exists(self.cache):
+            with open(self.cache, "r") as json_file:
+                prev_data = json.load(json_file)
+
+        data = self._list_followers()
+        logs = ""
+        if data == prev_data:
+            logs += "\n itch.io数据无变化 \n"
+        else:
+            logs += self._compare_data(prev_data, data)
+            with open(self.cache, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+
+            logs += "\n itch.io数据已更新 \n"
+
+        print(logs)
 
 
 def update():

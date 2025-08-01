@@ -127,14 +127,14 @@ check_params() {
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then
 		if [[ -z "${wemediamon_cnblokie}" ]]; then
-			close_with_echo "请输入有效GitHub目标列表!"
+			close_with_echo "请输入有效博客园cookie!"
 		fi
 	else
 		wemediamon_cnblokie=''
 	fi
 	if [ "${wemediamon_itchion}" == "1" ]; then
 		if [[ -z "${wemediamon_itck}" ]]; then
-			close_with_echo "请输入有效GitHub目标列表!"
+			close_with_echo "请输入有效itch.io cookie!"
 		fi
 	else
 		wemediamon_itck=''
