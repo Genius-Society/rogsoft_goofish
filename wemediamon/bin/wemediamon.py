@@ -173,11 +173,14 @@ class BiliMon:
                 )
 
         except requests.exceptions.RequestException as e:
-            print(f"错误: {e}, 重试中...")
-            time.sleep(random.uniform(4.5, 5))
-            trytime -= 1
             if trytime > 0:
+                print(f"错误: {e}, 重试中...")
+                time.sleep(random.uniform(4.5, 5))
+                trytime -= 1
                 return self._get_fans(page, trytime)
+
+            else:
+                raise ConnectionError("Failed to get bili fans for too many times!")
 
     def _get_followers(self):
         fans, pages = self._get_fans(page=1)
@@ -440,8 +443,9 @@ class GitHubMon:
     def __init__(self):
         self.tags = args.gitags.split(";")
         self.cache = f"{CACHE_PATH}/github_followers.json"
+        self.header = {"user-agent": USER_AGENT}
 
-    def _get_followers(self, user: str):
+    def _list_followers(self, user: str):
         response = requests.get(f"https://api.github.com/users/{user}/followers")
         response.raise_for_status()
         if response.status_code == 200:
@@ -455,31 +459,100 @@ class GitHubMon:
         else:
             raise ConnectionError(response.status_code)
 
+    # 获取用户所有仓库
+    def _list_user_repos(self, username):
+        page = 1
+        repos = []
+        while True:
+            resp = requests.get(
+                f"https://api.github.com/users/{username}/repos?per_page=100&page={page}",
+                headers=self.header,
+            )
+            if resp.status_code != 200:
+                raise ConnectionError(
+                    f"Failed to fetch {username} repos: {resp.status_code}"
+                )
+
+            data = resp.json()
+            if not data:
+                break
+
+            repos += [repo["full_name"] for repo in data]
+            page += 1
+            time.sleep(random.uniform(0.5, 1))
+
+        return repos
+
+    # 获取仓库收藏者
+    def _list_repo_stargazers(self, repo):
+        page = 1
+        stargazers = {}
+        while True:
+            resp = requests.get(
+                f"https://api.github.com/repos/{repo}/stargazers?per_page=100&page={page}",
+                headers=self.header,
+            )
+            if resp.status_code != 200:
+                raise ConnectionError(
+                    f"Failed to fetch stargazers for {repo}: {resp.status_code}"
+                )
+
+            data = resp.json()
+            if not data:
+                break
+
+            for user in data:
+                stargazers[str(user["id"])] = user["login"]
+
+            page += 1
+            time.sleep(random.uniform(0.5, 1))
+
+        return stargazers
+
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
         for tag in prev_data:
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
-                if diff:
-                    for id in diff:
-                        dog = prev_data[tag][id]
-                        me = tag.split("/")[-1]
-                        logs += f"\n Dog <a href='https://github.com/{dog}'>{dog}</a> unfollowed <a href='https://github.com/{me}'>{me}</a> ! \n"
+                for id in diff:
+                    dog = prev_data[tag][id]
+                    logs += f"<br>狗<a href='https://github.com/{dog}'>{dog}</a>取关了<a href='https://github.com/{tag}'>{tag}</a>!<br>"
 
         if logs:
             send_email(logs)
 
         return logs
 
+    def _get_latest_data(self, tags: list, trytime=3):
+        data = {}
+        try:
+            for tag in tags:
+                data[tag] = self._list_followers(tag)
+                repos = self._list_user_repos(tag)
+                for repo in tqdm(repos, desc=f"Analyzing {tag} repos"):
+                    data[repo] = self._list_repo_stargazers(repo)
+
+        except Exception as e:
+            if trytime > 0:
+                print(f"Failed to get latest data: {e}, retrying...")
+                time.sleep(random.uniform(4.5, 5))
+                trytime -= 1
+                return self._get_latest_data(self.tags, trytime)
+
+            else:
+                raise ConnectionError(
+                    "Failed to get latest github data for too many times!"
+                )
+
+        return data
+
     def upd_fans(self):
-        prev_data, data = {}, {}
+        prev_data = {}
         if os.path.exists(self.cache):
             with open(self.cache, "r") as json_file:
                 prev_data = json.load(json_file)
 
-        for tag in tqdm(self.tags, desc="Getting current followers"):
-            data[tag] = self._get_followers(tag)
-
+        data = self._get_latest_data(self.tags)
         logs = ""
         if data == prev_data:
             logs += "\n No data changed. \n"
