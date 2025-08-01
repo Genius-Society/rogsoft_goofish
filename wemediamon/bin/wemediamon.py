@@ -169,12 +169,12 @@ class BiliMon:
             else:
                 print(json_data["message"])
                 raise PermissionError(
-                    f"可能 {self.uid} 需要重新手动扫码登陆, 错误代码: {json_data['code']}"
+                    f"B站 {self.uid} 可能需要重新手动扫码登陆, 错误代码: {json_data['code']}"
                 )
 
         except requests.exceptions.RequestException as e:
             if trytime > 0:
-                print(f"错误: {e}, 重试中...")
+                print(f"Failed to get bili fans: {e}, retrying...")
                 time.sleep(random.uniform(4.5, 5))
                 trytime -= 1
                 return self._get_fans(page, trytime)
@@ -184,7 +184,7 @@ class BiliMon:
 
     def _get_followers(self):
         fans, pages = self._get_fans(page=1)
-        for i in tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} 粉丝中"):
+        for i in tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} B站粉丝中"):
             time.sleep(random.uniform(0.5, 1))
             followers, _ = self._get_fans(page=i)
             if followers:
@@ -220,7 +220,7 @@ class BiliMon:
 
         traitors_out1000 = []
         out1000_keys = list(out1000.keys())
-        for item in tqdm(out1000_keys, desc=f"过滤 {self.uid} 的1K以外列表"):
+        for item in tqdm(out1000_keys, desc=f"过滤 {self.uid} B站1K以外粉丝列表"):
             if item in new_fans:
                 del out1000[item]
 
@@ -247,7 +247,7 @@ class BiliMon:
 
     def _filter_unfollows(self, unfollows):
         real_unfollows, out1000 = [], {}
-        for unfollower in tqdm(unfollows, desc=f"过滤 {self.uid} 取关列表"):
+        for unfollower in tqdm(unfollows, desc=f"过滤 {self.uid} B站取关列表"):
             if self._is_fans(unfollower["uid"]):
                 out1000.update({unfollower["uid"]: unfollower["uname"]})
             else:
@@ -279,7 +279,7 @@ class BiliMon:
 
         new_fans: dict = self._get_followers()
         while not new_fans:
-            print(f"获取 {self.uid} 粉丝列表失败, 重试中...")
+            print(f"获取 {self.uid} B站粉丝列表失败, 重试中...")
             new_fans = self._get_followers()
 
         if new_fans != old_fans:
@@ -290,7 +290,7 @@ class BiliMon:
 
             unfollows, out1000 = self._filter_unfollows(unfollows)
             if unfollows:
-                content = f"以下狗取关了 {self.uid}:"
+                content = f"B站以下狗取关了 {self.uid}:"
                 traitors = []
                 for user in unfollows:
                     url = f'https://space.bilibili.com/{user["uid"]}'
@@ -302,23 +302,23 @@ class BiliMon:
                     send_email(content)
 
             else:
-                print(f"暂未发现取关 {self.uid} 者")
+                print(f"暂未发现B站取关 {self.uid} 者")
 
             self._upd_json(new_fans, out1000)
 
         else:
-            print(f"暂未发现取关 {self.uid} 者")
+            print(f"暂未发现B站取关 {self.uid} 者")
 
     def clean_all_traitors(self):
         cleaned_traitors = []
         traitors = self._txt2lst()
         if not traitors:
-            print("当前狗库为空!")
+            print("当前B站狗库为空!")
             return
 
-        for traitor in tqdm(traitors, desc="清理已注销的取关狗"):
+        for traitor in tqdm(traitors, desc="清理已注销的B站取关狗"):
             if self._is_deleted(traitor):
-                print(f"取关狗 {traitor} 已被清理!")
+                print(f"B站取关狗 {traitor} 已被清理!")
             else:
                 cleaned_traitors.append(traitor)
 
@@ -407,7 +407,7 @@ class HFMon:
                     for id in diff:
                         dog = prev_data[tag][id]
                         me = tag.split("/")[-1]
-                        logs += f"\n Dog <a href='{self.hf_domain}/{dog}'>{dog}</a> unfollowed <a href='{self.hf_domain}/{me}'>{me}</a> ! \n"
+                        logs += f"<br>狗<a href='{self.hf_domain}/{dog}'>{dog}</a>取关了<a href='{self.hf_domain}/{me}'>{me}</a> !<br>"
 
         if logs:
             send_email(logs)
@@ -420,21 +420,21 @@ class HFMon:
             with open(self.cache, "r") as json_file:
                 prev_data = json.load(json_file)
 
-        for user in tqdm(self.tag_users, desc="Loading user followers"):
+        for user in tqdm(self.tag_users, desc="加载抱脸用户粉丝"):
             data[user] = self._get_followers("user", user)
 
-        for org in tqdm(self.tag_orgs, desc="Loading organization followers"):
+        for org in tqdm(self.tag_orgs, desc="加载抱脸组织粉丝"):
             data[org] = self._get_followers("organization", org)
 
         logs = ""
         if data == prev_data:
-            logs += "\n No data changed. \n"
+            logs += "\n 抱脸数据无变化 \n"
         else:
             logs += self._compare_data(prev_data, data)
             with open(self.cache, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n Data has been updated! \n"
+            logs += "\n 抱脸数据已更新 \n"
 
         print(logs)
 
@@ -470,7 +470,7 @@ class GitHubMon:
             )
             if resp.status_code != 200:
                 raise ConnectionError(
-                    f"Failed to fetch {username} repos: {resp.status_code}"
+                    f"Failed to fetch {username} GitHub repos: {resp.status_code}"
                 )
 
             data = resp.json()
@@ -494,7 +494,7 @@ class GitHubMon:
             )
             if resp.status_code != 200:
                 raise ConnectionError(
-                    f"Failed to fetch stargazers for {repo}: {resp.status_code}"
+                    f"Failed to fetch GitHub stargazers for {repo}: {resp.status_code}"
                 )
 
             data = resp.json()
@@ -529,19 +529,19 @@ class GitHubMon:
             for tag in tags:
                 data[tag] = self._list_followers(tag)
                 repos = self._list_user_repos(tag)
-                for repo in tqdm(repos, desc=f"Analyzing {tag} repos"):
+                for repo in tqdm(repos, desc=f"解析 {tag} 仓库中"):
                     data[repo] = self._list_repo_stargazers(repo)
 
         except Exception as e:
             if trytime > 0:
-                print(f"Failed to get latest data: {e}, retrying...")
+                print(f"Failed to get latest GitHub data: {e}, retrying...")
                 time.sleep(random.uniform(4.5, 5))
                 trytime -= 1
                 return self._get_latest_data(self.tags, trytime)
 
             else:
                 raise ConnectionError(
-                    "Failed to get latest github data for too many times!"
+                    "Failed to get latest GitHub data for too many times!"
                 )
 
         return data
@@ -555,13 +555,13 @@ class GitHubMon:
         data = self._get_latest_data(self.tags)
         logs = ""
         if data == prev_data:
-            logs += "\n No data changed. \n"
+            logs += "\n GitHub数据无变化 \n"
         else:
             logs += self._compare_data(prev_data, data)
             with open(self.cache, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n Data has been updated! \n"
+            logs += "\n GitHub数据已更新 \n"
 
         print(logs)
 
