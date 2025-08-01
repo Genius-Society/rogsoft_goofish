@@ -118,4 +118,4 @@ def upd_cookie(
 
 
 if __name__ == "__main__":
-    upd_cookie(manual=True, split=False)
+    upd_cookie(manual=True, split=False, page="https://itch.io/my-followers")
