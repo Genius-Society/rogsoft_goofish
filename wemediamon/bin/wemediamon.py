@@ -9,6 +9,7 @@ import argparse
 import requests
 import schedule
 from tqdm import tqdm as _tqdm
+from bs4 import BeautifulSoup
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
@@ -441,12 +442,13 @@ class HFMon:
 
 class GitHubMon:
     def __init__(self):
+        self.domain = "github.com"
         self.tags = args.gitags.split(";")
         self.cache = f"{CACHE_PATH}/github_followers.json"
         self.header = {"user-agent": USER_AGENT}
 
     def _list_followers(self, user: str):
-        response = requests.get(f"https://api.github.com/users/{user}/followers")
+        response = requests.get(f"https://api.{self.domain}/users/{user}/followers")
         response.raise_for_status()
         if response.status_code == 200:
             fans = response.json()
@@ -465,7 +467,7 @@ class GitHubMon:
         repos = []
         while True:
             resp = requests.get(
-                f"https://api.github.com/users/{username}/repos?per_page=100&page={page}",
+                f"https://api.{self.domain}/users/{username}/repos?per_page=100&page={page}",
                 headers=self.header,
             )
             if resp.status_code != 200:
@@ -489,7 +491,7 @@ class GitHubMon:
         stargazers = {}
         while True:
             resp = requests.get(
-                f"https://api.github.com/repos/{repo}/stargazers?per_page=100&page={page}",
+                f"https://api.{self.domain}/repos/{repo}/stargazers?per_page=100&page={page}",
                 headers=self.header,
             )
             if resp.status_code != 200:
@@ -516,7 +518,7 @@ class GitHubMon:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
-                    logs += f"<br>狗<a href='https://github.com/{dog}'>{dog}</a>取关了<a href='https://github.com/{tag}'>{tag}</a>!<br>"
+                    logs += f"<br>狗<a href='https://{self.domain}/{dog}'>{dog}</a>取关了<a href='https://{self.domain}/{tag}'>{tag}</a>!<br>"
 
         if logs:
             send_email(logs)
@@ -567,14 +569,89 @@ class GitHubMon:
 
 
 class CnblogsMon:
-    def __init__(self):  # TODO:
-        return
+    def __init__(self):
+        self.domain = "https://home.cnblogs.com"
+        self.cache = f"{CACHE_PATH}/cnblogs_followers.json"
+        self.header = {"user-agent": USER_AGENT, "cookie": args.cnblokie}
+
+    def _parse_fans(self, url):
+        response = requests.get(url, headers=self.header)
+        response.raise_for_status()
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            target_span = soup.find("span", title="账户ID").find_next("span")
+            return target_span.text.strip()
+
+        return None
+
+    def _list_followers(self):
+        fans = {}
+        if self.check_login():
+            response = requests.get(
+                f"{self.domain}/u/{self.username}/followers",
+                headers=self.header,
+            )
+            response.raise_for_status()
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+                fan_lnks = soup.find("div", class_="avatar_list").find_all(
+                    "a", attrs={"title": True}
+                )
+                for a in fan_lnks:
+                    href: str = self.domain + a["href"]
+                    username = href.split("/u/")[-1]
+                    uid = self._parse_fans(href)
+                    fans[uid] = username
+
+        return fans
+
+    def _compare_data(self, prev_data: dict, data: dict):
+        logs = ""
+        diff = set(prev_data.keys()) - set(data.keys())
+        for id in diff:
+            dog = prev_data[id]
+            logs += f"<br>狗<a href='{self.domain}/u/{dog}'>{dog}</a>取关了我!<br>"
+
+        if logs:
+            send_email(logs)
+
+        return logs
 
     def check_login(self):
-        print("Check cnblogs login...")
+        response = requests.get(
+            "https://account.cnblogs.com/user/userinfo",
+            headers=self.header,
+        )
+        response.raise_for_status()
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            blog_lnk = soup.find("a", id="user_nav_blog_link")["href"]
+            self.username = blog_lnk.split("cnblogs.com/")[-1][:-1]
+            if self.username:
+                print("已登录博客园")
+                return True
+
+        print("未登录博客园")
+        return False
 
     def upd_fans(self):
-        print("Update cnblogs followers...")
+        prev_data = {}
+        if os.path.exists(self.cache):
+            with open(self.cache, "r") as json_file:
+                prev_data = json.load(json_file)
+
+        data = self._list_followers()
+        logs = ""
+        if data == prev_data:
+            logs += "\n 博客园数据无变化 \n"
+        else:
+            logs += self._compare_data(prev_data, data)
+            with open(self.cache, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+
+            logs += "\n 博客园数据已更新 \n"
+
+        print(logs)
 
 
 class ItchMon:
