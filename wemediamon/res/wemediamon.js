@@ -172,9 +172,15 @@ function get_run_log(flag) {
 			retArea.value = response.replace("XU6J03M6", " ");
 			retArea.scrollTop = retArea.scrollHeight;
 		},
-		error: function (_) {
-			E("loading_block_title").innerHTML = "获取日志异常 ...";
-			E("log_content").value = "获取日志失败, 请关闭本窗口!";
+		error: function (err) {
+			if (err.statusText == "Not Found") {
+				E("loading_block_title").innerHTML = "当前日志为空 ...";
+				E("run_log_content").value = "日志暂不存在, 点击确定关闭本窗口!";
+			}
+			else {
+				E("loading_block_title").innerHTML = "获取日志异常 ...";
+				E("run_log_content").value = "获取日志失败, 点击确定关闭本窗口!";
+			}
 			E("ok_button").style.visibility = "visible";
 			return false;
 		}
@@ -208,9 +214,15 @@ function get_log() {
 			}
 			_responseLen = response.length;
 		},
-		error: function (_) {
-			E("log_pannel_title").innerHTML = "获取日志异常 ...";
-			E("run_log_content").value = "获取日志失败, 请关闭本窗口!";
+		error: function (err) {
+			if (err.statusText == "Not Found") {
+				E("log_pannel_title").innerHTML = "当前日志为空 ...";
+				E("log_content").value = "日志暂不存在, 请返回主界面!";
+			}
+			else {
+				E("log_pannel_title").innerHTML = "获取日志异常 ...";
+				E("log_content").value = "获取日志失败, 请返回主界面!";
+			}
 			setTimeout("get_log();", 5000);
 		}
 	});
@@ -271,6 +283,7 @@ function count_down_close() {
 
 function show_mon_log() {
 	document.scrollingElement.scrollTop = 0;
+	E("log_pannel_title").innerHTML = "此处展示wemediamon程序的监控日志...";
 	E("log_pannel_div").style.visibility = "visible";
 	var page_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 	var page_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;

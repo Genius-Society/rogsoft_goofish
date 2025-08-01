@@ -480,6 +480,7 @@ class GitHubMon:
         for tag in tqdm(self.tags, desc="Getting current followers"):
             data[tag] = self._get_followers(tag)
 
+        logs = ""
         if data == prev_data:
             logs += "\n No data changed. \n"
         else:
