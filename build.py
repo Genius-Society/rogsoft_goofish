@@ -44,9 +44,12 @@ def pack_folder(module_name: str):
 
 def build_module():
     try:
+        fix_crlf()
         conf = get_or_create()
+
     except Exception as e:
         print(f"config.json file format is incorrect: {e}")
+        return
 
     if "module" not in conf:
         print("module is not in config.json")
@@ -71,6 +74,12 @@ def build_module():
         json.dump(conf, fw, sort_keys=True, indent=4, ensure_ascii=False)
 
     print("build done", conf["module"] + ".tar.gz")
+
+
+def fix_crlf():
+    git_bash = "D:\\Program Files\\Git\\bin\\bash.exe"
+    sh_script = os.path.dirname(os.path.abspath(__file__)) + "\\rm_crlf.sh"
+    subprocess.run([git_bash, sh_script], check=True)
 
 
 if __name__ == "__main__":
