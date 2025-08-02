@@ -103,6 +103,9 @@ check_params() {
 	if [ -z "${wemediamon_cache}" ]; then
 		close_with_echo "请输入有效缓存路径!"
 	fi
+	if [ "${wemediamon_bilimon}" != '1' ] && [ "${wemediamon_hfmon}" != '1' ] && [ "${wemediamon_gitmon}" != '1' ] && [ "${wemediamon_cnblon}" != '1' ] && [ "${wemediamon_itchion}" != '1' ]; then
+		close_with_echo "请至少开启一个监控器!"
+	fi
 	# 检查选填入参
 	if [ "${wemediamon_bilimon}" == "1" ]; then
 		if [[ -z "${wemediamon_bilick}" ]]; then
