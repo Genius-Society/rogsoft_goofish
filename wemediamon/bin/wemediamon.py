@@ -55,7 +55,8 @@ parser.add_argument("--email", type=str, required=True)
 parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
-parser.add_argument("--hftag", type=str, default="")
+parser.add_argument("--hftk", type=str, default="")
+parser.add_argument("--hftags", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
 parser.add_argument("--cnblokie", type=str, default="")
 parser.add_argument("--itck", type=str, default="")
@@ -331,113 +332,27 @@ class BiliMon:
 
 class HFMon:
     def __init__(self):
-        self.hf_domain = "https://huggingface.co"
+        self.targets = args.hftags.replace(" ", "").split(";")
+        self.token = args.hftk.strip()
         self.header = {"User-Agent": USER_AGENT}
-        self.target: str = args.hftag
-        self.cache = f"{CACHE_PATH}/hf_followers.json"
-        self.tag_users, self.tag_orgs = self._parse_tags()
+        if self.token:
+            self.header.update({"Authorization": f"Bearer {self.token}"})
 
-    def _list_user_following(self, username):
-        response = requests.get(
-            f"{self.hf_domain}/api/users/{username}/following",
-            headers=self.header,
-        )
-        response.raise_for_status()
-        if response.status_code == 200:
-            follows = response.json()
-            followings = {}
-            for follow in follows:
-                followings[str(follow["_id"])] = str(follow["user"])
-
-            return followings
+    def _activate_space(self, repo: str):
+        space = repo.replace("/", "-").replace("_", "-").lower()
+        response = requests.get(f"https://{space}.hf.space", headers=self.header)
+        if response.status_code == 404:
+            requests.get(
+                f"https://{space}.static.hf.space", headers=self.header
+            ).raise_for_status()
 
         else:
-            raise ConnectionError(response.status_code)
+            response.raise_for_status()
 
-    def _list_user_following_orgs(self, username):
-        response = requests.get(
-            f"{self.hf_domain}/api/users/{username}/following/orgs",
-            headers=self.header,
-        )
-        response.raise_for_status()
-        if response.status_code == 200:
-            follows = response.json()
-            followings = {}
-            for follow in follows:
-                followings[str(follow["_id"])] = str(follow["name"])
-
-            return followings
-
-        else:
-            raise ConnectionError(response.status_code)
-
-    def _parse_tags(self):
-        username = self.target
-        following_users = [username]
-        followings = self._list_user_following(username)
-        for _id in followings:
-            following_users.append(followings[_id])
-
-        following_orgs = []
-        followings = self._list_user_following_orgs(username)
-        for _id in followings:
-            following_orgs.append(followings[_id])
-
-        return following_users, following_orgs
-
-    def _get_followers(self, tag_type: str, tag: str):
-        response = requests.get(f"{self.hf_domain}/api/{tag_type}s/{tag}/followers")
-        response.raise_for_status()
-        if response.status_code == 200:
-            fans = response.json()
-            followers = {}
-            for follower in fans:
-                followers[str(follower["_id"])] = str(follower["user"])
-
-            return followers
-
-        else:
-            raise ConnectionError(response.status_code)
-
-    def _compare_data(self, prev_data: dict, data: dict):
-        logs = ""
-        for tag in prev_data:
-            if tag in data:
-                diff = set(prev_data[tag].keys()) - set(data[tag].keys())
-                if diff:
-                    for id in diff:
-                        dog = prev_data[tag][id]
-                        me = tag.split("/")[-1]
-                        logs += f"<br>狗<a href='{self.hf_domain}/{dog}'>{dog}</a>取关了<a href='{self.hf_domain}/{me}'>{me}</a> !<br>"
-
-        if logs:
-            send_email(logs)
-
-        return logs
-
-    def upd_fans(self):
-        prev_data, data = {}, {}
-        if os.path.exists(self.cache):
-            with open(self.cache, "r") as json_file:
-                prev_data = json.load(json_file)
-
-        for user in tqdm(self.tag_users, desc="加载抱脸用户粉丝"):
-            data[user] = self._get_followers("user", user)
-
-        for org in tqdm(self.tag_orgs, desc="加载抱脸组织粉丝"):
-            data[org] = self._get_followers("organization", org)
-
-        logs = ""
-        if data == prev_data:
-            logs += "\n 抱脸数据无变化 \n"
-        else:
-            logs += self._compare_data(prev_data, data)
-            with open(self.cache, "w") as json_file:
-                json.dump(data, json_file, indent=4)
-
-            logs += "\n 抱脸数据已更新 \n"
-
-        print(logs)
+    def activate(self):
+        for repo in tqdm(self.targets, desc="激活抱脸 Spaces 中"):
+            if repo:
+                self._activate_space(repo)
 
 
 class GitHubMon:
@@ -450,16 +365,12 @@ class GitHubMon:
     def _list_followers(self, user: str):
         response = requests.get(f"https://api.{self.domain}/users/{user}/followers")
         response.raise_for_status()
-        if response.status_code == 200:
-            fans = response.json()
-            followers = {}
-            for follower in fans:
-                followers[str(follower["id"])] = str(follower["login"])
+        fans = response.json()
+        followers = {}
+        for follower in fans:
+            followers[str(follower["id"])] = str(follower["login"])
 
-            return followers
-
-        else:
-            raise ConnectionError(response.status_code)
+        return followers
 
     # 获取用户所有仓库
     def _list_user_repos(self, username):
@@ -470,11 +381,7 @@ class GitHubMon:
                 f"https://api.{self.domain}/users/{username}/repos?per_page=100&page={page}",
                 headers=self.header,
             )
-            if resp.status_code != 200:
-                raise ConnectionError(
-                    f"Failed to fetch {username} GitHub repos: {resp.status_code}"
-                )
-
+            resp.raise_for_status()
             data = resp.json()
             if not data:
                 break
@@ -494,11 +401,7 @@ class GitHubMon:
                 f"https://api.{self.domain}/repos/{repo}/stargazers?per_page=100&page={page}",
                 headers=self.header,
             )
-            if resp.status_code != 200:
-                raise ConnectionError(
-                    f"Failed to fetch GitHub stargazers for {repo}: {resp.status_code}"
-                )
-
+            resp.raise_for_status()
             data = resp.json()
             if not data:
                 break
@@ -542,9 +445,7 @@ class GitHubMon:
                 return self._get_latest_data(self.tags, trytime)
 
             else:
-                raise ConnectionError(
-                    "Failed to get latest GitHub data for too many times!"
-                )
+                raise ConnectionError("Getting latest GitHub data for too many times!")
 
         return data
 
@@ -577,12 +478,9 @@ class CnblogsMon:
     def _parse_fans(self, url):
         response = requests.get(url, headers=self.header)
         response.raise_for_status()
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "html.parser")
-            target_span = soup.find("span", title="账户ID").find_next("span")
-            return target_span.text.strip()
-
-        return None
+        soup = BeautifulSoup(response.text, "html.parser")
+        target_span = soup.find("span", title="账户ID").find_next("span")
+        return target_span.text.strip()
 
     def _list_followers(self):
         fans = {}
@@ -592,19 +490,15 @@ class CnblogsMon:
                 headers=self.header,
             )
             response.raise_for_status()
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, "html.parser")
-                fan_lnks = soup.find("div", class_="avatar_list").find_all(
-                    "a", attrs={"title": True}
-                )
-                for a in fan_lnks:
-                    href: str = self.domain + a["href"]
-                    username = href.split("/u/")[-1]
-                    uid = self._parse_fans(href)
-                    fans[uid] = username
-
-        else:
-            raise PermissionError("博客园登录状态失效, 请更新cookie!")
+            soup = BeautifulSoup(response.text, "html.parser")
+            fan_lnks = soup.find("div", class_="avatar_list").find_all(
+                "a", attrs={"title": True}
+            )
+            for a in fan_lnks:
+                href: str = self.domain + a["href"]
+                username = href.split("/u/")[-1]
+                uid = self._parse_fans(href)
+                fans[uid] = username
 
         return fans
 
@@ -626,14 +520,13 @@ class CnblogsMon:
             headers=self.header,
         )
         response.raise_for_status()
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "html.parser")
-            blog_lnk = soup.find("a", id="user_nav_blog_link")
-            if blog_lnk:
-                self.username = blog_lnk["href"].split("cnblogs.com/")[-1][:-1]
-                if self.username:
-                    print("已登录博客园")
-                    return True
+        soup = BeautifulSoup(response.text, "html.parser")
+        blog_lnk = soup.find("a", id="user_nav_blog_link")
+        if blog_lnk:
+            self.username = blog_lnk["href"].split("cnblogs.com/")[-1][:-1]
+            if self.username:
+                print("已登录博客园")
+                return True
 
         print("未登录博客园")
         return False
@@ -666,7 +559,7 @@ class ItchMon:
             "accept-language": "zh-CN,zh;q=0.9",
             "connection": "keep-alive",
             "cookie": args.itck,
-            "host": self.domain.replace("https://", ""),
+            "host": "itch.io",
             "referer": f"{self.domain}/dashboard",
             "user-agent": USER_AGENT,
         }
@@ -694,9 +587,7 @@ class ItchMon:
         diff = set(prev_data.keys()) - set(data.keys())
         for id in diff:
             dog = prev_data[id]
-            logs += (
-                f"<br>狗<a href='{self.domain}/profile/{dog}'>{dog}</a>取关了我!<br>"
-            )
+            logs += f"狗<a href='{self.domain}/profile/{dog}'>{dog}</a>取关了我!<br>"
 
         if logs:
             send_email(logs)
@@ -706,17 +597,13 @@ class ItchMon:
     def check_login(self):
         response = requests.get(f"{self.domain}/my-followers", headers=self.header)
         response.raise_for_status()
-        if response.status_code == 200:
-            if response.history:
-                print("未登录itch.io")
-                return False, ""
-
-            else:
-                print("已登录itch.io")
-                return True, response.text
+        if response.history:
+            print("未登录itch.io")
+            return False, ""
 
         else:
-            raise ConnectionError(response.status_code)
+            print("已登录itch.io")
+            return True, response.text
 
     def upd_fans(self):
         prev_data = {}
@@ -742,8 +629,8 @@ def update():
     if args.bilick:
         BiliMon().upd_fans()
 
-    if args.hftag:
-        HFMon().upd_fans()
+    if args.hftags:
+        HFMon().activate()
 
     if args.gitags:
         GitHubMon().upd_fans()
@@ -782,8 +669,8 @@ if __name__ == "__main__":
             case "UPD_BILI_BLACKS":
                 BiliMon().clean_all_traitors()
 
-            case "UPD_HF_FANS":
-                HFMon().upd_fans()
+            case "ACTIVATE_HF_REPOS":
+                HFMon().activate()
 
             case "UPD_GIT_FANS":
                 GitHubMon().upd_fans()

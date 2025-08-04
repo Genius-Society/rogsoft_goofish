@@ -184,11 +184,8 @@ a:focus {
 	height: auto;
 }
 
-#cache,
-#hftag,
-#gitags,
-#email,
-#smtp {
+input[type="password"],
+input[type="text"] {
 	width: 300px;
 }
 

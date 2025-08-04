@@ -83,7 +83,8 @@ check_params() {
 	wemediamon_bilimon=$(dbus get wemediamon_bilimon)
 	wemediamon_bilick=$(dbus get wemediamon_bilick)
 	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
-	wemediamon_hftag=$(dbus get wemediamon_hftag)
+	wemediamon_hftk=$(dbus get wemediamon_hftk)
+	wemediamon_hftags=$(dbus get wemediamon_hftags)
 	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
 	wemediamon_gitags=$(dbus get wemediamon_gitags)
 	wemediamon_cnblon=$(dbus get wemediamon_cnblon)
@@ -115,11 +116,12 @@ check_params() {
 		wemediamon_bilick=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
-		if [[ -z "${wemediamon_hftag}" ]]; then
+		if [[ -z "${wemediamon_hftags}" ]]; then
 			close_with_echo "请输入有效抱脸用户名!"
 		fi
 	else
-		wemediamon_hftag=''
+		wemediamon_hftk=''
+		wemediamon_hftags=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
@@ -168,7 +170,8 @@ start_wemediamon() {
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
-		--hftag "${wemediamon_hftag}" \
+		--hftk "${wemediamon_hftk}" \
+		--hftags "${wemediamon_hftags}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
@@ -188,7 +191,8 @@ trigger_once() {
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
-		--hftag "${wemediamon_hftag}" \
+		--hftk "${wemediamon_hftk}" \
+		--hftags "${wemediamon_hftags}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}"

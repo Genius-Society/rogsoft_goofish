@@ -247,18 +247,30 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>监控目标<span style="color: red;"> * </span></th>
+                                                    <th>Token<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input type="text" class="input_ss_table" id="hftag"
-                                                            name="hftag" maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off" placeholder="目前仅能填写一个用户名">
+                                                        <input type="password" class="input_ss_table" id="hftk"
+                                                            name="hftk" maxlength="100" value="" autocorrect="off"
+                                                            autocapitalize="off" readonly
+                                                            onblur="switchType(this, false);"
+                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
+                                                            placeholder="https://huggingface.co/settings/tokens">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>保活仓库<span style="color: red;"> * </span></th>
+                                                    <td>
+                                                        <input type="text" class="input_ss_table" id="hftags"
+                                                            name="hftags" maxlength="100" value="" autocorrect="off"
+                                                            autocapitalize="off"
+                                                            placeholder="username/space1;username/space2;...">
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_HF_FANS')">单轮粉丝扫描</a>
+                                                            onclick="trigger('ACTIVATE_HF_REPOS')">单轮仓库激活</a>
                                                     </td>
                                                 </tr>
                                             </table>
