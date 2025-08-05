@@ -16,6 +16,11 @@ from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
 
+def tqdm(*args, **kwargs):  # 强制使用 Unicode 样式
+    kwargs.setdefault("ascii", False)
+    return _tqdm(*args, **kwargs)
+
+
 class Tee:
     def __init__(self, log_path: str):
         self.log_file = open(log_path, "a", encoding="utf-8")
@@ -56,7 +61,7 @@ parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--hftk", type=str, default="")
-parser.add_argument("--hftags", type=str, default="")
+parser.add_argument("--papers", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
 parser.add_argument("--cnblokie", type=str, default="")
 parser.add_argument("--itck", type=str, default="")
@@ -65,12 +70,8 @@ parser.add_argument("--itck", type=str, default="")
 args = parser.parse_args()
 # print(args)
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
+PROXY = {"http": "http://127.0.0.1:23456", "https": "http://127.0.0.1:23456"}
 CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
-
-
-def tqdm(*args, **kwargs):  # 强制使用 Unicode 样式
-    kwargs.setdefault("ascii", False)
-    return _tqdm(*args, **kwargs)
 
 
 def send_email(
@@ -330,29 +331,243 @@ class BiliMon:
             self._save_traitors(cleaned_traitors)
 
 
+class HfApi:
+    def __init__(self, token: str = None):
+        self.endpoint = "https://huggingface.co/api"
+        self.header = {"user-agent": USER_AGENT}
+        if token:
+            self.header["Authorization"] = f"Bearer {token}"
+
+    def list_user_following(self, username: str):
+        url = f"{self.endpoint}/users/{username}/following"
+        return self._get(url)
+
+    def list_user_follower(self, user_type: str, username: str):
+        url = f"{self.endpoint}/{user_type}s/{username}/followers"
+        return self._get(url)
+
+    def list_user_org(self, username: str):
+        url = f"{self.endpoint}/users/{username}/following/orgs"
+        return self._get(url)
+
+    def list_models(self, author: str = None):
+        url = f"{self.endpoint}/models"
+        params = {"author": author}
+        return self._get(url, params)
+
+    def list_datasets(self, author: str = None):
+        url = f"{self.endpoint}/datasets"
+        params = {"author": author}
+        return self._get(url, params)
+
+    def list_spaces(self, author: str = None):
+        url = f"{self.endpoint}/spaces"
+        params = {"author": author}
+        return self._get(url, params)
+
+    def list_collections(self, owner: str = None):
+        url = f"{self.endpoint}/collections"
+        params = {"owner": owner}
+        return self._get(url, params)
+
+    def list_repo_likers(self, repo_type: str, repo_id: str):
+        url = f"{self.endpoint}/{repo_type}s/{repo_id}/likers"
+        return self._get(url)
+
+    def list_upvoters(self, item_type: str, item_id: str):
+        url = f"{self.endpoint}/{item_type}s/{item_id}/upvoters"
+        return self._get(url)
+
+    def get_user_overview(self, username: str):
+        url = f"{self.endpoint}/users/{username}/overview"
+        return self._get(url)
+
+    def whoami(self):
+        url = f"{self.endpoint}/whoami-v2"
+        return self._get(url)
+
+    def space_info(self, space_id: str):
+        url = f"{self.endpoint}/spaces/{space_id}"
+        return self._get(url)
+
+    def _get(self, url, params=None):
+        response = requests.get(url, headers=self.header, params=params, proxies=PROXY)
+        response.raise_for_status()
+        return response.json()
+
+
 class HFMon:
     def __init__(self):
-        self.targets = args.hftags.replace(" ", "").split(";")
+        self.domain = "https://huggingface.co"
+        self.cache = f"{CACHE_PATH}/hf_followers.json"
+        self.papers = args.papers.replace(" ", "").split(";")
         self.token = args.hftk.strip()
-        self.header = {"User-Agent": USER_AGENT}
-        if self.token:
-            self.header.update({"Authorization": f"Bearer {self.token}"})
+        self.header = {
+            "User-Agent": USER_AGENT,
+            "Authorization": f"Bearer {self.token}",
+        }
+        self.api = HfApi(token=self.token)
+        self.me = self.api.whoami()["name"]
+        self.tag_users, self.tag_orgs = self._parse_tags()
 
-    def _activate_space(self, repo: str):
-        space = repo.replace("/", "-").replace("_", "-").lower()
-        response = requests.get(f"https://{space}.hf.space", headers=self.header)
-        if response.status_code == 404:
-            requests.get(
-                f"https://{space}.static.hf.space", headers=self.header
-            ).raise_for_status()
+    def _parse_tags(self):
+        following_users = [self.me]
+        followings = self.api.list_user_following(self.me)
+        for following in followings:
+            following_users.append(following["user"])
 
+        following_orgs = []
+        orgs = self.api.list_user_org(self.me)
+        for org in orgs:
+            following_orgs.append(org["name"])
+
+        return following_users, following_orgs
+
+    def _activate_space(self, space_id: str):
+        static = self.api.space_info(space_id)["sdk"] == "static"
+        response = requests.get(
+            f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
+            headers=self.header,
+        )
+        response.raise_for_status()
+
+    def _get_followers(self, tag_type: str, tag: str):
+        fans = self.api.list_user_follower(tag_type, tag)
+        followers = {}
+        for follower in fans:
+            followers[str(follower["_id"])] = str(follower["user"])
+
+        return followers
+
+    def _list_repos(self, username):
+        repos = []
+        models = self.api.list_models(author=username)
+        for model in models:
+            if not model["private"]:
+                repos.append({"repo_id": model["id"], "repo_type": "model"})
+
+        datasets = self.api.list_datasets(author=username)
+        for dataset in datasets:
+            if not dataset["private"]:
+                repos.append({"repo_id": dataset["id"], "repo_type": "dataset"})
+
+        spaces = self.api.list_spaces(author=username)
+        for space in spaces:
+            if not space["private"]:
+                repos.append({"repo_id": space["id"], "repo_type": "space"})
+
+        collects = self.api.list_collections(owner=username)
+        for collect in collects:
+            if not collect["private"]:
+                repos.append({"repo_id": collect["slug"], "repo_type": "collection"})
+
+        return repos
+
+    def _list_upvoters(self, repo_type: str, repo_id: str):
+        fans = self.api.list_upvoters(repo_type, repo_id)
+        upvoters = {}
+        for upvoter in fans:
+            upvoters[str(upvoter["_id"])] = str(upvoter["user"])
+
+        return upvoters
+
+    def _list_repo_stargazers(self, repo: dict):
+        fans = {}
+        repo_id = repo["repo_id"]
+        repo_type = repo["repo_type"]
+        if repo_type == "collection" or repo_type == "paper":
+            fans = self._list_upvoters(repo_type, repo_id)
         else:
-            response.raise_for_status()
+            likers = self.api.list_repo_likers(repo_type, repo_id)
+            for liker in likers:
+                uid = self.api.get_user_overview(liker["user"])["_id"]
+                fans[uid] = liker["user"]
+
+        return fans
+
+    def _compare_data(self, prev_data: dict, data: dict):
+        logs = ""
+        for tag in prev_data:
+            if tag in data:
+                diff = set(prev_data[tag].keys()) - set(data[tag].keys())
+                for id in diff:
+                    dog = prev_data[tag][id]
+                    logs += f"<br>Dog <a href='{self.domain}/{dog}'>{dog}</a> unfollowed <a href='{self.domain}/{tag}'>{tag}</a> !<br>"
+
+        if logs:
+            send_email(logs)
+
+        return logs
+
+    def _mapo(self, repo: dict):
+        if repo["repo_type"] == "model":
+            return repo["repo_id"]
+
+        return repo["repo_type"] + "s/" + repo["repo_id"]
+
+    def _get_latest_data(self, trytime=3):
+        data = {}
+        try:
+            for user in self.tag_users:
+                data[user] = self._get_followers("user", user)
+                repos = self._list_repos(user)
+                for repo in tqdm(repos, desc=f"Analyzing user {user} repos"):
+                    data[self._mapo(repo)] = self._list_repo_stargazers(repo)
+
+            for org in self.tag_orgs:
+                data[org] = self._get_followers("organization", org)
+                repos = self._list_repos(org)
+                for repo in tqdm(repos, desc=f"Analyzing org {org} repos"):
+                    data[self._mapo(repo)] = self._list_repo_stargazers(repo)
+
+            for paper in self.papers:
+                data[f"papers/{paper}"] = self._list_upvoters("paper", paper)
+
+        except Exception as e:
+            if trytime > 0:
+                print(f"Failed to get latest HF data: {e}, retrying...")
+                time.sleep(5)
+                trytime -= 1
+                return self._get_latest_data(trytime)
+
+            else:
+                raise ConnectionError("Get latest HF data for too many times!")
+
+        return data
 
     def activate(self):
-        for repo in tqdm(self.targets, desc="激活抱脸 Spaces 中"):
-            if repo:
-                self._activate_space(repo)
+        org = self.api.get_user_overview(self.me)["orgs"][0]["name"]
+        spaces = self.api.list_spaces(author=org)
+        repos = [s["id"] for s in spaces if s["private"]]
+        for repo in tqdm(repos, desc=f"激活 {org} 所有私有 Spaces 中"):
+            self._activate_space(repo)
+
+    def upd_fans(self):
+        status = "Success"
+        logs = ""
+        try:
+            prev_data, data = {}, {}
+            if os.path.exists(self.cache):
+                with open(self.cache, "r") as json_file:
+                    prev_data = json.load(json_file)
+
+            data = self._get_latest_data()
+            if data == prev_data:
+                logs += "\n No data changed. \n"
+            else:
+                logs += self._compare_data(prev_data, data)
+                with open(self.cache, "w") as json_file:
+                    json.dump(data, json_file, indent=4)
+
+                logs += "\n Data has been updated! \n"
+
+            print(logs)
+
+        except Exception as e:
+            status = f"{e}"
+            send_email(status)
+
+        return status, logs
 
 
 class GitHubMon:
@@ -555,10 +770,6 @@ class ItchMon:
     def __init__(self):
         self.domain = "https://itch.io"
         self.cache = f"{CACHE_PATH}/itch_followers.json"
-        self.proxy = {
-            "http": "http://127.0.0.1:23456",
-            "https": "http://127.0.0.1:23456",
-        }
         self.header = {
             "accept-language": "zh-CN,zh;q=0.9",
             "connection": "keep-alive",
@@ -602,7 +813,7 @@ class ItchMon:
         response = requests.get(
             f"{self.domain}/my-followers",
             headers=self.header,
-            proxies=self.proxy,
+            proxies=PROXY,
         )
         response.raise_for_status()
         if response.history:
@@ -638,8 +849,9 @@ def update():
     if args.bilick:
         BiliMon().upd_fans()
 
-    if args.hftags:
+    if args.hftk:
         HFMon().activate()
+        HFMon().upd_fans()
 
     if args.gitags:
         GitHubMon().upd_fans()
@@ -677,6 +889,9 @@ if __name__ == "__main__":
 
             case "UPD_BILI_BLACKS":
                 BiliMon().clean_all_traitors()
+
+            case "UPD_HF_FANS":
+                HFMon().upd_fans()
 
             case "ACTIVATE_HF_REPOS":
                 HFMon().activate()

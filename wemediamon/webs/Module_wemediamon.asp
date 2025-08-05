@@ -258,10 +258,10 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>保活仓库<span style="color: red;"> * </span></th>
+                                                    <th>监控论文<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input type="text" class="input_ss_table" id="hftags"
-                                                            name="hftags" maxlength="100" value="" autocorrect="off"
+                                                        <input type="text" class="input_ss_table" id="papers"
+                                                            name="papers" maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off"
                                                             placeholder="username/space1;username/space2;...">
                                                     </td>
@@ -270,7 +270,9 @@
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('ACTIVATE_HF_REPOS')">单轮仓库激活</a>
+                                                            onclick="trigger('UPD_HF_FANS')">单轮粉丝扫描</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('ACTIVATE_HF_REPOS')">单轮激活空间</a>
                                                     </td>
                                                 </tr>
                                             </table>
