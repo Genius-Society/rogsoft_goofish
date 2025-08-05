@@ -529,53 +529,36 @@ class HFMon:
 
         return repo["repo_type"] + "s/" + repo["repo_id"]
 
-    def _get_latest_data(self, trytime=3):
+    def _get_latest_data(self):
         data = {}
-        try:
-            for user in self.tag_users:
-                data[user] = self._get_followers("user", user)
-                repos = self._list_repos(user)
-                for repo in tqdm(repos, desc=f"Analyzing user {user} repos"):
-                    data[self._mapo(repo)] = self._list_repo_stargazers(repo)
+        for user in self.tag_users:
+            data[user] = self._get_followers("user", user)
+            repos = self._list_repos(user)
+            for repo in tqdm(repos, desc=f"Analyzing user {user} repos"):
+                data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
-            for org in self.tag_orgs:
-                data[org] = self._get_followers("organization", org)
-                repos = self._list_repos(org)
-                for repo in tqdm(repos, desc=f"Analyzing org {org} repos"):
-                    data[self._mapo(repo)] = self._list_repo_stargazers(repo)
+        for org in self.tag_orgs:
+            data[org] = self._get_followers("organization", org)
+            repos = self._list_repos(org)
+            for repo in tqdm(repos, desc=f"Analyzing org {org} repos"):
+                data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
-            for paper in self.papers:
-                data[f"papers/{paper}"] = self._list_upvoters("paper", paper)
-
-        except Exception as e:
-            if trytime > 0:
-                print(f"Failed to get latest HF data: {e}, retrying...")
-                time.sleep(5)
-                trytime -= 1
-                return self._get_latest_data(trytime)
-
-            else:
-                raise ConnectionError("Try latest HF data for too many times!")
+        for paper in self.papers:
+            data[f"papers/{paper}"] = self._list_upvoters("paper", paper)
 
         return data
 
     def _list_spaces(self, username: str):
         sleepings, errors = [], []
-        try:
-            spaces = self.api.list_spaces(username, self.token)
-            for space in spaces:
-                status = self.api.get_space_runtime(space["id"], self.token)["stage"]
-                if status == "SLEEPING":
-                    sleepings.append(space["id"])
-                elif "ERROR" in status:
-                    errors.append(f"{self.domain}/spaces/{space['id']}")
+        spaces = self.api.list_spaces(username, self.token)
+        for space in spaces:
+            status = self.api.get_space_runtime(space["id"], self.token)["stage"]
+            if status == "SLEEPING":
+                sleepings.append(space["id"])
+            elif "ERROR" in status:
+                errors.append(f"{self.domain}/spaces/{space['id']}")
 
-            return sleepings, errors
-
-        except Exception as e:
-            print(f"An error occurred in the request: {e}")
-
-        return [], []
+        return sleepings, errors
 
     def activate(self):
         logs = ""
@@ -608,6 +591,7 @@ class HFMon:
                 prev_data = json.load(json_file)
 
         data = self._get_latest_data()
+        logs = ""
         if data == prev_data:
             logs += "\n No data changed. \n"
         else:
