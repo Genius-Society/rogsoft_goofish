@@ -331,72 +331,96 @@ class BiliMon:
             self._save_traitors(cleaned_traitors)
 
 
-class HfApi:
-    def __init__(self, token: str = None):
-        self.endpoint = "https://huggingface.co/api"
-        self.header = {"user-agent": USER_AGENT}
-        if token:
-            self.header["Authorization"] = f"Bearer {token}"
-
-    def list_user_following(self, username: str):
-        url = f"{self.endpoint}/users/{username}/following"
-        return self._get(url)
-
-    def list_user_follower(self, user_type: str, username: str):
-        url = f"{self.endpoint}/{user_type}s/{username}/followers"
-        return self._get(url)
-
-    def list_user_org(self, username: str):
-        url = f"{self.endpoint}/users/{username}/following/orgs"
-        return self._get(url)
-
-    def list_models(self, author: str = None):
-        url = f"{self.endpoint}/models"
-        params = {"author": author}
-        return self._get(url, params)
-
-    def list_datasets(self, author: str = None):
-        url = f"{self.endpoint}/datasets"
-        params = {"author": author}
-        return self._get(url, params)
-
-    def list_spaces(self, author: str = None):
-        url = f"{self.endpoint}/spaces"
-        params = {"author": author}
-        return self._get(url, params)
-
-    def list_collections(self, owner: str = None):
-        url = f"{self.endpoint}/collections"
-        params = {"owner": owner}
-        return self._get(url, params)
-
-    def list_repo_likers(self, repo_type: str, repo_id: str):
-        url = f"{self.endpoint}/{repo_type}s/{repo_id}/likers"
-        return self._get(url)
-
-    def list_upvoters(self, item_type: str, item_id: str):
-        url = f"{self.endpoint}/{item_type}s/{item_id}/upvoters"
-        return self._get(url)
-
-    def get_user_overview(self, username: str):
-        url = f"{self.endpoint}/users/{username}/overview"
-        return self._get(url)
-
-    def whoami(self):
-        url = f"{self.endpoint}/whoami-v2"
-        return self._get(url)
-
-    def space_info(self, space_id: str):
-        url = f"{self.endpoint}/spaces/{space_id}"
-        return self._get(url)
-
-    def _get(self, url, params=None):
-        response = requests.get(url, headers=self.header, params=params, proxies=PROXY)
-        response.raise_for_status()
-        return response.json()
-
-
 class HFMon:
+    class HfApi:
+        def __init__(self, token: str = None):
+            self.endpoint = "https://huggingface.co/api"
+            self.header = {"user-agent": USER_AGENT}
+            if token:
+                self.header["Authorization"] = f"Bearer {token}"
+
+        def list_user_following(self, username: str):
+            return self._get(f"{self.endpoint}/users/{username}/following")
+
+        def list_user_follower(self, user_type: str, username: str):
+            return self._get(f"{self.endpoint}/{user_type}s/{username}/followers")
+
+        def list_user_org(self, username: str):
+            return self._get(f"{self.endpoint}/users/{username}/following/orgs")
+
+        def list_models(self, author: str = None):
+            return self._get(f"{self.endpoint}/models", params={"author": author})
+
+        def list_datasets(self, author: str = None):
+            return self._get(f"{self.endpoint}/datasets", params={"author": author})
+
+        def list_spaces(self, author: str = None, token: str = None):
+            header = {"user-agent": USER_AGENT}
+            if token:
+                header["Authorization"] = f"Bearer {token}"
+
+            return self._get(
+                f"{self.endpoint}/spaces",
+                headers=header,
+                params={"author": author},
+            )
+
+        def get_space_runtime(self, space_id: str, token: str = None):
+            header = {"user-agent": USER_AGENT}
+            if token:
+                header["Authorization"] = f"Bearer {token}"
+
+            return self._get(
+                f"{self.endpoint}/spaces/{space_id}/runtime",
+                headers=header,
+            )
+
+        def list_collections(self, owner: str = None):
+            return self._get(f"{self.endpoint}/collections", params={"owner": owner})
+
+        def list_repo_likers(self, repo_type: str, repo_id: str):
+            return self._get(f"{self.endpoint}/{repo_type}s/{repo_id}/likers")
+
+        def list_upvoters(self, item_type: str, item_id: str):
+            return self._get(f"{self.endpoint}/{item_type}s/{item_id}/upvoters")
+
+        def get_user_overview(self, username: str):
+            return self._get(f"{self.endpoint}/users/{username}/overview")
+
+        def whoami(self, token: str = None):
+            header = {"user-agent": USER_AGENT}
+            if token:
+                header["Authorization"] = f"Bearer {token}"
+
+            return self._get(f"{self.endpoint}/whoami-v2", headers=header)
+
+        def space_info(self, space_id: str):
+            return self._get(f"{self.endpoint}/spaces/{space_id}")
+
+        def _get(self, url, headers=None, params=None, trytime=3):
+            try:
+                if not headers:
+                    headers = self.header
+
+                response = requests.get(
+                    url,
+                    headers=headers,
+                    params=params,
+                    proxies=PROXY,
+                )
+                response.raise_for_status()
+                return response.json()
+
+            except Exception as e:
+                if trytime > 0:
+                    print(f"Failed to call HfApi: {e}, retrying...")
+                    time.sleep(5)
+                    trytime -= 1
+                    return self._get(url, headers, params, trytime)
+
+                else:
+                    raise ConnectionError("Try HfApi for too many times!")
+
     def __init__(self):
         self.domain = "https://huggingface.co"
         self.cache = f"{CACHE_PATH}/hf_followers.json"
@@ -406,8 +430,8 @@ class HFMon:
             "User-Agent": USER_AGENT,
             "Authorization": f"Bearer {self.token}",
         }
-        self.api = HfApi(token=self.token)
-        self.me = self.api.whoami()["name"]
+        self.api = self.HfApi()
+        self.me = self.api.whoami(token=self.token)["name"]
         self.tag_users, self.tag_orgs = self._parse_tags()
 
     def _parse_tags(self):
@@ -531,43 +555,69 @@ class HFMon:
                 return self._get_latest_data(trytime)
 
             else:
-                raise ConnectionError("Get latest HF data for too many times!")
+                raise ConnectionError("Try latest HF data for too many times!")
 
         return data
 
-    def activate(self):
-        org = self.api.get_user_overview(self.me)["orgs"][0]["name"]
-        spaces = self.api.list_spaces(author=org)
-        repos = [s["id"] for s in spaces if s["private"]]
-        for repo in tqdm(repos, desc=f"激活 {org} 所有私有 Spaces 中"):
-            self._activate_space(repo)
-
-    def upd_fans(self):
-        status = "Success"
-        logs = ""
+    def _list_spaces(self, username: str):
+        sleepings, errors = [], []
         try:
-            prev_data, data = {}, {}
-            if os.path.exists(self.cache):
-                with open(self.cache, "r") as json_file:
-                    prev_data = json.load(json_file)
+            spaces = self.api.list_spaces(username, self.token)
+            for space in spaces:
+                status = self.api.get_space_runtime(space["id"], self.token)["stage"]
+                if status == "SLEEPING":
+                    sleepings.append(space["id"])
+                elif "ERROR" in status:
+                    errors.append(f"{self.domain}/spaces/{space['id']}")
 
-            data = self._get_latest_data()
-            if data == prev_data:
-                logs += "\n No data changed. \n"
-            else:
-                logs += self._compare_data(prev_data, data)
-                with open(self.cache, "w") as json_file:
-                    json.dump(data, json_file, indent=4)
-
-                logs += "\n Data has been updated! \n"
-
-            print(logs)
+            return sleepings, errors
 
         except Exception as e:
-            status = f"{e}"
-            send_email(status)
+            print(f"An error occurred in the request: {e}")
 
-        return status, logs
+        return [], []
+
+    def activate(self):
+        logs = ""
+        spaces, failures = [], []
+        targets = self.tag_users + self.tag_orgs
+        for tag in tqdm(targets, desc="Collecting spaces"):
+            sleeps, errors = self._list_spaces(tag)
+            spaces += sleeps
+            failures += errors
+
+        for space in tqdm(spaces, desc="Activating spaces"):
+            self._activate_space(space)
+            logs += f"\n[{space}]({self.domain}/spaces/{space})\n"
+
+        logs += f"\n[{datetime.now()}] Activation complete!\n"
+        print(logs)
+        content = ""
+        for failure in failures:
+            errepo: str = failure
+            errepo = errepo.replace(self.domain, "")
+            content += f"<br><a href='{failure}'>{errepo[1:]}</a><br>"
+
+        if content:
+            send_email(f"Failed to activate following spaces:{content}")
+
+    def upd_fans(self):
+        prev_data, data = {}, {}
+        if os.path.exists(self.cache):
+            with open(self.cache, "r") as json_file:
+                prev_data = json.load(json_file)
+
+        data = self._get_latest_data()
+        if data == prev_data:
+            logs += "\n No data changed. \n"
+        else:
+            logs += self._compare_data(prev_data, data)
+            with open(self.cache, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+
+            logs += "\n Data has been updated! \n"
+
+        print(logs)
 
 
 class GitHubMon:
@@ -660,7 +710,7 @@ class GitHubMon:
                 return self._get_latest_data(self.tags, trytime)
 
             else:
-                raise ConnectionError("Getting latest GitHub data for too many times!")
+                raise ConnectionError("Try latest GitHub data for too many times!")
 
         return data
 
