@@ -555,6 +555,10 @@ class ItchMon:
     def __init__(self):
         self.domain = "https://itch.io"
         self.cache = f"{CACHE_PATH}/itch_followers.json"
+        self.proxy = {
+            "http": "http://127.0.0.1:23456",
+            "https": "http://127.0.0.1:23456",
+        }
         self.header = {
             "accept-language": "zh-CN,zh;q=0.9",
             "connection": "keep-alive",
@@ -595,7 +599,11 @@ class ItchMon:
         return logs
 
     def check_login(self):
-        response = requests.get(f"{self.domain}/my-followers", headers=self.header)
+        response = requests.get(
+            f"{self.domain}/my-followers",
+            headers=self.header,
+            proxies=self.proxy,
+        )
         response.raise_for_status()
         if response.history:
             print("未登录itch.io")
@@ -626,6 +634,7 @@ class ItchMon:
 
 
 def update():
+    time.sleep(random.uniform(0.5, 5))
     if args.bilick:
         BiliMon().upd_fans()
 
