@@ -394,8 +394,12 @@ class HFMon:
 
             return self._get(f"{self.endpoint}/whoami-v2", headers=header)
 
-        def space_info(self, space_id: str):
-            return self._get(f"{self.endpoint}/spaces/{space_id}")
+        def space_info(self, space_id: str, token: str = None):
+            header = {"user-agent": USER_AGENT}
+            if token:
+                header["Authorization"] = f"Bearer {token}"
+
+            return self._get(f"{self.endpoint}/spaces/{space_id}", headers=header)
 
         def _get(self, url, headers=None, params=None, trytime=3):
             try:
@@ -448,7 +452,7 @@ class HFMon:
         return following_users, following_orgs
 
     def _activate_space(self, space_id: str):
-        static = self.api.space_info(space_id)["sdk"] == "static"
+        static = self.api.space_info(space_id, self.token)["sdk"] == "static"
         response = requests.get(
             f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
             headers=self.header,
@@ -516,7 +520,7 @@ class HFMon:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
-                    logs += f"<br>Dog <a href='{self.domain}/{dog}'>{dog}</a> unfollowed <a href='{self.domain}/{tag}'>{tag}</a> !<br>"
+                    logs += f"<br>狗<a href='{self.domain}/{dog}'>{dog}</a>取关了<a href='{self.domain}/{tag}'>{tag}</a> !<br>"
 
         if logs:
             send_email(logs)
@@ -534,13 +538,13 @@ class HFMon:
         for user in self.tag_users:
             data[user] = self._get_followers("user", user)
             repos = self._list_repos(user)
-            for repo in tqdm(repos, desc=f"Analyzing user {user} repos"):
+            for repo in tqdm(repos, desc=f"分析 {user} 用户仓库中"):
                 data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
         for org in self.tag_orgs:
             data[org] = self._get_followers("organization", org)
             repos = self._list_repos(org)
-            for repo in tqdm(repos, desc=f"Analyzing org {org} repos"):
+            for repo in tqdm(repos, desc=f"分析 {org} 组织仓库中"):
                 data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
         for paper in self.papers:
@@ -561,20 +565,18 @@ class HFMon:
         return sleepings, errors
 
     def activate(self):
-        logs = ""
         spaces, failures = [], []
         targets = self.tag_users + self.tag_orgs
-        for tag in tqdm(targets, desc="Collecting spaces"):
+        for tag in tqdm(targets, desc="搜集抱脸空间中"):
             sleeps, errors = self._list_spaces(tag)
             spaces += sleeps
             failures += errors
 
-        for space in tqdm(spaces, desc="Activating spaces"):
+        for space in tqdm(spaces, desc="激活抱脸空间中"):
             self._activate_space(space)
-            logs += f"\n[{space}]({self.domain}/spaces/{space})\n"
+            print(space)
 
-        logs += f"\n[{datetime.now()}] Activation complete!\n"
-        print(logs)
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 抱脸空间激活完成!")
         content = ""
         for failure in failures:
             errepo: str = failure
@@ -582,7 +584,7 @@ class HFMon:
             content += f"<br><a href='{failure}'>{errepo[1:]}</a><br>"
 
         if content:
-            send_email(f"Failed to activate following spaces:{content}")
+            send_email(f"激活以下抱脸空间失败: {content}")
 
     def upd_fans(self):
         prev_data, data = {}, {}
@@ -593,13 +595,13 @@ class HFMon:
         data = self._get_latest_data()
         logs = ""
         if data == prev_data:
-            logs += "\n No data changed. \n"
+            logs += "\n抱脸数据无变动\n"
         else:
             logs += self._compare_data(prev_data, data)
             with open(self.cache, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n Data has been updated! \n"
+            logs += "\n抱脸数据已更新!\n"
 
         print(logs)
 
@@ -688,13 +690,13 @@ class GitHubMon:
 
         except Exception as e:
             if trytime > 0:
-                print(f"Failed to get latest GitHub data: {e}, retrying...")
+                print(f"获取最新 GitHub 数据失败: {e}, 重试中...")
                 time.sleep(random.uniform(4.5, 5))
                 trytime -= 1
                 return self._get_latest_data(self.tags, trytime)
 
             else:
-                raise ConnectionError("Try latest GitHub data for too many times!")
+                raise ConnectionError("重试获取最新 GitHub 数据过多次!")
 
         return data
 
@@ -707,13 +709,13 @@ class GitHubMon:
         data = self._get_latest_data(self.tags)
         logs = ""
         if data == prev_data:
-            logs += "\n GitHub数据无变化 \n"
+            logs += "\n GitHub 数据无变化 \n"
         else:
             logs += self._compare_data(prev_data, data)
             with open(self.cache, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n GitHub数据已更新 \n"
+            logs += "\n GitHub 数据已更新 \n"
 
         print(logs)
 
@@ -789,13 +791,13 @@ class CnblogsMon:
         data = self._list_followers()
         logs = ""
         if data == prev_data:
-            logs += "\n 博客园数据无变化 \n"
+            logs += "\n博客园数据无变化\n"
         else:
             logs += self._compare_data(prev_data, data)
             with open(self.cache, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n 博客园数据已更新 \n"
+            logs += "\n博客园数据已更新\n"
 
         print(logs)
 
