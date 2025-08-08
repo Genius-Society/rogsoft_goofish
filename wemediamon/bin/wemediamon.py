@@ -572,11 +572,16 @@ class HFMon:
             spaces += sleeps
             failures += errors
 
+        logs = ""
         for space in tqdm(spaces, desc="激活抱脸空间中"):
             self._activate_space(space)
-            print(space)
+            logs += f"{space} "
 
-        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 抱脸空间激活完成!")
+        if logs:
+            print(
+                f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 抱脸空间 {logs}激活完成!"
+            )
+
         content = ""
         for failure in failures:
             errepo: str = failure
