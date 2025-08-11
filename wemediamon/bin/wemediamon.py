@@ -302,7 +302,11 @@ class BiliMon:
 
                 if content:
                     self._add_traitors(traitors)
-                    send_email(content)
+                    send_email(
+                        content,
+                        "[WeMediaMon 插件] 按罪人名单降下终末",
+                        "监测到取关狗",
+                    )
 
             else:
                 print(f"暂未发现B站取关 {self.uid} 者")
@@ -523,7 +527,7 @@ class HFMon:
                     logs += f"<br>狗<a href='{self.domain}/{dog}'>{dog}</a>取关了<a href='{self.domain}/{tag}'>{tag}</a> !<br>"
 
         if logs:
-            send_email(logs)
+            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
 
@@ -589,7 +593,11 @@ class HFMon:
             content += f"<br><a href='{failure}'>{errepo[1:]}</a><br>"
 
         if content:
-            send_email(f"激活以下抱脸空间失败: {content}")
+            send_email(
+                f"激活以下抱脸空间失败: {content}",
+                "[WeMediaMon 插件] 运行错误",
+                "空间激活出现问题",
+            )
 
     def upd_fans(self):
         prev_data, data = {}, {}
@@ -680,7 +688,7 @@ class GitHubMon:
                     logs += f"<br>狗<a href='https://{self.domain}/{dog}'>{dog}</a>取关了<a href='https://{self.domain}/{tag}'>{tag}</a>!<br>"
 
         if logs:
-            send_email(logs)
+            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
 
@@ -766,7 +774,7 @@ class CnblogsMon:
             logs += f"<br>狗<a href='{self.domain}/u/{dog}'>{dog}</a>取关了我!<br>"
 
         if logs:
-            send_email(logs)
+            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
 
@@ -846,7 +854,7 @@ class ItchMon:
             logs += f"狗<a href='{self.domain}/profile/{dog}'>{dog}</a>取关了我!<br>"
 
         if logs:
-            send_email(logs)
+            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
 
