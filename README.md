@@ -6,7 +6,7 @@
 监控自媒体粉丝动向: 取关狗死全家! 推荐B站的UP在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
 
 <a href="https://github.com/Genius-Society/wemediamon" target="_blank">
-    <img src="./wemediamon/res/icon-wemediamon.png" style="160px">
+    <img src="./wemediamon/res/icon-wemediamon.png" style="width: 160px;">
 </a>
 
 ## Code download
