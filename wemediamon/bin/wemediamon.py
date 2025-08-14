@@ -407,6 +407,7 @@ class HFMon:
 
         def _get(self, url, headers=None, params=None, trytime=3):
             try:
+                time.sleep(random.uniform(0.5, 1))
                 if not headers:
                     headers = self.header
 
@@ -422,7 +423,7 @@ class HFMon:
             except Exception as e:
                 if trytime > 0:
                     print(f"Failed to call HfApi: {e}, retrying...")
-                    time.sleep(5)
+                    time.sleep(random.uniform(14.5, 15))
                     trytime -= 1
                     return self._get(url, headers, params, trytime)
 
@@ -627,6 +628,7 @@ class GitHubMon:
         self.header = {"user-agent": USER_AGENT}
 
     def _list_followers(self, user: str):
+        time.sleep(random.uniform(0.5, 1))
         response = requests.get(f"https://api.{self.domain}/users/{user}/followers")
         response.raise_for_status()
         fans = response.json()
@@ -641,6 +643,7 @@ class GitHubMon:
         page = 1
         repos = []
         while True:
+            time.sleep(random.uniform(0.5, 1))
             resp = requests.get(
                 f"https://api.{self.domain}/users/{username}/repos?per_page=100&page={page}",
                 headers=self.header,
@@ -652,7 +655,6 @@ class GitHubMon:
 
             repos += [repo["full_name"] for repo in data]
             page += 1
-            time.sleep(random.uniform(0.5, 1))
 
         return repos
 
@@ -661,6 +663,7 @@ class GitHubMon:
         page = 1
         stargazers = {}
         while True:
+            time.sleep(random.uniform(0.5, 1))
             resp = requests.get(
                 f"https://api.{self.domain}/repos/{repo}/stargazers?per_page=100&page={page}",
                 headers=self.header,
@@ -674,7 +677,6 @@ class GitHubMon:
                 stargazers[str(user["id"])] = user["login"]
 
             page += 1
-            time.sleep(random.uniform(0.5, 1))
 
         return stargazers
 
