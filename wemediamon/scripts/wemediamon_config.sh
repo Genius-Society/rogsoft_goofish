@@ -229,10 +229,19 @@ start() {
 	fi
 }
 
+check_proxy() {
+	echo "等待代理网络连通..."
+	until ping -c 1 huggingface.co >/dev/null 2>&1; do
+		sleep 1
+	done
+	echo "已 ping 通，继续执行后续命令"
+}
+
 # 自启/重启时触发开启 WeMediaMon
 if [ $# -eq 0 ] || [ $# -eq 1 ]; then
 	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python -u /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
 		set_lock
+		check_proxy
 		start_wemediamon
 		unset_lock
 	fi
