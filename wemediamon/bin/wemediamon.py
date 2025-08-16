@@ -334,6 +334,23 @@ class BiliMon:
         if cleaned_traitors:
             self._save_traitors(cleaned_traitors)
 
+    def trigger(self, trytime=3):
+        try:
+            self.upd_fans()
+
+        except Exception as e:
+            print(e)
+            if trytime > 0:
+                trytime -= 1
+                self.trigger(trytime)
+
+            else:
+                send_email(
+                    f"{e}",
+                    "[WeMediaMon 插件] B站监控器触发出错",
+                    "已重试过多次",
+                )
+
 
 class HFMon:
     class HfApi:
@@ -619,6 +636,24 @@ class HFMon:
 
         print(logs)
 
+    def trigger(self, trytime=3):
+        try:
+            self.activate()
+            self.upd_fans()
+
+        except Exception as e:
+            print(e)
+            if trytime > 0:
+                trytime -= 1
+                self.trigger(trytime)
+
+            else:
+                send_email(
+                    f"{e}",
+                    "[WeMediaMon 插件] 抱脸监控器触发失败",
+                    "已重试过多次",
+                )
+
 
 class GitHubMon:
     def __init__(self):
@@ -734,6 +769,23 @@ class GitHubMon:
 
         print(logs)
 
+    def trigger(self, trytime=3):
+        try:
+            self.upd_fans()
+
+        except Exception as e:
+            print(e)
+            if trytime > 0:
+                trytime -= 1
+                self.trigger(trytime)
+
+            else:
+                send_email(
+                    f"{e}",
+                    "[WeMediaMon 插件] GitHub监控器触发出错",
+                    "已重试过多次",
+                )
+
 
 class CnblogsMon:
     def __init__(self):
@@ -816,6 +868,23 @@ class CnblogsMon:
 
         print(logs)
 
+    def trigger(self, trytime=3):
+        try:
+            self.upd_fans()
+
+        except Exception as e:
+            print(e)
+            if trytime > 0:
+                trytime -= 1
+                self.trigger(trytime)
+
+            else:
+                send_email(
+                    f"{e}",
+                    "[WeMediaMon 插件] 博客园监控器触发出错",
+                    "已重试过多次",
+                )
+
 
 class ItchMon:
     def __init__(self):
@@ -894,24 +963,40 @@ class ItchMon:
 
         print(logs)
 
+    def trigger(self, trytime=3):
+        try:
+            self.upd_fans()
+
+        except Exception as e:
+            print(e)
+            if trytime > 0:
+                trytime -= 1
+                self.trigger(trytime)
+
+            else:
+                send_email(
+                    f"{e}",
+                    "[WeMediaMon 插件] itch.io监控器触发出错",
+                    "已重试过多次",
+                )
+
 
 def update():
     time.sleep(random.uniform(0.5, 5))
     if args.bilick:
-        BiliMon().upd_fans()
+        BiliMon().trigger()
 
     if args.hftk:
-        HFMon().activate()
-        HFMon().upd_fans()
+        HFMon().trigger()
 
     if args.gitags:
-        GitHubMon().upd_fans()
+        GitHubMon().trigger()
 
     if args.cnblokie:
-        CnblogsMon().upd_fans()
+        CnblogsMon().trigger()
 
     if args.itck:
-        ItchMon().upd_fans()
+        ItchMon().trigger()
 
 
 def start_monitor(period=args.period):
