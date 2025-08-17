@@ -15,6 +15,24 @@ from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
+# 创建 ArgumentParser 对象
+parser = argparse.ArgumentParser(description="WeMediaMon config script")
+# 添加参数
+parser.add_argument("--cmd", type=str, required=True)
+parser.add_argument("--period", type=int, default=2, required=True)
+parser.add_argument("--email", type=str, required=True)
+parser.add_argument("--smtp", type=str, required=True)
+parser.add_argument("--cache", type=str, required=True)
+parser.add_argument("--bilick", type=str, default="")
+parser.add_argument("--hftk", type=str, default="")
+parser.add_argument("--papers", type=str, default="")
+parser.add_argument("--gitags", type=str, default="")
+parser.add_argument("--cnblokie", type=str, default="")
+parser.add_argument("--itck", type=str, default="")
+
+# 解析命令行参数
+args = parser.parse_args()
+
 
 def tqdm(*args, **kwargs):  # 强制使用 Unicode 样式
     kwargs.setdefault("ascii", False)
@@ -50,28 +68,6 @@ class Tee:
 tee = Tee("/tmp/upload/wemediamon_log.txt")
 sys.stdout = tee
 sys.stderr = tee
-
-# 创建 ArgumentParser 对象
-parser = argparse.ArgumentParser(description="WeMediaMon config script")
-# 添加参数
-parser.add_argument("--cmd", type=str, required=True)
-parser.add_argument("--period", type=int, default=2, required=True)
-parser.add_argument("--email", type=str, required=True)
-parser.add_argument("--smtp", type=str, required=True)
-parser.add_argument("--cache", type=str, required=True)
-parser.add_argument("--bilick", type=str, default="")
-parser.add_argument("--hftk", type=str, default="")
-parser.add_argument("--papers", type=str, default="")
-parser.add_argument("--gitags", type=str, default="")
-parser.add_argument("--cnblokie", type=str, default="")
-parser.add_argument("--itck", type=str, default="")
-
-# 解析命令行参数
-args = parser.parse_args()
-# print(args)
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
-PROXY = {"http": "http://127.0.0.1:23456", "https": "http://127.0.0.1:23456"}
-CACHE_PATH = args.cache if args.cache[-1] != "/" else args.cache[:-1]
 
 
 def send_email(
@@ -112,23 +108,16 @@ def send_email(
             print(f"邮件发送失败: {e}")
 
 
-class BiliMon:
-    def __init__(self):
-        self.dbfile = f"{CACHE_PATH}/bili_followers.json"
-        self.blacks = f"{CACHE_PATH}/bili_blacklist.txt"
-        self._parse_cookie(args.bilick)
-
-    def _parse_cookie(self, ck: str):
-        self.uid = ck.split("DedeUserID=")[1].split(";")[0]
-        self.sessdata = ck.split("SESSDATA=")[1].split(";")[0]
-        self.bili_jct = ck.split("bili_jct=")[1].split(";")[0]
-        self.buvid3 = ck.split("buvid3=")[1].split(";")[0]
-        self.ck = ck
-        self.credential = Credential(
-            sessdata=self.sessdata,
-            bili_jct=self.bili_jct,
-            buvid3=self.buvid3,
-        )
+class Monitor:
+    def __init__(self, name: str):
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
+        self.proxy = {
+            "http": "http://127.0.0.1:23456",
+            "https": "http://127.0.0.1:23456",
+        }
+        self.cache = args.cache if args.cache[-1] != "/" else args.cache[:-1]
+        self.fans = f"{self.cache}/{name}_followers.json"
+        self.blacks = f"{self.cache}/{name}_blacklist.txt"
 
     def _txt2lst(self):
         if not os.path.exists(self.blacks):
@@ -150,12 +139,30 @@ class BiliMon:
         merged_traitors = list(set(old_traitors + traitors))
         self._save_traitors(merged_traitors)
 
+
+class BiliMon(Monitor):
+    def __init__(self):
+        super().__init__("bili")
+        self._parse_cookie(args.bilick)
+
+    def _parse_cookie(self, ck: str):
+        self.uid = ck.split("DedeUserID=")[1].split(";")[0]
+        self.sessdata = ck.split("SESSDATA=")[1].split(";")[0]
+        self.bili_jct = ck.split("bili_jct=")[1].split(";")[0]
+        self.buvid3 = ck.split("buvid3=")[1].split(";")[0]
+        self.ck = ck
+        self.credential = Credential(
+            sessdata=self.sessdata,
+            bili_jct=self.bili_jct,
+            buvid3=self.buvid3,
+        )
+
     def _get_fans(self, page, trytime=3):
         try:
             response = requests.get(
                 f"https://api.bilibili.com/x/relation/followers?vmid={self.uid}&pn={page}",
                 headers={
-                    "User-Agent": USER_AGENT,
+                    "User-Agent": self.ua,
                     "Cookie": self.ck,
                 },
             )  # 使用 requests 库下载 JSON 数据
@@ -217,8 +224,8 @@ class BiliMon:
         return sync(is_fans_async(uid))
 
     def _upd_json(self, new_fans: dict, out1000: dict):
-        if os.path.exists(self.dbfile):
-            with open(self.dbfile, "r", encoding="utf-8") as file:
+        if os.path.exists(self.fans):
+            with open(self.fans, "r", encoding="utf-8") as file:
                 out1000.update(json.load(file)["out1000"])
 
         traitors_out1000 = []
@@ -234,7 +241,7 @@ class BiliMon:
         if traitors_out1000:
             self._add_traitors(traitors_out1000)
 
-        with open(self.dbfile, "w", encoding="utf-8") as file:
+        with open(self.fans, "w", encoding="utf-8") as file:
             json.dump(
                 {
                     "total": len(new_fans) + len(out1000),
@@ -246,7 +253,7 @@ class BiliMon:
                 indent=4,
             )
 
-        print(f"{self.dbfile} 已更新!")
+        print(f"{self.fans} 已更新!")
 
     def _filter_unfollows(self, unfollows):
         real_unfollows, out1000 = [], {}
@@ -263,7 +270,7 @@ class BiliMon:
             "https://api.bilibili.com/x/web-interface/nav",
             headers={
                 "cookie": self.ck,
-                "user-agent": USER_AGENT,
+                "user-agent": self.ua,
             },
         )
         response.raise_for_status()
@@ -276,8 +283,8 @@ class BiliMon:
 
     def upd_fans(self):
         old_fans = []
-        if os.path.exists(self.dbfile):
-            with open(self.dbfile, "r", encoding="utf-8") as file:
+        if os.path.exists(self.fans):
+            with open(self.fans, "r", encoding="utf-8") as file:
                 old_fans = json.load(file)["fans1000"]
 
         new_fans: dict = self._get_followers()
@@ -316,7 +323,7 @@ class BiliMon:
         else:
             print(f"暂未发现B站取关 {self.uid} 者")
 
-    def clean_all_traitors(self):
+    def upd_traitors(self):
         cleaned_traitors = []
         traitors = self._txt2lst()
         if not traitors:
@@ -352,11 +359,13 @@ class BiliMon:
                 )
 
 
-class HFMon:
+class HFMon(Monitor):
     class HfApi:
-        def __init__(self, token: str = None):
+        def __init__(self, token: str = None, user_agent="", proxy=None):
             self.endpoint = "https://huggingface.co/api"
-            self.header = {"user-agent": USER_AGENT}
+            self.ua = user_agent
+            self.proxy = proxy
+            self.header = {"user-agent": self.ua}
             if token:
                 self.header["Authorization"] = f"Bearer {token}"
 
@@ -376,7 +385,7 @@ class HFMon:
             return self._get(f"{self.endpoint}/datasets", params={"author": author})
 
         def list_spaces(self, author: str = None, token: str = None):
-            header = {"user-agent": USER_AGENT}
+            header = {"user-agent": self.ua}
             if token:
                 header["Authorization"] = f"Bearer {token}"
 
@@ -387,7 +396,7 @@ class HFMon:
             )
 
         def get_space_runtime(self, space_id: str, token: str = None):
-            header = {"user-agent": USER_AGENT}
+            header = {"user-agent": self.ua}
             if token:
                 header["Authorization"] = f"Bearer {token}"
 
@@ -409,14 +418,14 @@ class HFMon:
             return self._get(f"{self.endpoint}/users/{username}/overview")
 
         def whoami(self, token: str = None):
-            header = {"user-agent": USER_AGENT}
+            header = {"user-agent": self.ua}
             if token:
                 header["Authorization"] = f"Bearer {token}"
 
             return self._get(f"{self.endpoint}/whoami-v2", headers=header)
 
         def space_info(self, space_id: str, token: str = None):
-            header = {"user-agent": USER_AGENT}
+            header = {"user-agent": self.ua}
             if token:
                 header["Authorization"] = f"Bearer {token}"
 
@@ -432,7 +441,7 @@ class HFMon:
                     url,
                     headers=headers,
                     params=params,
-                    proxies=PROXY,
+                    proxies=self.proxy,
                 )
                 response.raise_for_status()
                 return response.json()
@@ -448,15 +457,15 @@ class HFMon:
                     raise ConnectionError("Try HfApi for too many times!")
 
     def __init__(self):
+        super().__init__("hf")
         self.domain = "https://huggingface.co"
-        self.cache = f"{CACHE_PATH}/hf_followers.json"
         self.papers = args.papers.replace(" ", "").split(";")
         self.token = args.hftk.strip()
         self.header = {
-            "User-Agent": USER_AGENT,
+            "User-Agent": self.ua,
             "Authorization": f"Bearer {self.token}",
         }
-        self.api = self.HfApi()
+        self.api = self.HfApi(user_agent=self.ua, proxy=self.proxy)
         self.me = self.api.whoami(token=self.token)["name"]
         self.tag_users, self.tag_orgs = self._parse_tags()
 
@@ -537,14 +546,17 @@ class HFMon:
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
+        traitors = []
         for tag in prev_data:
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
-                    logs += f"<br>狗<a href='{self.domain}/{dog}'>{dog}</a>取关了<a href='{self.domain}/{tag}'>{tag}</a> !<br>"
+                    traitors.append(dog)
+                    logs += f"<br>狗<a href='{self.domain}/api/users/{dog}/overview'>{dog}</a>取关了<a href='{self.domain}/{tag}'>{tag}</a> !<br>"
 
         if logs:
+            self._add_traitors(traitors)
             send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
@@ -619,8 +631,8 @@ class HFMon:
 
     def upd_fans(self):
         prev_data, data = {}, {}
-        if os.path.exists(self.cache):
-            with open(self.cache, "r") as json_file:
+        if os.path.exists(self.fans):
+            with open(self.fans, "r") as json_file:
                 prev_data = json.load(json_file)
 
         data = self._get_latest_data()
@@ -629,7 +641,7 @@ class HFMon:
             logs += "\n抱脸数据无变动\n"
         else:
             logs += self._compare_data(prev_data, data)
-            with open(self.cache, "w") as json_file:
+            with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
             logs += "\n抱脸数据已更新!\n"
@@ -655,12 +667,12 @@ class HFMon:
                 )
 
 
-class GitHubMon:
+class GitHubMon(Monitor):
     def __init__(self):
+        super().__init__("github")
         self.domain = "github.com"
         self.tags = args.gitags.split(";")
-        self.cache = f"{CACHE_PATH}/github_followers.json"
-        self.header = {"user-agent": USER_AGENT}
+        self.header = {"user-agent": self.ua}
 
     def _list_followers(self, user: str):
         time.sleep(random.uniform(0.5, 1))
@@ -717,14 +729,17 @@ class GitHubMon:
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
+        traitors = []
         for tag in prev_data:
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
+                    traitors.append(dog)
                     logs += f"<br>狗<a href='https://{self.domain}/{dog}'>{dog}</a>取关了<a href='https://{self.domain}/{tag}'>{tag}</a>!<br>"
 
         if logs:
+            self._add_traitors(traitors)
             send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
@@ -752,8 +767,8 @@ class GitHubMon:
 
     def upd_fans(self):
         prev_data = {}
-        if os.path.exists(self.cache):
-            with open(self.cache, "r") as json_file:
+        if os.path.exists(self.fans):
+            with open(self.fans, "r") as json_file:
                 prev_data = json.load(json_file)
 
         data = self._get_latest_data(self.tags)
@@ -762,7 +777,7 @@ class GitHubMon:
             logs += "\n GitHub 数据无变化 \n"
         else:
             logs += self._compare_data(prev_data, data)
-            with open(self.cache, "w") as json_file:
+            with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
             logs += "\n GitHub 数据已更新 \n"
@@ -787,11 +802,11 @@ class GitHubMon:
                 )
 
 
-class CnblogsMon:
+class CnblogsMon(Monitor):
     def __init__(self):
+        super().__init__("cnblogs")
         self.domain = "https://home.cnblogs.com"
-        self.cache = f"{CACHE_PATH}/cnblogs_followers.json"
-        self.header = {"user-agent": USER_AGENT, "cookie": args.cnblokie}
+        self.header = {"user-agent": self.ua, "cookie": args.cnblokie}
 
     def _parse_fans(self, url):
         response = requests.get(url, headers=self.header)
@@ -822,12 +837,15 @@ class CnblogsMon:
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
+        traitors = []
         diff = set(prev_data.keys()) - set(data.keys())
         for id in diff:
             dog = prev_data[id]
+            traitors.append(dog)
             logs += f"<br>狗<a href='{self.domain}/u/{dog}'>{dog}</a>取关了我!<br>"
 
         if logs:
+            self._add_traitors(traitors)
             send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
@@ -851,8 +869,8 @@ class CnblogsMon:
 
     def upd_fans(self):
         prev_data = {}
-        if os.path.exists(self.cache):
-            with open(self.cache, "r") as json_file:
+        if os.path.exists(self.fans):
+            with open(self.fans, "r") as json_file:
                 prev_data = json.load(json_file)
 
         data = self._list_followers()
@@ -861,7 +879,7 @@ class CnblogsMon:
             logs += "\n博客园数据无变化\n"
         else:
             logs += self._compare_data(prev_data, data)
-            with open(self.cache, "w") as json_file:
+            with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
             logs += "\n博客园数据已更新\n"
@@ -886,17 +904,17 @@ class CnblogsMon:
                 )
 
 
-class ItchMon:
+class ItchMon(Monitor):
     def __init__(self):
+        super().__init__("itch")
         self.domain = "https://itch.io"
-        self.cache = f"{CACHE_PATH}/itch_followers.json"
         self.header = {
             "accept-language": "zh-CN,zh;q=0.9",
             "connection": "keep-alive",
             "cookie": args.itck,
             "host": "itch.io",
             "referer": f"{self.domain}/dashboard",
-            "user-agent": USER_AGENT,
+            "user-agent": self.ua,
         }
 
     def _list_followers(self):
@@ -919,12 +937,15 @@ class ItchMon:
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
+        traitors = []
         diff = set(prev_data.keys()) - set(data.keys())
         for id in diff:
             dog = prev_data[id]
+            traitors.append(dog)
             logs += f"狗<a href='{self.domain}/profile/{dog}'>{dog}</a>取关了我!<br>"
 
         if logs:
+            self._add_traitors(traitors)
             send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
 
         return logs
@@ -933,7 +954,7 @@ class ItchMon:
         response = requests.get(
             f"{self.domain}/my-followers",
             headers=self.header,
-            proxies=PROXY,
+            proxies=self.proxy,
         )
         response.raise_for_status()
         if response.history:
@@ -946,8 +967,8 @@ class ItchMon:
 
     def upd_fans(self):
         prev_data = {}
-        if os.path.exists(self.cache):
-            with open(self.cache, "r") as json_file:
+        if os.path.exists(self.fans):
+            with open(self.fans, "r") as json_file:
                 prev_data = json.load(json_file)
 
         data = self._list_followers()
@@ -956,7 +977,7 @@ class ItchMon:
             logs += "\n itch.io数据无变化 \n"
         else:
             logs += self._compare_data(prev_data, data)
-            with open(self.cache, "w") as json_file:
+            with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
             logs += "\n itch.io数据已更新 \n"
@@ -1024,7 +1045,7 @@ if __name__ == "__main__":
                 BiliMon().upd_fans()
 
             case "UPD_BILI_BLACKS":
-                BiliMon().clean_all_traitors()
+                BiliMon().upd_traitors()
 
             case "UPD_HF_FANS":
                 HFMon().upd_fans()
