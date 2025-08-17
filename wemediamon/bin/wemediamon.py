@@ -161,10 +161,7 @@ class BiliMon(Monitor):
         try:
             response = requests.get(
                 f"https://api.bilibili.com/x/relation/followers?vmid={self.uid}&pn={page}",
-                headers={
-                    "User-Agent": self.ua,
-                    "Cookie": self.ck,
-                },
+                headers={"User-Agent": self.ua, "Cookie": self.ck},
             )  # 使用 requests 库下载 JSON 数据
             response.raise_for_status()  # 检查是否成功获取数据
             json_data = response.json()  # 使用 json 库解析 JSON 数据
@@ -268,10 +265,7 @@ class BiliMon(Monitor):
     def check_login(self):
         response = requests.get(
             "https://api.bilibili.com/x/web-interface/nav",
-            headers={
-                "cookie": self.ck,
-                "user-agent": self.ua,
-            },
+            headers={"cookie": self.ck, "user-agent": self.ua},
         )
         response.raise_for_status()
         if response.status_code == 200:
@@ -461,10 +455,7 @@ class HFMon(Monitor):
         self.domain = "https://huggingface.co"
         self.papers = args.papers.replace(" ", "").split(";")
         self.token = args.hftk.strip()
-        self.header = {
-            "User-Agent": self.ua,
-            "Authorization": f"Bearer {self.token}",
-        }
+        self.header = {"User-Agent": self.ua, "Authorization": f"Bearer {self.token}"}
         self.api = self.HfApi(user_agent=self.ua, proxy=self.proxy)
         self.me = self.api.whoami(token=self.token)["name"]
         self.tag_users, self.tag_orgs = self._parse_tags()
@@ -812,8 +803,8 @@ class CnblogsMon(Monitor):
         response = requests.get(url, headers=self.header)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        target_span = soup.find("span", title="账户ID").find_next("span")
-        return target_span.text.strip()
+        target_span: str = soup.find("span", title="账户ID").find_next("span").text
+        return target_span.strip()
 
     def _list_followers(self):
         fans = {}
