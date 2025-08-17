@@ -230,11 +230,11 @@ start() {
 }
 
 check_proxy() {
-	echo "等待代理网络连通..."
+	echo_date "等待代理网络连通..."
 	until ping -c 1 huggingface.co >/dev/null 2>&1; do
 		sleep 1
 	done
-	echo "已 ping 通，继续执行后续命令"
+	echo_date "已 ping 通, 继续执行后续命令"
 }
 
 # 自启/重启时触发开启 WeMediaMon

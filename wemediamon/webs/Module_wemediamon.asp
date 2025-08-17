@@ -275,6 +275,15 @@
                                                             onclick="trigger('ACTIVATE_HF_REPOS')">单轮激活空间</a>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <th>管理取关狗</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('SEE_HF_BLACKS')">查看取关狗名单</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_HF_BLACKS')">清理已注销狗</a>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </div>
                                         <div id="tablet_2" style="display: none;">
@@ -300,6 +309,15 @@
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('UPD_GIT_FANS')">单轮粉丝扫描</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>管理取关狗</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('SEE_GIT_BLACKS')">查看取关狗名单</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_GIT_BLACKS')">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -333,6 +351,15 @@
                                                             onclick="trigger('UPD_CNBLOGS_FANS')">单轮粉丝扫描</a>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <th>管理取关狗</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('SEE_CNBLOGS_BLACKS')">查看取关狗名单</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_CNBLOGS_BLACKS')">清理已注销狗</a>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </div>
                                         <div id="tablet_4" style="display: none;">
@@ -362,6 +389,15 @@
                                                             onclick="trigger('TEST_ITCH_CK')">Cookie有效测试</a>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('UPD_ITCH_FANS')">单轮粉丝扫描</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>管理取关狗</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('SEE_ITCH_BLACKS')">查看取关狗名单</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_ITCH_BLACKS')">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                             </table>
