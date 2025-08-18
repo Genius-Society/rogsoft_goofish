@@ -198,13 +198,50 @@ trigger_once() {
 		--itck "${wemediamon_itck}"
 }
 
-# 查看B站取关狗
-watch_bili_dog() {
-	if [[ -f "${wemediamon_cache}/bili_blacklist.txt" ]]; then
-		awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt"
-	else
-		echo_date "当前狗库为空!"
-	fi
+# 查看取关狗
+watch_dog() {
+	case $1 in
+	SEE_BILI_BLACKS)
+		if [[ -f "${wemediamon_cache}/bili_blacklist.txt" ]]; then
+			awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt"
+		else
+			echo_date "当前B站狗库为空!"
+		fi
+		;;
+
+	SEE_HF_BLACKS)
+		if [[ -f "${wemediamon_cache}/hf_blacklist.txt" ]]; then
+			awk '{print "https://huggingface.co/api/users/" $0 "/overview"}' "${wemediamon_cache}/hf_blacklist.txt"
+		else
+			echo_date "当前抱脸狗库为空!"
+		fi
+		;;
+
+	SEE_GIT_BLACKS)
+		if [[ -f "${wemediamon_cache}/github_blacklist.txt" ]]; then
+			awk '{print "https://api.github.com/user/" $0}' "${wemediamon_cache}/github_blacklist.txt"
+		else
+			echo_date "当前GitHub狗库为空!"
+		fi
+		;;
+
+	SEE_CNBLOGS_BLACKS)
+		if [[ -f "${wemediamon_cache}/cnblogs_blacklist.txt" ]]; then
+			awk '{print "https://home.cnblogs.com/u/" $0}' "${wemediamon_cache}/cnblogs_blacklist.txt"
+		else
+			echo_date "当前博客园狗库为空!"
+		fi
+		;;
+
+	SEE_ITCH_BLACKS)
+		if [[ -f "${wemediamon_cache}/itch_blacklist.txt" ]]; then
+			awk '{print "https://itch.io/profile/" $0}' "${wemediamon_cache}/itch_blacklist.txt"
+		else
+			echo_date "当前itch.io狗库为空!"
+		fi
+		;;
+
+	esac
 }
 
 # 关闭监控进程
@@ -260,8 +297,8 @@ elif [ $# -eq 2 ]; then
 		fix_env | tee -a $RUN_LOG
 		;;
 
-	SEE_BILI_BLACKS)
-		watch_bili_dog | tee -a $RUN_LOG
+	SEE_*_BLACKS)
+		watch_dog "$2" | tee -a $RUN_LOG
 		;;
 
 	*)

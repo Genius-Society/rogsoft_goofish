@@ -541,12 +541,16 @@ class HFMon(Monitor):
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
-                    traitors.append(dog)
-                    logs += f"<br>抱脸狗<a href='{self.endpoint}/api/users/{dog}/overview'>{dog}</a>取关了<a href='{self.endpoint}/{tag}'>{tag}</a> !<br>"
+                    traitors.append(id)
+                    logs += f"<br><a href='{self.endpoint}/{dog}'>{dog}</a>取关了<a href='{self.endpoint}/{tag}'>{tag}</a>!<br>"
 
-        if logs:
+        if traitors:
             self._add_traitors(traitors)
-            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
+            send_email(
+                f"以下抱脸狗:{logs}",
+                "[WeMediaMon 插件] 按罪人名单降下终末",
+                "监测到取关狗",
+            )
 
         return logs
 
@@ -722,12 +726,16 @@ class GitHubMon(Monitor):
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
-                    traitors.append(dog)
-                    logs += f"<br>GitHub狗<a href='https://{self.endpoint}/{dog}'>{dog}</a>取关了<a href='https://{self.endpoint}/{tag}'>{tag}</a>!<br>"
+                    traitors.append(id)
+                    logs += f"<br><a href='https://{self.endpoint}/{dog}'>{dog}</a>取关了<a href='https://{self.endpoint}/{tag}'>{tag}</a>!<br>"
 
-        if logs:
+        if traitors:
             self._add_traitors(traitors)
-            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
+            send_email(
+                f"以下GitHub狗:{logs}",
+                "[WeMediaMon 插件] 按罪人名单降下终末",
+                "监测到取关狗",
+            )
 
         return logs
 
@@ -831,14 +839,16 @@ class CnblogsMon(Monitor):
         diff = set(prev_data.keys()) - set(data.keys())
         for id in diff:
             dog = prev_data[id]
-            traitors.append(dog)
-            logs += (
-                f"<br>博客园狗<a href='{self.endpoint}/u/{dog}'>{dog}</a>取关了我!<br>"
-            )
+            traitors.append(id)
+            logs += f"<br><a href='{self.endpoint}/u/{id}'>{dog}</a><br>"
 
-        if logs:
+        if traitors:
             self._add_traitors(traitors)
-            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
+            send_email(
+                f"以下博客园狗取关了我:{logs}",
+                "[WeMediaMon 插件] 按罪人名单降下终末",
+                "监测到取关狗",
+            )
 
         return logs
 
@@ -934,11 +944,15 @@ class ItchMon(Monitor):
         for id in diff:
             dog = prev_data[id]
             traitors.append(dog)
-            logs += f"itch.io狗<a href='{self.endpoint}/profile/{dog}'>{dog}</a>取关了我!<br>"
+            logs += f"<br><a href='{self.endpoint}/profile/{dog}'>{dog}</a><br>"
 
-        if logs:
+        if traitors:
             self._add_traitors(traitors)
-            send_email(logs, "[WeMediaMon 插件] 按罪人名单降下终末", "监测到取关狗")
+            send_email(
+                f"以下itch.io狗取关了我:{logs}",
+                "[WeMediaMon 插件] 按罪人名单降下终末",
+                "监测到取关狗",
+            )
 
         return logs
 
