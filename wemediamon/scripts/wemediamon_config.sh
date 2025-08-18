@@ -5,7 +5,7 @@ eval $(dbus export wemediamon)
 MON_LOG=/tmp/upload/wemediamon_log.txt
 RUN_LOG=/tmp/upload/wemediamon_run_log.txt
 LOCK_FILE=/var/lock/wemediamon.lock
-alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
+alias echo_date='echo [$(TZ=UTC-8 date -R +%Y-%m-%d\ %X)] '
 export PATH=$PATH:/opt/bin/
 
 # 文件保护锁

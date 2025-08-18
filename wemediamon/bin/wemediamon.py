@@ -8,7 +8,7 @@ import smtplib
 import argparse
 import requests
 import schedule
-from tqdm import tqdm as _tqdm
+from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
 from email.header import Header
@@ -16,7 +16,7 @@ from email.mime.text import MIMEText
 from bilibili_api import ResponseCodeException, Credential, user, sync
 
 # 创建 ArgumentParser 对象
-parser = argparse.ArgumentParser(description="WeMediaMon config script")
+parser = argparse.ArgumentParser(description="WeMediaMon 配置脚本")
 # 添加参数
 parser.add_argument("--cmd", type=str, required=True)
 parser.add_argument("--period", type=int, default=2, required=True)
@@ -32,11 +32,6 @@ parser.add_argument("--itck", type=str, default="")
 
 # 解析命令行参数
 args = parser.parse_args()
-
-
-def tqdm(*args, **kwargs):  # 强制使用 Unicode 样式
-    kwargs.setdefault("ascii", False)
-    return _tqdm(*args, **kwargs)
 
 
 class Tee:
@@ -119,6 +114,10 @@ class Monitor:
         self.fans = f"{self.cache}/{name}_followers.json"
         self.blacks = f"{self.cache}/{name}_blacklist.txt"
 
+    def _tqdm(self, *args, **kwargs):  # 强制使用 Unicode 样式
+        kwargs.setdefault("ascii", False)
+        return tqdm(*args, **kwargs)
+
     def _txt2lst(self):
         if not os.path.exists(self.blacks):
             return []
@@ -174,24 +173,23 @@ class BiliMon(Monitor):
                 return (fans, math.ceil(json_data["data"]["total"] / 50))
 
             else:
-                print(json_data["message"])
-                raise PermissionError(
-                    f"B站 {self.uid} 可能需要重新手动扫码登陆, 错误代码: {json_data['code']}"
-                )
+                log = f"{json_data['message']}, 错误代码: {json_data['code']}"
+                print(log)
+                raise PermissionError(log)
 
         except requests.exceptions.RequestException as e:
             if trytime > 0:
-                print(f"Failed to get bili fans: {e}, retrying...")
+                print(f"获取B站粉丝失败: {e}, 重试中...")
                 time.sleep(random.uniform(4.5, 5))
                 trytime -= 1
                 return self._get_fans(page, trytime)
 
             else:
-                raise ConnectionError("Failed to get bili fans for too many times!")
+                raise ConnectionError("获取B站粉丝失败过多次!")
 
     def _get_followers(self):
         fans, pages = self._get_fans(page=1)
-        for i in tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} B站粉丝中"):
+        for i in self._tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} B站粉丝中"):
             time.sleep(random.uniform(0.5, 1))
             followers, _ = self._get_fans(page=i)
             if followers:
@@ -227,7 +225,7 @@ class BiliMon(Monitor):
 
         traitors_out1000 = []
         out1000_keys = list(out1000.keys())
-        for item in tqdm(out1000_keys, desc=f"过滤 {self.uid} B站1K以外粉丝列表"):
+        for item in self._tqdm(out1000_keys, desc=f"过滤 {self.uid} B站1K以外粉丝列表"):
             if item in new_fans:
                 del out1000[item]
 
@@ -254,7 +252,7 @@ class BiliMon(Monitor):
 
     def _filter_unfollows(self, unfollows):
         real_unfollows, out1000 = [], {}
-        for unfollower in tqdm(unfollows, desc=f"过滤 {self.uid} B站取关列表"):
+        for unfollower in self._tqdm(unfollows, desc=f"过滤 {self.uid} B站取关列表"):
             if self._is_fans(unfollower["uid"]):
                 out1000.update({unfollower["uid"]: unfollower["uname"]})
             else:
@@ -324,7 +322,7 @@ class BiliMon(Monitor):
             print("当前B站狗库为空!")
             return
 
-        for traitor in tqdm(traitors, desc="清理已注销的B站取关狗"):
+        for traitor in self._tqdm(traitors, desc="清理已注销的B站取关狗"):
             if self._is_deleted(traitor):
                 print(f"B站取关狗 {traitor} 已被清理!")
             else:
@@ -442,17 +440,17 @@ class HFMon(Monitor):
 
             except Exception as e:
                 if trytime > 0:
-                    print(f"Failed to call HfApi: {e}, retrying...")
+                    print(f"调用 HfApi 失败: {e}, 重试中...")
                     time.sleep(random.uniform(14.5, 15))
                     trytime -= 1
                     return self._get(url, headers, params, trytime)
 
                 else:
-                    raise ConnectionError("Try HfApi for too many times!")
+                    raise ConnectionError("调用 HfApi 失败过多次!")
 
     def __init__(self):
         super().__init__("hf")
-        self.domain = "https://huggingface.co"
+        self.endpoint = "https://huggingface.co"
         self.papers = args.papers.replace(" ", "").split(";")
         self.token = args.hftk.strip()
         self.header = {"User-Agent": self.ua, "Authorization": f"Bearer {self.token}"}
@@ -544,7 +542,7 @@ class HFMon(Monitor):
                 for id in diff:
                     dog = prev_data[tag][id]
                     traitors.append(dog)
-                    logs += f"<br>狗<a href='{self.domain}/api/users/{dog}/overview'>{dog}</a>取关了<a href='{self.domain}/{tag}'>{tag}</a> !<br>"
+                    logs += f"<br>抱脸狗<a href='{self.endpoint}/api/users/{dog}/overview'>{dog}</a>取关了<a href='{self.endpoint}/{tag}'>{tag}</a> !<br>"
 
         if logs:
             self._add_traitors(traitors)
@@ -563,13 +561,13 @@ class HFMon(Monitor):
         for user in self.tag_users:
             data[user] = self._get_followers("user", user)
             repos = self._list_repos(user)
-            for repo in tqdm(repos, desc=f"分析 {user} 用户仓库中"):
+            for repo in self._tqdm(repos, desc=f"分析 {user} 用户仓库中"):
                 data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
         for org in self.tag_orgs:
             data[org] = self._get_followers("organization", org)
             repos = self._list_repos(org)
-            for repo in tqdm(repos, desc=f"分析 {org} 组织仓库中"):
+            for repo in self._tqdm(repos, desc=f"分析 {org} 组织仓库中"):
                 data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
         for paper in self.papers:
@@ -585,32 +583,30 @@ class HFMon(Monitor):
             if status == "SLEEPING":
                 sleepings.append(space["id"])
             elif "ERROR" in status:
-                errors.append(f"{self.domain}/spaces/{space['id']}")
+                errors.append(f"{self.endpoint}/spaces/{space['id']}")
 
         return sleepings, errors
 
     def activate(self):
         spaces, failures = [], []
         targets = self.tag_users + self.tag_orgs
-        for tag in tqdm(targets, desc="搜集抱脸空间中"):
+        for tag in self._tqdm(targets, desc="搜集抱脸空间中"):
             sleeps, errors = self._list_spaces(tag)
             spaces += sleeps
             failures += errors
 
         logs = ""
-        for space in tqdm(spaces, desc="激活抱脸空间中"):
+        for space in self._tqdm(spaces, desc="激活抱脸空间中"):
             self._activate_space(space)
             logs += f"{space} "
 
         if logs:
-            print(
-                f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 抱脸空间 {logs}激活完成!"
-            )
+            print(f"抱脸空间 {logs}激活完成!")
 
         content = ""
         for failure in failures:
             errepo: str = failure
-            errepo = errepo.replace(self.domain, "")
+            errepo = errepo.replace(self.endpoint, "")
             content += f"<br><a href='{failure}'>{errepo[1:]}</a><br>"
 
         if content:
@@ -661,13 +657,13 @@ class HFMon(Monitor):
 class GitHubMon(Monitor):
     def __init__(self):
         super().__init__("github")
-        self.domain = "github.com"
+        self.endpoint = "github.com"
         self.tags = args.gitags.split(";")
         self.header = {"user-agent": self.ua}
 
     def _list_followers(self, user: str):
         time.sleep(random.uniform(0.5, 1))
-        response = requests.get(f"https://api.{self.domain}/users/{user}/followers")
+        response = requests.get(f"https://api.{self.endpoint}/users/{user}/followers")
         response.raise_for_status()
         fans = response.json()
         followers = {}
@@ -683,7 +679,7 @@ class GitHubMon(Monitor):
         while True:
             time.sleep(random.uniform(0.5, 1))
             resp = requests.get(
-                f"https://api.{self.domain}/users/{username}/repos?per_page=100&page={page}",
+                f"https://api.{self.endpoint}/users/{username}/repos?per_page=100&page={page}",
                 headers=self.header,
             )
             resp.raise_for_status()
@@ -703,7 +699,7 @@ class GitHubMon(Monitor):
         while True:
             time.sleep(random.uniform(0.5, 1))
             resp = requests.get(
-                f"https://api.{self.domain}/repos/{repo}/stargazers?per_page=100&page={page}",
+                f"https://api.{self.endpoint}/repos/{repo}/stargazers?per_page=100&page={page}",
                 headers=self.header,
             )
             resp.raise_for_status()
@@ -727,7 +723,7 @@ class GitHubMon(Monitor):
                 for id in diff:
                     dog = prev_data[tag][id]
                     traitors.append(dog)
-                    logs += f"<br>狗<a href='https://{self.domain}/{dog}'>{dog}</a>取关了<a href='https://{self.domain}/{tag}'>{tag}</a>!<br>"
+                    logs += f"<br>GitHub狗<a href='https://{self.endpoint}/{dog}'>{dog}</a>取关了<a href='https://{self.endpoint}/{tag}'>{tag}</a>!<br>"
 
         if logs:
             self._add_traitors(traitors)
@@ -741,7 +737,7 @@ class GitHubMon(Monitor):
             for tag in tags:
                 data[tag] = self._list_followers(tag)
                 repos = self._list_user_repos(tag)
-                for repo in tqdm(repos, desc=f"解析 {tag} 仓库中"):
+                for repo in self._tqdm(repos, desc=f"解析 {tag} 仓库中"):
                     data[repo] = self._list_repo_stargazers(repo)
 
         except Exception as e:
@@ -796,7 +792,7 @@ class GitHubMon(Monitor):
 class CnblogsMon(Monitor):
     def __init__(self):
         super().__init__("cnblogs")
-        self.domain = "https://home.cnblogs.com"
+        self.endpoint = "https://home.cnblogs.com"
         self.header = {"user-agent": self.ua, "cookie": args.cnblokie}
 
     def _parse_fans(self, url):
@@ -810,7 +806,7 @@ class CnblogsMon(Monitor):
         fans = {}
         if self.check_login():
             response = requests.get(
-                f"{self.domain}/u/{self.username}/followers",
+                f"{self.endpoint}/u/{self.username}/followers",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -819,12 +815,15 @@ class CnblogsMon(Monitor):
                 "a", attrs={"title": True}
             )
             for a in fan_lnks:
-                href: str = self.domain + a["href"]
+                href: str = self.endpoint + a["href"]
                 username = href.split("/u/")[-1]
                 uid = self._parse_fans(href)
                 fans[uid] = username
 
-        return fans
+            return fans
+
+        else:
+            raise PermissionError("博客园登录状态失效!")
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
@@ -833,7 +832,9 @@ class CnblogsMon(Monitor):
         for id in diff:
             dog = prev_data[id]
             traitors.append(dog)
-            logs += f"<br>狗<a href='{self.domain}/u/{dog}'>{dog}</a>取关了我!<br>"
+            logs += (
+                f"<br>博客园狗<a href='{self.endpoint}/u/{dog}'>{dog}</a>取关了我!<br>"
+            )
 
         if logs:
             self._add_traitors(traitors)
@@ -898,13 +899,13 @@ class CnblogsMon(Monitor):
 class ItchMon(Monitor):
     def __init__(self):
         super().__init__("itch")
-        self.domain = "https://itch.io"
+        self.endpoint = "https://itch.io"
         self.header = {
             "accept-language": "zh-CN,zh;q=0.9",
             "connection": "keep-alive",
             "cookie": args.itck,
             "host": "itch.io",
-            "referer": f"{self.domain}/dashboard",
+            "referer": f"{self.endpoint}/dashboard",
             "user-agent": self.ua,
         }
 
@@ -933,7 +934,7 @@ class ItchMon(Monitor):
         for id in diff:
             dog = prev_data[id]
             traitors.append(dog)
-            logs += f"狗<a href='{self.domain}/profile/{dog}'>{dog}</a>取关了我!<br>"
+            logs += f"itch.io狗<a href='{self.endpoint}/profile/{dog}'>{dog}</a>取关了我!<br>"
 
         if logs:
             self._add_traitors(traitors)
@@ -943,7 +944,7 @@ class ItchMon(Monitor):
 
     def check_login(self):
         response = requests.get(
-            f"{self.domain}/my-followers",
+            f"{self.endpoint}/my-followers",
             headers=self.header,
             proxies=self.proxy,
         )
