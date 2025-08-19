@@ -353,7 +353,7 @@ class BiliMon(Monitor):
 
 class HFMon(Monitor):
     class HfApi:
-        def __init__(self, token: str = None, user_agent="", proxy=None):
+        def __init__(self, token: str = None, user_agent: str = None, proxy=None):
             self.endpoint = "https://huggingface.co/api"
             self.ua = user_agent
             self.proxy = proxy
@@ -591,6 +591,20 @@ class HFMon(Monitor):
 
         return sleepings, errors
 
+    def _is_deleted(self, uid):
+        response = requests.get(
+            f"{self.endpoint}/api/users/{uid}/overview",
+            headers=self.header,
+            proxies=self.proxy,
+        )
+        retcode = response.status_code
+        if retcode == 200:
+            return False
+        elif retcode == 404:
+            return True
+
+        response.raise_for_status()
+
     def activate(self):
         spaces, failures = [], []
         targets = self.tag_users + self.tag_orgs
@@ -638,6 +652,24 @@ class HFMon(Monitor):
             logs += "\n抱脸数据已更新!\n"
 
         print(logs)
+
+    def upd_traitors(self):
+        cleaned_traitors = []
+        traitors = self._txt2lst()
+        if not traitors:
+            print("当前抱脸狗库为空!")
+            return
+
+        for traitor in self._tqdm(traitors, desc="清理已注销的抱脸取关狗"):
+            if self._is_deleted(traitor):
+                print(f"抱脸取关狗 {traitor} 已被清理!")
+            else:
+                cleaned_traitors.append(traitor)
+
+            time.sleep(random.uniform(0.5, 1))
+
+        if cleaned_traitors:
+            self._save_traitors(cleaned_traitors)
 
     def trigger(self, trytime=3):
         try:
@@ -759,6 +791,37 @@ class GitHubMon(Monitor):
                 raise ConnectionError("重试获取最新 GitHub 数据过多次!")
 
         return data
+
+    def _is_deleted(self, uid):
+        response = requests.get(
+            f"https://api.{self.endpoint}/user/{uid}",
+            headers=self.header,
+        )
+        retcode = response.status_code
+        if retcode == 200:
+            return False
+        elif retcode == 404:
+            return True
+
+        response.raise_for_status()
+
+    def upd_traitors(self):
+        cleaned_traitors = []
+        traitors = self._txt2lst()
+        if not traitors:
+            print("当前GitHub狗库为空!")
+            return
+
+        for traitor in self._tqdm(traitors, desc="清理已注销的GitHub取关狗"):
+            if self._is_deleted(traitor):
+                print(f"GitHub取关狗 {traitor} 已被清理!")
+            else:
+                cleaned_traitors.append(traitor)
+
+            time.sleep(random.uniform(0.5, 1))
+
+        if cleaned_traitors:
+            self._save_traitors(cleaned_traitors)
 
     def upd_fans(self):
         prev_data = {}
@@ -1059,8 +1122,14 @@ if __name__ == "__main__":
             case "ACTIVATE_HF_REPOS":
                 HFMon().activate()
 
+            case "UPD_HF_BLACKS":
+                HFMon().upd_traitors()
+
             case "UPD_GIT_FANS":
                 GitHubMon().upd_fans()
+
+            case "UPD_GIT_BLACKS":
+                GitHubMon().upd_traitors()
 
             case "TEST_CNBLOGS_CK":
                 CnblogsMon().check_login()

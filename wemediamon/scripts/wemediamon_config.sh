@@ -104,7 +104,11 @@ check_params() {
 	if [ -z "${wemediamon_cache}" ]; then
 		close_with_echo "请输入有效缓存路径!"
 	fi
-	if [ "${wemediamon_bilimon}" != '1' ] && [ "${wemediamon_hfmon}" != '1' ] && [ "${wemediamon_gitmon}" != '1' ] && [ "${wemediamon_cnblon}" != '1' ] && [ "${wemediamon_itchion}" != '1' ]; then
+	if [ "${wemediamon_bilimon}" != '1' ] &&
+		[ "${wemediamon_hfmon}" != '1' ] &&
+		[ "${wemediamon_gitmon}" != '1' ] &&
+		[ "${wemediamon_cnblon}" != '1' ] &&
+		[ "${wemediamon_itchion}" != '1' ]; then
 		close_with_echo "请至少开启一个监控器!"
 	fi
 	# 检查选填入参
@@ -112,37 +116,37 @@ check_params() {
 		if [[ -z "${wemediamon_bilick}" ]]; then
 			close_with_echo "请输入有效B站cookie!"
 		fi
-	else
-		wemediamon_bilick=''
+	# else
+	# 	wemediamon_bilick=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftk}" ]]; then
 			close_with_echo "请输入有效抱脸Token!"
 		fi
-	else
-		wemediamon_hftk=''
-		wemediamon_papers=''
+	# else
+	# 	wemediamon_hftk=''
+	# 	wemediamon_papers=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
 			close_with_echo "请输入有效GitHub目标列表!"
 		fi
-	else
-		wemediamon_gitags=''
+	# else
+	# 	wemediamon_gitags=''
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then
 		if [[ -z "${wemediamon_cnblokie}" ]]; then
 			close_with_echo "请输入有效博客园cookie!"
 		fi
-	else
-		wemediamon_cnblokie=''
+	# else
+	# 	wemediamon_cnblokie=''
 	fi
 	if [ "${wemediamon_itchion}" == "1" ]; then
 		if [[ -z "${wemediamon_itck}" ]]; then
 			close_with_echo "请输入有效itch.io cookie!"
 		fi
-	else
-		wemediamon_itck=''
+	# else
+	# 	wemediamon_itck=''
 	fi
 }
 
@@ -239,6 +243,10 @@ watch_dog() {
 		else
 			echo_date "当前itch.io狗库为空!"
 		fi
+		;;
+
+	*)
+		echo_date "未知指令: $1"
 		;;
 
 	esac
