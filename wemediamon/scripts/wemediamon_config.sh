@@ -5,7 +5,7 @@ eval $(dbus export wemediamon)
 MON_LOG=/tmp/upload/wemediamon_log.txt
 RUN_LOG=/tmp/upload/wemediamon_run_log.txt
 LOCK_FILE=/var/lock/wemediamon.lock
-alias echo_date='echo [$(TZ=UTC-8 date -R +%Y-%m-%d\ %X)] '
+alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 export PATH=$PATH:/opt/bin/
 
 # 文件保护锁
@@ -116,37 +116,26 @@ check_params() {
 		if [[ -z "${wemediamon_bilick}" ]]; then
 			close_with_echo "请输入有效B站cookie!"
 		fi
-	# else
-	# 	wemediamon_bilick=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftk}" ]]; then
 			close_with_echo "请输入有效抱脸Token!"
 		fi
-	# else
-	# 	wemediamon_hftk=''
-	# 	wemediamon_papers=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
 			close_with_echo "请输入有效GitHub目标列表!"
 		fi
-	# else
-	# 	wemediamon_gitags=''
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then
 		if [[ -z "${wemediamon_cnblokie}" ]]; then
 			close_with_echo "请输入有效博客园cookie!"
 		fi
-	# else
-	# 	wemediamon_cnblokie=''
 	fi
 	if [ "${wemediamon_itchion}" == "1" ]; then
 		if [[ -z "${wemediamon_itck}" ]]; then
 			close_with_echo "请输入有效itch.io cookie!"
 		fi
-	# else
-	# 	wemediamon_itck=''
 	fi
 }
 
