@@ -142,6 +142,7 @@ class Monitor:
 class BiliMon(Monitor):
     def __init__(self):
         super().__init__("bili")
+        self.endpoint = "bilibili.com"
         self._parse_cookie(args.bilick)
 
     def _parse_cookie(self, ck: str):
@@ -159,7 +160,7 @@ class BiliMon(Monitor):
     def _get_fans(self, page, trytime=3):
         try:
             response = requests.get(
-                f"https://api.bilibili.com/x/relation/followers?vmid={self.uid}&pn={page}",
+                f"https://api.{self.endpoint}/x/relation/followers?vmid={self.uid}&pn={page}",
                 headers={"User-Agent": self.ua, "Cookie": self.ck},
             )  # 使用 requests 库下载 JSON 数据
             response.raise_for_status()  # 检查是否成功获取数据
@@ -173,9 +174,9 @@ class BiliMon(Monitor):
                 return (fans, math.ceil(json_data["data"]["total"] / 50))
 
             else:
-                log = f"{json_data['message']}, 错误代码: {json_data['code']}"
-                print(log)
-                raise PermissionError(log)
+                raise PermissionError(
+                    f"{json_data['message']}, 错误代码: {json_data['code']}"
+                )
 
         except requests.exceptions.RequestException as e:
             if trytime > 0:
@@ -262,7 +263,7 @@ class BiliMon(Monitor):
 
     def check_login(self):
         response = requests.get(
-            "https://api.bilibili.com/x/web-interface/nav",
+            f"https://api.{self.endpoint}/x/web-interface/nav",
             headers={"cookie": self.ck, "user-agent": self.ua},
         )
         response.raise_for_status()
@@ -295,7 +296,7 @@ class BiliMon(Monitor):
                 content = f"B站以下狗取关了 {self.uid}:"
                 traitors = []
                 for user in unfollows:
-                    url = f'https://space.bilibili.com/{user["uid"]}'
+                    url = f'https://space.{self.endpoint}/{user["uid"]}'
                     content += f'<br><a href="{url}">{user["uname"]}</a><br>'
                     traitors.append(user["uid"])
 
@@ -319,8 +320,7 @@ class BiliMon(Monitor):
         cleaned_traitors = []
         traitors = self._txt2lst()
         if not traitors:
-            print("当前B站狗库为空!")
-            return
+            raise LookupError("当前B站狗库为空!")
 
         for traitor in self._tqdm(traitors, desc="清理已注销的B站取关狗"):
             if self._is_deleted(traitor):
@@ -330,7 +330,7 @@ class BiliMon(Monitor):
 
             time.sleep(random.uniform(0.5, 1))
 
-        if cleaned_traitors:
+        if cleaned_traitors != traitors:
             self._save_traitors(cleaned_traitors)
 
     def trigger(self, trytime=3):
@@ -338,7 +338,7 @@ class BiliMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(e)
+            print(f"B站监控器触发出错: {e}, 重试中...")
             if trytime > 0:
                 trytime -= 1
                 self.trigger(trytime)
@@ -657,8 +657,7 @@ class HFMon(Monitor):
         cleaned_traitors = []
         traitors = self._txt2lst()
         if not traitors:
-            print("当前抱脸狗库为空!")
-            return
+            raise LookupError("当前抱脸狗库为空!")
 
         for traitor in self._tqdm(traitors, desc="清理已注销的抱脸取关狗"):
             if self._is_deleted(traitor):
@@ -668,7 +667,7 @@ class HFMon(Monitor):
 
             time.sleep(random.uniform(0.5, 1))
 
-        if cleaned_traitors:
+        if cleaned_traitors != traitors:
             self._save_traitors(cleaned_traitors)
 
     def trigger(self, trytime=3):
@@ -677,7 +676,7 @@ class HFMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(e)
+            print(f"抱脸监控器触发失败: {e}, 重试中...")
             if trytime > 0:
                 trytime -= 1
                 self.trigger(trytime)
@@ -809,8 +808,7 @@ class GitHubMon(Monitor):
         cleaned_traitors = []
         traitors = self._txt2lst()
         if not traitors:
-            print("当前GitHub狗库为空!")
-            return
+            raise LookupError("当前GitHub狗库为空!")
 
         for traitor in self._tqdm(traitors, desc="清理已注销的GitHub取关狗"):
             if self._is_deleted(traitor):
@@ -820,7 +818,7 @@ class GitHubMon(Monitor):
 
             time.sleep(random.uniform(0.5, 1))
 
-        if cleaned_traitors:
+        if cleaned_traitors != traitors:
             self._save_traitors(cleaned_traitors)
 
     def upd_fans(self):
@@ -847,7 +845,7 @@ class GitHubMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(e)
+            print(f"GitHub监控器触发出错: {e}, 重试中...")
             if trytime > 0:
                 trytime -= 1
                 self.trigger(trytime)
@@ -863,7 +861,7 @@ class GitHubMon(Monitor):
 class CnblogsMon(Monitor):
     def __init__(self):
         super().__init__("cnblogs")
-        self.endpoint = "https://home.cnblogs.com"
+        self.endpoint = "cnblogs.com"
         self.header = {"user-agent": self.ua, "cookie": args.cnblokie}
 
     def _parse_fans(self, url):
@@ -877,7 +875,7 @@ class CnblogsMon(Monitor):
         fans = {}
         if self.check_login():
             response = requests.get(
-                f"{self.endpoint}/u/{self.username}/followers",
+                f"https://home.{self.endpoint}/u/{self.username}/followers",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -886,7 +884,7 @@ class CnblogsMon(Monitor):
                 "a", attrs={"title": True}
             )
             for a in fan_lnks:
-                href: str = self.endpoint + a["href"]
+                href: str = f"https://home.{self.endpoint}" + a["href"]
                 username = href.split("/u/")[-1]
                 uid = self._parse_fans(href)
                 fans[uid] = username
@@ -903,7 +901,7 @@ class CnblogsMon(Monitor):
         for id in diff:
             dog = prev_data[id]
             traitors.append(id)
-            logs += f"<br><a href='{self.endpoint}/u/{id}'>{dog}</a><br>"
+            logs += f"<br><a href='https://home.{self.endpoint}/u/{id}'>{dog}</a><br>"
 
         if traitors:
             self._add_traitors(traitors)
@@ -915,16 +913,52 @@ class CnblogsMon(Monitor):
 
         return logs
 
+    def _is_deleted(self, uid):
+        response = requests.get(
+            f"https://home.{self.endpoint}/u/{uid}",
+            headers=self.header,
+        )
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        err_div = soup.find("div", class_="error")
+        if err_div:
+            if " 用户不存在, 单击" in err_div:
+                return True
+            else:
+                raise LookupError(f"{err_div}")
+
+        return False
+
+    def upd_traitors(self):
+        if not self.check_login():
+            return
+
+        cleaned_traitors = []
+        traitors = self._txt2lst()
+        if not traitors:
+            raise LookupError("当前博客园狗库为空!")
+
+        for traitor in self._tqdm(traitors, desc="清理已注销的博客园取关狗"):
+            if self._is_deleted(traitor):
+                print(f"博客园取关狗 {traitor} 已被清理!")
+            else:
+                cleaned_traitors.append(traitor)
+
+            time.sleep(random.uniform(0.5, 1))
+
+        if cleaned_traitors != traitors:
+            self._save_traitors(cleaned_traitors)
+
     def check_login(self):
         response = requests.get(
-            "https://account.cnblogs.com/user/userinfo",
+            f"https://account.{self.endpoint}/user/userinfo",
             headers=self.header,
         )
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         blog_lnk = soup.find("a", id="user_nav_blog_link")
         if blog_lnk:
-            self.username = blog_lnk["href"].split("cnblogs.com/")[-1][:-1]
+            self.username = blog_lnk["href"].split(f"{self.endpoint}/")[-1][:-1]
             if self.username:
                 print("已登录博客园")
                 return True
@@ -956,7 +990,7 @@ class CnblogsMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(e)
+            print(f"博客园监控器触发出错: {e}, 重试中...")
             if trytime > 0:
                 trytime -= 1
                 self.trigger(trytime)
@@ -1058,7 +1092,7 @@ class ItchMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(e)
+            print(f"itch.io监控器触发出错: {e}, 重试中...")
             if trytime > 0:
                 trytime -= 1
                 self.trigger(trytime)
@@ -1090,12 +1124,16 @@ def update():
 
 
 def start_monitor(period=args.period):
-    update()
-    print(f"监控开启中...每 {period} 小时触发一次")
-    schedule.every(period).hours.do(update)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    try:
+        update()
+        print(f"监控开启中...每 {period} 小时触发一次")
+        schedule.every(period).hours.do(update)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    except Exception as e:
+        send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
 
 
 if __name__ == "__main__":
@@ -1137,6 +1175,9 @@ if __name__ == "__main__":
             case "UPD_CNBLOGS_FANS":
                 CnblogsMon().upd_fans()
 
+            case "UPD_CNBLOGS_BLACKS":
+                CnblogsMon().upd_traitors()
+
             case "TEST_ITCH_CK":
                 ItchMon().check_login()
 
@@ -1147,4 +1188,4 @@ if __name__ == "__main__":
                 print(f"未知指令: {args.cmd}")
 
     except Exception as e:
-        send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
+        print(f"{e}")

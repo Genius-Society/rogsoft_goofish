@@ -116,26 +116,37 @@ check_params() {
 		if [[ -z "${wemediamon_bilick}" ]]; then
 			close_with_echo "请输入有效B站cookie!"
 		fi
+	else
+		wemediamon_bilick=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftk}" ]]; then
 			close_with_echo "请输入有效抱脸Token!"
 		fi
+	else
+		wemediamon_hftk=''
+		wemediamon_papers=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
 			close_with_echo "请输入有效GitHub目标列表!"
 		fi
+	else
+		wemediamon_gitags=''
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then
 		if [[ -z "${wemediamon_cnblokie}" ]]; then
 			close_with_echo "请输入有效博客园cookie!"
 		fi
+	else
+		wemediamon_cnblokie=''
 	fi
 	if [ "${wemediamon_itchion}" == "1" ]; then
 		if [[ -z "${wemediamon_itck}" ]]; then
 			close_with_echo "请输入有效itch.io cookie!"
 		fi
+	else
+		wemediamon_itck=''
 	fi
 }
 
@@ -195,7 +206,7 @@ trigger_once() {
 watch_dog() {
 	case $1 in
 	SEE_BILI_BLACKS)
-		if [[ -f "${wemediamon_cache}/bili_blacklist.txt" ]]; then
+		if [[ -s "${wemediamon_cache}/bili_blacklist.txt" ]]; then
 			awk '{print "https://space.bilibili.com/" $0}' "${wemediamon_cache}/bili_blacklist.txt"
 		else
 			echo_date "当前B站狗库为空!"
@@ -203,7 +214,7 @@ watch_dog() {
 		;;
 
 	SEE_HF_BLACKS)
-		if [[ -f "${wemediamon_cache}/hf_blacklist.txt" ]]; then
+		if [[ -s "${wemediamon_cache}/hf_blacklist.txt" ]]; then
 			awk '{print "https://huggingface.co/api/users/" $0 "/overview"}' "${wemediamon_cache}/hf_blacklist.txt"
 		else
 			echo_date "当前抱脸狗库为空!"
@@ -211,7 +222,7 @@ watch_dog() {
 		;;
 
 	SEE_GIT_BLACKS)
-		if [[ -f "${wemediamon_cache}/github_blacklist.txt" ]]; then
+		if [[ -s "${wemediamon_cache}/github_blacklist.txt" ]]; then
 			awk '{print "https://api.github.com/user/" $0}' "${wemediamon_cache}/github_blacklist.txt"
 		else
 			echo_date "当前GitHub狗库为空!"
@@ -219,7 +230,7 @@ watch_dog() {
 		;;
 
 	SEE_CNBLOGS_BLACKS)
-		if [[ -f "${wemediamon_cache}/cnblogs_blacklist.txt" ]]; then
+		if [[ -s "${wemediamon_cache}/cnblogs_blacklist.txt" ]]; then
 			awk '{print "https://home.cnblogs.com/u/" $0}' "${wemediamon_cache}/cnblogs_blacklist.txt"
 		else
 			echo_date "当前博客园狗库为空!"
@@ -227,7 +238,7 @@ watch_dog() {
 		;;
 
 	SEE_ITCH_BLACKS)
-		if [[ -f "${wemediamon_cache}/itch_blacklist.txt" ]]; then
+		if [[ -s "${wemediamon_cache}/itch_blacklist.txt" ]]; then
 			awk '{print "https://itch.io/profile/" $0}' "${wemediamon_cache}/itch_blacklist.txt"
 		else
 			echo_date "当前itch.io狗库为空!"
@@ -273,7 +284,8 @@ check_proxy() {
 
 # 自启/重启时触发开启 WeMediaMon
 if [ $# -eq 0 ] || [ $# -eq 1 ]; then
-	if [ "${wemediamon_enable}" == "1" ] && [ -z "$(ps w | grep 'python -u /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
+	if [ "${wemediamon_enable}" == "1" ] &&
+		[ -z "$(ps w | grep 'python -u /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
 		set_lock
 		check_proxy
 		start_wemediamon
