@@ -219,7 +219,7 @@ watch_dog() {
 
 	SEE_HF_BLACKS)
 		if [[ -s "${wemediamon_cache}/hf_blacklist.txt" ]]; then
-			awk '{print "https://huggingface.co/api/users/" $0 "/overview"}' "${wemediamon_cache}/hf_blacklist.txt"
+			awk '{print "https://huggingface.co/api/users/"$0"/overview"}' "${wemediamon_cache}/hf_blacklist.txt"
 		else
 			echo_date "当前抱脸狗库为空!"
 		fi
