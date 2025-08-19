@@ -72,8 +72,7 @@ close_with_echo() {
 	exit
 }
 
-# 检查入参
-check_params() {
+load_params() {
 	# 加载dbus变量
 	wemediamon_enable=$(dbus get wemediamon_enable)
 	wemediamon_period=$(dbus get wemediamon_period)
@@ -91,6 +90,11 @@ check_params() {
 	wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
 	wemediamon_itchion=$(dbus get wemediamon_itchion)
 	wemediamon_itck=$(dbus get wemediamon_itck)
+}
+
+# 检查入参
+check_params() {
+	load_params
 	# 检查必填入参
 	if [[ -z "${wemediamon_period}" ]]; then
 		close_with_echo "请输入有效周期!"
@@ -184,7 +188,7 @@ start_wemediamon() {
 
 # 单次触发指令
 trigger_once() {
-	check_params
+	load_params
 	check_env
 
 	# 开启单次触发扫描
