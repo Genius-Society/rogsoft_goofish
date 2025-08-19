@@ -1006,13 +1006,13 @@ class CnblogsMon(Monitor):
 class ItchMon(Monitor):
     def __init__(self):
         super().__init__("itch")
-        self.endpoint = "https://itch.io"
+        self.endpoint = "itch.io"
         self.header = {
             "accept-language": "zh-CN,zh;q=0.9",
             "connection": "keep-alive",
             "cookie": args.itck,
             "host": "itch.io",
-            "referer": f"{self.endpoint}/dashboard",
+            "referer": f"https://{self.endpoint}/dashboard",
             "user-agent": self.ua,
         }
 
@@ -1040,8 +1040,8 @@ class ItchMon(Monitor):
         diff = set(prev_data.keys()) - set(data.keys())
         for id in diff:
             dog = prev_data[id]
-            traitors.append(dog)
-            logs += f"<br><a href='{self.endpoint}/profile/{dog}'>{dog}</a><br>"
+            traitors.append(id)
+            logs += f"<br><a href='https://{self.endpoint}/profile/{dog}'>{dog}</a><br>"
 
         if traitors:
             self._add_traitors(traitors)
@@ -1053,9 +1053,40 @@ class ItchMon(Monitor):
 
         return logs
 
+    def _is_deleted(self, uid):
+        response = requests.get(
+            f"https://api.{self.endpoint}/users/{uid}",
+            headers={"cookie": self.header["cookie"], "user-agent": self.ua},
+            proxies=self.proxy,
+        )
+        retcode = response.status_code
+        if retcode == 200:
+            return False
+        elif retcode == 400 and response.json()["errors"] == ["invalid user"]:
+            return True
+
+        response.raise_for_status()
+
+    def upd_traitors(self):
+        cleaned_traitors = []
+        traitors = self._txt2lst()
+        if not traitors:
+            raise LookupError("当前itch.io狗库为空!")
+
+        for traitor in self._tqdm(traitors, desc="清理已注销的itch.io取关狗"):
+            if self._is_deleted(traitor):
+                print(f"itch.io取关狗 {traitor} 已被清理!")
+            else:
+                cleaned_traitors.append(traitor)
+
+            time.sleep(random.uniform(0.5, 1))
+
+        if cleaned_traitors != traitors:
+            self._save_traitors(cleaned_traitors)
+
     def check_login(self):
         response = requests.get(
-            f"{self.endpoint}/my-followers",
+            f"https://{self.endpoint}/my-followers",
             headers=self.header,
             proxies=self.proxy,
         )
@@ -1183,6 +1214,9 @@ if __name__ == "__main__":
 
             case "UPD_ITCH_FANS":
                 ItchMon().upd_fans()
+
+            case "UPD_ITCH_BLACKS":
+                ItchMon().upd_traitors()
 
             case _:
                 print(f"未知指令: {args.cmd}")
