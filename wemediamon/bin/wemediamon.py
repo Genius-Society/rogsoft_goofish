@@ -70,7 +70,7 @@ def send_email(
     subject="[WeMediaMon 插件] 测试邮件",
     title="SMTP有效性检测",
     smtp_server="smtp.qq.com",
-    smtp_port=587,
+    smtp_port=465,
     email=args.email,
     smtp=args.smtp,
 ):
@@ -89,18 +89,20 @@ def send_email(
     msg["From"] = email
     msg["To"] = email
     try:
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
             server.login(email, smtp)
             server.sendmail(email, [msg["To"]], msg.as_string())
 
         print("邮件发送成功!")
 
-    except smtplib.SMTPException as e:
+    except smtplib.SMTPResponseException as e:
         if e.smtp_code == -1:
             print("邮件发送成功!")
         else:
             print(f"邮件发送失败: {e}")
+
+    except Exception as ex:
+        print(ex)
 
 
 class Monitor:
