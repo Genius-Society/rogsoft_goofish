@@ -48,21 +48,7 @@ function conf2obj() {
 		show_hide_el(i);
 	}
 
-	$('input[type="text"][id]').each(function (_, el) {
-		var id = $(el).attr("id");
-		if (id && dbus["wemediamon_" + id]) {
-			E(id).value = dbus["wemediamon_" + id];
-		}
-	});
-
-	$('input[type="password"][id]').each(function (_, el) {
-		var id = $(el).attr("id");
-		if (id && dbus["wemediamon_" + id]) {
-			E(id).value = dbus["wemediamon_" + id];
-		}
-	});
-
-	$('textarea[name]').each(function (_, el) {
+	$('textarea[name],input[type="text"][id], input[type="password"][id], input[type="number"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["wemediamon_" + id]) {
 			E(id).value = dbus["wemediamon_" + id];

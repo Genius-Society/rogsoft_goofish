@@ -34,7 +34,7 @@ def download_file(url: str, folder_path=f"./{TMP_DIR}"):
     print(f"文件已下载到: {file_path}")
 
 
-def unzip_file(zip_file: str, extract_folder=f"./{TMP_DIR}"):
+def unzip_file(zip_file: str, extract_folder=f"./{TMP_DIR}/{CHROME}"):
     if not os.path.exists(extract_folder):  # 确保解压缩目录存在, 如果不存在则创建
         os.makedirs(extract_folder)
     # 打开压缩包
