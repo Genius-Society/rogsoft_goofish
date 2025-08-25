@@ -279,22 +279,26 @@ start() {
 }
 
 check_proxy() {
+	local count=0
 	echo_date "等待代理网络连通..."
 	until ping -c 1 huggingface.co >/dev/null 2>&1; do
 		sleep 1
+		count=$((count + 1))
+		if [ "$count" -ge 30 ]; then
+			echo_date "代理网络仍不可达, 脚本关闭!"
+			exit 1
+		fi
 	done
 	echo_date "已 ping 通, 继续执行后续命令"
 }
 
 # 自启/重启时触发开启 WeMediaMon
-if [ $# -eq 0 ] || [ $# -eq 1 ]; then
-	if [ "${wemediamon_enable}" == "1" ] &&
-		[ -z "$(ps w | grep 'python -u /koolshare/wemediamon/wemediamon.py' | grep -v grep)" ]; then
-		set_lock
-		check_proxy
-		start_wemediamon
-		unset_lock
-	fi
+if [[ $# -eq 0 || $# -eq 1 ]] && [[ "${wemediamon_enable}" == "1" ]]; then
+	stop
+	set_lock
+	check_proxy
+	start_wemediamon
+	unset_lock
 # 网页传参命令触发
 elif [ $# -eq 2 ]; then
 	set_lock

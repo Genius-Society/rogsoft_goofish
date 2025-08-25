@@ -709,45 +709,73 @@ class GitHubMon(Monitor):
 
         return followers
 
+    def _recurse_user_repos(self, username, pn, trytime=3):
+        try:
+            response = requests.get(
+                f"https://api.{self.endpoint}/users/{username}/repos?per_page=100&page={pn}",
+                headers=self.header,
+            )
+            response.raise_for_status()
+            return response.json()
+
+        except Exception as e:
+            if trytime > 0:
+                print(f"获取 {username} 用户第 {pn} 页关注者出错: {e}, 重试中...")
+                time.sleep(random.uniform(4.5, 5))
+                trytime -= 1
+                return self._recurse_user_repos(username, pn, trytime)
+
+            else:
+                raise ConnectionError("重试获取收藏者列表过多次!")
+
     # 获取用户所有仓库
     def _list_user_repos(self, username):
-        page = 1
+        pn = 1
         repos = []
         while True:
             time.sleep(random.uniform(0.5, 1))
-            resp = requests.get(
-                f"https://api.{self.endpoint}/users/{username}/repos?per_page=100&page={page}",
-                headers=self.header,
-            )
-            resp.raise_for_status()
-            data = resp.json()
+            data = self._recurse_user_repos(username, pn)
             if not data:
                 break
 
             repos += [repo["full_name"] for repo in data]
-            page += 1
+            pn += 1
 
         return repos
 
+    def _recurse_repo_stargazers(self, repo, pn, trytime=3):
+        try:
+            response = requests.get(
+                f"https://api.{self.endpoint}/repos/{repo}/stargazers?per_page=100&page={pn}",
+                headers=self.header,
+            )
+            response.raise_for_status()
+            return response.json()
+
+        except Exception as e:
+            if trytime > 0:
+                print(f"获取 {repo} 仓库第 {pn} 页收藏者出错: {e}, 重试中...")
+                time.sleep(random.uniform(4.5, 5))
+                trytime -= 1
+                return self._recurse_repo_stargazers(repo, pn, trytime)
+
+            else:
+                raise ConnectionError("重试获取收藏者列表过多次!")
+
     # 获取仓库收藏者
     def _list_repo_stargazers(self, repo):
-        page = 1
+        pn = 1
         stargazers = {}
         while True:
             time.sleep(random.uniform(0.5, 1))
-            resp = requests.get(
-                f"https://api.{self.endpoint}/repos/{repo}/stargazers?per_page=100&page={page}",
-                headers=self.header,
-            )
-            resp.raise_for_status()
-            data = resp.json()
+            data = self._recurse_repo_stargazers(repo, pn)
             if not data:
                 break
 
             for user in data:
                 stargazers[str(user["id"])] = user["login"]
 
-            page += 1
+            pn += 1
 
         return stargazers
 
