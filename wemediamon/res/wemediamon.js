@@ -48,7 +48,7 @@ function conf2obj() {
 		show_hide_el(i);
 	}
 
-	$('textarea[name],input[type="text"][id], input[type="password"][id], input[type="number"][id]').each(function (_, el) {
+	$('textarea[name][id], input[type="text"][id], input[type="password"][id], input[type="number"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["wemediamon_" + id]) {
 			E(id).value = dbus["wemediamon_" + id];
@@ -70,21 +70,7 @@ function obj2conf(cmd) {
 		get_run_log(1);
 	}
 
-	$('input[type="text"][id]').each(function (_, el) {
-		var id = $(el).attr("id");
-		if (id) {
-			dbus_new["wemediamon_" + id] = E(id).value;;
-		}
-	});
-
-	$('input[type="password"][id]').each(function (_, el) {
-		var id = $(el).attr("id");
-		if (id) {
-			dbus_new["wemediamon_" + id] = E(id).value;;
-		}
-	});
-
-	$('textarea[name]').each(function (_, el) {
+	$('textarea[name][id], input[type="text"][id], input[type="password"][id], input[type="number"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id) {
 			dbus_new["wemediamon_" + id] = E(id).value;;
