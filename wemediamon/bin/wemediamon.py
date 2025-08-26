@@ -278,13 +278,12 @@ class BiliMon(Monitor):
         )["list"]
 
     def _get_followings(self):
-        print(f"递归用户 {self.uid} 的所有关注...")
         pn = 1
         followings = []
         following = self._recurse_following(pn)
         while following:
             followings += following
-            print(f"获取第 {pn} 页...")
+            print(f"递归用户 {self.uid} 关注列表第 {pn} 页...")
             pn += 1
             time.sleep(random.uniform(0.5, 1))
             following = self._recurse_following(pn)
@@ -317,13 +316,12 @@ class BiliMon(Monitor):
         if not uid:
             uid = self.uid
 
-        print(f"递归用户 {uid} 追的合集/收藏夹...")
         pn = 1
         favlists = []
         favlist = self._recurse_favlist(pn, uid)
         while favlist:
             favlists += favlist
-            print(f"获取第 {pn} 页...")
+            print(f"递归用户 {uid} 追的合集/收藏夹列表第 {pn} 页...")
             pn += 1
             time.sleep(random.uniform(0.5, 1))
             favlist = self._recurse_favlist(pn, uid)
@@ -456,9 +454,9 @@ class BiliMon(Monitor):
     def trigger(self, trytime=3):
         try:
             self.upd_fans()
+            self.clean_folders()
             self.clean_followings()
             self.clean_subscriptions()
-            self.clean_folders()
 
         except Exception as e:
             print(f"B站监控器触发出错: {e}, 重试中...")
