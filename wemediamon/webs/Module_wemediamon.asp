@@ -134,7 +134,7 @@
                                                 <tr>
                                                     <th>提示邮箱(QQ/Foxmail)<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input type="password" class="input_ss_table" id="email"
+                                                        <input type="text" class="input_ss_table" id="email"
                                                             name="email" maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"

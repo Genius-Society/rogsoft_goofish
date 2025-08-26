@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from bilibili_api import ResponseCodeException, Credential, user, sync
+from bilibili_api import ResponseCodeException, Credential, favorite_list, user, sync
 
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="WeMediaMon 配置脚本")
@@ -146,6 +146,7 @@ class BiliMon(Monitor):
         super().__init__("bili")
         self.endpoint = "bilibili.com"
         self._parse_cookie(args.bilick)
+        self.header = {"User-Agent": self.ua, "Cookie": self.ck}
 
     def _parse_cookie(self, ck: str):
         self.uid = ck.split("DedeUserID=")[1].split(";")[0]
@@ -159,11 +160,11 @@ class BiliMon(Monitor):
             buvid3=self.buvid3,
         )
 
-    def _get_fans(self, page, trytime=3):
+    def _get_fans(self, pn, trytime=3):
         try:
             response = requests.get(
-                f"https://api.{self.endpoint}/x/relation/followers?vmid={self.uid}&pn={page}",
-                headers={"User-Agent": self.ua, "Cookie": self.ck},
+                f"https://api.{self.endpoint}/x/relation/followers?vmid={self.uid}&pn={pn}",
+                headers=self.header,
             )  # 使用 requests 库下载 JSON 数据
             response.raise_for_status()  # 检查是否成功获取数据
             json_data = response.json()  # 使用 json 库解析 JSON 数据
@@ -185,41 +186,36 @@ class BiliMon(Monitor):
                 print(f"获取B站粉丝失败: {e}, 重试中...")
                 time.sleep(random.uniform(4.5, 5))
                 trytime -= 1
-                return self._get_fans(page, trytime)
+                return self._get_fans(pn, trytime)
 
             else:
                 raise ConnectionError("获取B站粉丝失败过多次!")
 
     def _get_followers(self):
-        fans, pages = self._get_fans(page=1)
+        fans, pages = self._get_fans(pn=1)
         for i in self._tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} B站粉丝中"):
             time.sleep(random.uniform(0.5, 1))
-            followers, _ = self._get_fans(page=i)
+            followers, _ = self._get_fans(pn=i)
             if followers:
                 fans.update(followers)
 
         return fans
 
     def _is_deleted(self, uid):
-        async def is_deleted_async(user_id):
-            user_ins = user.User(uid=int(user_id), credential=self.credential)
-            try:
-                await user_ins.get_user_info()
-                return False
+        try:
+            time.sleep(random.uniform(0.5, 1))
+            sync(user.User(uid=int(uid), credential=self.credential).get_user_info())
+            return False  # TODO:
 
-            except ResponseCodeException as e:
-                return e.code == -404
-
-        return sync(is_deleted_async(uid))
+        except ResponseCodeException as e:
+            return e.code == -404
 
     def _is_fans(self, uid):
-        async def is_fans_async(relation_id):
-            user_ins = user.User(uid=self.uid, credential=self.credential)
-            relation = await user_ins.get_relation(relation_id)
-            followed_status = relation["be_relation"]["attribute"]
-            return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
-
-        return sync(is_fans_async(uid))
+        relation = sync(
+            user.User(uid=self.uid, credential=self.credential).get_relation(uid)
+        )
+        followed_status = relation["be_relation"]["attribute"]
+        return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
 
     def _upd_json(self, new_fans: dict, out1000: dict):
         if os.path.exists(self.fans):
@@ -263,10 +259,96 @@ class BiliMon(Monitor):
 
         return real_unfollows, out1000
 
+    def _unfollow(self, uid: int):
+        try:
+            time.sleep(random.uniform(0.5, 1))
+            sync(
+                user.User(uid=uid, credential=self.credential).modify_relation(
+                    user.RelationType.UNSUBSCRIBE
+                )
+            )  # TODO:
+            return True
+
+        except ResponseCodeException as e:
+            return e.code == 22001
+
+    def _recurse_following(self, pn: int):
+        return sync(
+            user.User(uid=self.uid, credential=self.credential).get_followings(pn=pn)
+        )["list"]
+
+    def _get_followings(self):
+        print(f"递归用户 {self.uid} 的所有关注...")
+        pn = 1
+        followings = []
+        following = self._recurse_following(pn)
+        while following:
+            followings += following
+            print(f"获取第 {pn} 页...")
+            pn += 1
+            time.sleep(random.uniform(0.5, 1))
+            following = self._recurse_following(pn)
+
+        return followings
+
+    def _get_folders(self, uid: int = None):
+        if not uid:
+            uid = self.uid
+
+        response = requests.get(
+            f"https://api.{self.endpoint}/x/v3/fav/folder/created/list-all?up_mid={uid}",
+            headers=self.header,
+        )
+        response.raise_for_status()
+        return response.json()["data"]["list"]
+
+    def _recurse_favlist(self, pn: int, uid: int, step=50):  # 递归追的合集/收藏夹
+        response = requests.get(
+            f"https://api.{self.endpoint}/x/v3/fav/folder/collected/list",
+            params={"pn": pn, "ps": step, "up_mid": uid, "platform": "web"},
+            headers=self.header,
+        ).json()
+        if response["code"] != 0:
+            raise ConnectionError(response["message"])
+
+        return response["data"]["list"]
+
+    def _get_favlists(self, uid=None):  # 获取追的合集/收藏夹
+        if not uid:
+            uid = self.uid
+
+        print(f"递归用户 {uid} 追的合集/收藏夹...")
+        pn = 1
+        favlists = []
+        favlist = self._recurse_favlist(pn, uid)
+        while favlist:
+            favlists += favlist
+            print(f"获取第 {pn} 页...")
+            pn += 1
+            time.sleep(random.uniform(0.5, 1))
+            favlist = self._recurse_favlist(pn, uid)
+
+        return favlists
+
+    def _unsubscribe(self, season_id: int):  # seasons <- subscriptions
+        time.sleep(random.uniform(0.5, 1))
+        return (
+            requests.post(
+                f"https://api.{self.endpoint}/x/v3/fav/season/unfav",
+                data={
+                    "season_id": season_id,
+                    "platform": "web",
+                    "csrf": self.bili_jct,
+                },
+                headers=self.header,
+            ).json()["code"]
+            == 0
+        )
+
     def check_login(self):
         response = requests.get(
             f"https://api.{self.endpoint}/x/web-interface/nav",
-            headers={"cookie": self.ck, "user-agent": self.ua},
+            headers=self.header,
         )
         response.raise_for_status()
         if response.status_code == 200:
@@ -318,7 +400,7 @@ class BiliMon(Monitor):
         else:
             print(f"暂未发现B站取关 {self.uid} 者")
 
-    def upd_traitors(self):
+    def clean_traitors(self):
         cleaned_traitors = []
         traitors = self._txt2lst()
         if not traitors:
@@ -330,14 +412,53 @@ class BiliMon(Monitor):
             else:
                 cleaned_traitors.append(traitor)
 
-            time.sleep(random.uniform(0.5, 1))
-
         if cleaned_traitors != traitors:
             self._save_traitors(cleaned_traitors)
+
+    def clean_followings(self):
+        followings = self._get_followings()
+        for following in self._tqdm(
+            followings, desc=f"筛选用户 {self.uid} 所有已注销关注"
+        ):
+            uid = int(following["mid"])
+            if following["uname"] == "账号已注销":
+                url = f"https://space.{self.endpoint}/{uid}"
+                if self._unfollow(uid):
+                    print(f"清理已注销关注 {url} 成功!")
+                else:
+                    print(f"清理已注销关注 {url} 失败...")
+
+    def clean_subscriptions(self):
+        favlists = self._get_favlists()
+        for favlist in self._tqdm(favlists, desc=f"筛选用户 {self.uid} 的已失效订阅"):
+            if favlist["title"] == "该合集已失效":
+                fid = favlist["id"]
+                url = f"https://space.{self.endpoint}/{favlists['mid']}/lists/{fid}"
+                if self._unsubscribe(fid):
+                    print(f"清理失效订阅 {url} 成功!")
+                else:
+                    print(f"清理失效订阅 {url} 失败...")
+
+    def clean_folders(self):
+        folders = self._get_folders()
+        for folder in self._tqdm(
+            folders, desc=f"清理用户 {self.uid} 所有收藏夹中失效视频"
+        ):
+            time.sleep(random.uniform(0.5, 1))
+            fid = folder["id"]
+            retcode = sync(
+                favorite_list.clean_video_favorite_list_content(fid, self.credential)
+            )
+            url = f"https://space.{self.endpoint}/{self.uid}/favlist?fid={fid}"
+            if retcode != 0:
+                print(f"清理收藏夹 {url} 已失效视频出错: {retcode}")
 
     def trigger(self, trytime=3):
         try:
             self.upd_fans()
+            self.clean_followings()
+            self.clean_subscriptions()
+            self.clean_folders()
 
         except Exception as e:
             print(f"B站监控器触发出错: {e}, 重试中...")
@@ -554,7 +675,7 @@ class HFMon(Monitor):
                 "监测到取关狗",
             )
 
-        return logs
+        print(logs)
 
     def _mapo(self, repo: dict):
         if repo["repo_type"] == "model":
@@ -643,17 +764,14 @@ class HFMon(Monitor):
                 prev_data = json.load(json_file)
 
         data = self._get_latest_data()
-        logs = ""
         if data == prev_data:
-            logs += "\n抱脸数据无变动\n"
+            print("抱脸数据无变动")
         else:
-            logs += self._compare_data(prev_data, data)
+            self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n抱脸数据已更新!\n"
-
-        print(logs)
+            print("抱脸数据已更新!")
 
     def upd_traitors(self):
         cleaned_traitors = []
@@ -798,7 +916,7 @@ class GitHubMon(Monitor):
                 "监测到取关狗",
             )
 
-        return logs
+        print(logs)
 
     def _get_latest_data(self, tags: list, trytime=3):
         data = {}
@@ -858,17 +976,14 @@ class GitHubMon(Monitor):
                 prev_data = json.load(json_file)
 
         data = self._get_latest_data(self.tags)
-        logs = ""
         if data == prev_data:
-            logs += "\n GitHub 数据无变化 \n"
+            print("GitHub 数据无变化")
         else:
-            logs += self._compare_data(prev_data, data)
+            self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n GitHub 数据已更新 \n"
-
-        print(logs)
+            print("GitHub 数据已更新")
 
     def trigger(self, trytime=3):
         try:
@@ -941,7 +1056,7 @@ class CnblogsMon(Monitor):
                 "监测到取关狗",
             )
 
-        return logs
+        print(logs)
 
     def _is_deleted(self, uid):
         response = requests.get(
@@ -1003,17 +1118,14 @@ class CnblogsMon(Monitor):
                 prev_data = json.load(json_file)
 
         data = self._list_followers()
-        logs = ""
         if data == prev_data:
-            logs += "\n博客园数据无变化\n"
+            print("博客园数据无变化")
         else:
-            logs += self._compare_data(prev_data, data)
+            self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n博客园数据已更新\n"
-
-        print(logs)
+            print("博客园数据已更新")
 
     def trigger(self, trytime=3):
         try:
@@ -1081,7 +1193,7 @@ class ItchMon(Monitor):
                 "监测到取关狗",
             )
 
-        return logs
+        print(logs)
 
     def _is_deleted(self, uid):
         response = requests.get(
@@ -1136,17 +1248,14 @@ class ItchMon(Monitor):
                 prev_data = json.load(json_file)
 
         data = self._list_followers()
-        logs = ""
         if data == prev_data:
-            logs += "\n itch.io数据无变化 \n"
+            print("itch.io数据无变化")
         else:
-            logs += self._compare_data(prev_data, data)
+            self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            logs += "\n itch.io数据已更新 \n"
-
-        print(logs)
+            print("itch.io数据已更新")
 
     def trigger(self, trytime=3):
         try:
@@ -1213,7 +1322,7 @@ if __name__ == "__main__":
                 BiliMon().upd_fans()
 
             case "UPD_BILI_BLACKS":
-                BiliMon().upd_traitors()
+                BiliMon().clean_traitors()
 
             case "UPD_HF_FANS":
                 HFMon().upd_fans()
