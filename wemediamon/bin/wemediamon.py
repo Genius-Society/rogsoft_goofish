@@ -205,10 +205,13 @@ class BiliMon(Monitor):
         try:
             time.sleep(random.uniform(0.5, 1))
             sync(user.User(uid=int(uid), credential=self.credential).get_user_info())
-            return False  # TODO:
+            return False
 
         except ResponseCodeException as e:
-            return e.code == -404
+            if e.code == -404:
+                return True
+            else:
+                raise ResponseCodeException(f"{e}")
 
     def _is_fans(self, uid):
         relation = sync(
@@ -266,13 +269,18 @@ class BiliMon(Monitor):
                 user.User(uid=uid, credential=self.credential).modify_relation(
                     user.RelationType.UNSUBSCRIBE
                 )
-            )  # TODO:
+            )  # return None
             return True
 
         except ResponseCodeException as e:
-            return e.code == 22001
+            if e.code == 22001:
+                return True
+            else:
+                raise ResponseCodeException(f"{e}")
 
     def _recurse_following(self, pn: int):
+        print(f"递归用户 {self.uid} 关注列表第 {pn} 页...")
+        time.sleep(random.uniform(0.5, 1))
         return sync(
             user.User(uid=self.uid, credential=self.credential).get_followings(pn=pn)
         )["list"]
@@ -283,9 +291,7 @@ class BiliMon(Monitor):
         following = self._recurse_following(pn)
         while following:
             followings += following
-            print(f"递归用户 {self.uid} 关注列表第 {pn} 页...")
             pn += 1
-            time.sleep(random.uniform(0.5, 1))
             following = self._recurse_following(pn)
 
         return followings
@@ -302,6 +308,8 @@ class BiliMon(Monitor):
         return response.json()["data"]["list"]
 
     def _recurse_favlist(self, pn: int, uid: int, step=50):  # 递归追的合集/收藏夹
+        print(f"递归用户 {uid} 追的合集/收藏夹列表第 {pn} 页...")
+        time.sleep(random.uniform(0.5, 1))
         response = requests.get(
             f"https://api.{self.endpoint}/x/v3/fav/folder/collected/list",
             params={"pn": pn, "ps": step, "up_mid": uid, "platform": "web"},
@@ -321,9 +329,7 @@ class BiliMon(Monitor):
         favlist = self._recurse_favlist(pn, uid)
         while favlist:
             favlists += favlist
-            print(f"递归用户 {uid} 追的合集/收藏夹列表第 {pn} 页...")
             pn += 1
-            time.sleep(random.uniform(0.5, 1))
             favlist = self._recurse_favlist(pn, uid)
 
         return favlists
@@ -349,12 +355,8 @@ class BiliMon(Monitor):
             headers=self.header,
         )
         response.raise_for_status()
-        if response.status_code == 200:
-            isLogin = response.json()["data"]["isLogin"]
-            print(("已" if isLogin else "未") + "登录B站")
-
-        else:
-            raise ConnectionError(response.status_code)
+        isLogin = response.json()["data"]["isLogin"]
+        print(("已" if isLogin else "未") + "登录B站")
 
     def upd_fans(self):
         old_fans = []
@@ -827,6 +829,7 @@ class GitHubMon(Monitor):
 
     def _recurse_user_repos(self, username, pn, trytime=3):
         try:
+            time.sleep(random.uniform(0.5, 1))
             response = requests.get(
                 f"https://api.{self.endpoint}/users/{username}/repos?per_page=100&page={pn}",
                 headers=self.header,
@@ -837,7 +840,7 @@ class GitHubMon(Monitor):
         except Exception as e:
             if trytime > 0:
                 print(f"获取 {username} 用户第 {pn} 页关注者出错: {e}, 重试中...")
-                time.sleep(random.uniform(4.5, 5))
+                time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
                 return self._recurse_user_repos(username, pn, trytime)
 
@@ -849,7 +852,6 @@ class GitHubMon(Monitor):
         pn = 1
         repos = []
         while True:
-            time.sleep(random.uniform(0.5, 1))
             data = self._recurse_user_repos(username, pn)
             if not data:
                 break
@@ -861,6 +863,7 @@ class GitHubMon(Monitor):
 
     def _recurse_repo_stargazers(self, repo, pn, trytime=3):
         try:
+            time.sleep(random.uniform(0.5, 1))
             response = requests.get(
                 f"https://api.{self.endpoint}/repos/{repo}/stargazers?per_page=100&page={pn}",
                 headers=self.header,
@@ -871,7 +874,7 @@ class GitHubMon(Monitor):
         except Exception as e:
             if trytime > 0:
                 print(f"获取 {repo} 仓库第 {pn} 页收藏者出错: {e}, 重试中...")
-                time.sleep(random.uniform(4.5, 5))
+                time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
                 return self._recurse_repo_stargazers(repo, pn, trytime)
 
@@ -883,7 +886,6 @@ class GitHubMon(Monitor):
         pn = 1
         stargazers = {}
         while True:
-            time.sleep(random.uniform(0.5, 1))
             data = self._recurse_repo_stargazers(repo, pn)
             if not data:
                 break
