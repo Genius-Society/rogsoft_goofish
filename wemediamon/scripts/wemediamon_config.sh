@@ -94,7 +94,6 @@ load_params() {
 
 # 检查入参
 check_params() {
-	load_params
 	# 检查必填入参
 	if [[ -z "${wemediamon_period}" ]]; then
 		close_with_echo "请输入有效周期!"
@@ -258,17 +257,18 @@ watch_dog() {
 
 # 关闭监控进程
 stop() {
+	load_params
 	pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
-	if [ ! -z $pids ]; then
+	if [[ -n "$pids" ]]; then
 		echo_date "关闭监控进程..."
 		for pid in $pids; do
-			kill "${pid}"
+			kill "$pid"
 		done
 	fi
 	fun_wan_start
 }
 
-start() {
+apply() {
 	stop
 	if [ "${wemediamon_enable}" == "1" ]; then
 		start_wemediamon
@@ -294,8 +294,8 @@ check_proxy() {
 
 # 自启/重启时触发开启 WeMediaMon
 if [[ $# -eq 0 || $# -eq 1 ]] && [[ "${wemediamon_enable}" == "1" ]]; then
-	stop
 	set_lock
+	stop
 	check_proxy
 	start_wemediamon
 	unset_lock
@@ -307,7 +307,7 @@ elif [ $# -eq 2 ]; then
 
 	case $2 in
 	WEB_SUBMIT)
-		start | tee -a $RUN_LOG
+		apply | tee -a $RUN_LOG
 		;;
 
 	FIX_ENV)
