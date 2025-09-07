@@ -29,12 +29,12 @@ python build.py
 ```
 
 ## 依赖项
-| 前置插件 | 安装来源                                                                                           | 备注                                     |
-| :------- | :------------------------------------------------------------------------------------------------- | :--------------------------------------- |
-| USB2JFFS | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 需安装并挂载                             |
-| 虚拟内存 | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 需安装并挂载                             |
-| Entware  | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 需安装并挂载                             |
-| 科学上网 | [GitHub](https://github.com/hq450/fancyss?tab=readme-ov-file#%E6%8F%92%E4%BB%B6%E4%B8%8B%E8%BD%BD) | 推荐下载 lite 版 tar.gz 包并离线安装开启 |
+| 前置插件 (安装顺序自上而下) | 安装来源                                                                                           | 备注                                     | 必需  |
+| :-------------------------- | :------------------------------------------------------------------------------------------------- | :--------------------------------------- | :---: |
+| USB2JFFS                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |   ❌   |
+| 虚拟内存                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |   ❌   |
+| Entware                     | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |   ✔️   |
+| 科学上网                    | [GitHub](https://github.com/hq450/fancyss?tab=readme-ov-file#%E6%8F%92%E4%BB%B6%E4%B8%8B%E8%BD%BD) | 推荐下载 lite 版 tar.gz 包并离线安装开启 |   ✔️   |
 
 ## 机型支持
 在 asuswrt 为基础的固件上, WeMediaMon 插件目前仅支持 aarch64 架构的路由器, 具体如下:
