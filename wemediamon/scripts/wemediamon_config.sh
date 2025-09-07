@@ -285,7 +285,7 @@ check_proxy() {
 		sleep 1
 		count=$((count + 1))
 		if [ "$count" -ge 30 ]; then
-			echo_date "代理网络仍不可达, 脚本关闭!"
+			echo_date "代理网络仍不可达, 请检查【科学上网】插件, 脚本关闭!"
 			exit 1
 		fi
 	done
