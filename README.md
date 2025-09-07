@@ -1,46 +1,40 @@
-# WeMedia relation monitor
+# WeMediaMon 自媒体监控插件
 [![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](./LICENSE)
 [![hf](https://img.shields.io/badge/huggingface-WeMediaTools-ffd21e.svg)](https://huggingface.co/collections/Genius-Society/wemediatools-6899cafefc947c81ff14ddde)
 [![ms](https://img.shields.io/badge/modelscope-bili__dark__tools-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bili_dark_tools)
 
-监控自媒体粉丝动向: 取关狗死全家! 推荐B站的UP在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
+主要用于监控自媒体粉丝动向: 取关狗死全家! 推荐B站的UP在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
 
 <a href="https://github.com/Genius-Society/wemediamon" target="_blank">
     <img src="./wemediamon/res/icon-wemediamon.png" style="width: 160px;">
 </a>
 
-## Code download
+## 代码下载
 ```bash
 git clone git@gitee.com:Genius-Society/wemediamon.git
 cd wemediamon
 ```
 
-## Environment
+## 环境
 ```bash
-conda create -n py310 python=3.10 -y
-conda activate py310
+conda create -n py311 python=3.11 -y
+conda activate py311
 pip install -r requirements.txt
 ```
 
-## Build
+## 打包
 ```bash
 python build.py
 # 将生成的 wemediamon.tar.gz 包上传至软件中心离线安装页面进行安装
 ```
 
-## Requirement
-软件中心安装 Entware 插件并部署完成
-
-## 手动获取B站cookie方法
-1. 用 `VSCode` 打开工程, 选中 `cookie.py`;
-2. 在 `cookie.py` 的 `#TODO:` 处打个断点;
-3. 按 `F5` 调试 `.py` 文件, 弹出 `BiliBili` 登录页面;
-4. 用手机 `APP` 扫码登录后点击继续使其运行完毕 (断点可保留, 首次获取过 cookie 以后可用非 debug 模式重刷)
-
-注: 多账号切换获取 cookie 时推荐清理 `user_data` 文件夹而非登出, 否则会导致被登出的账号 cookie 失效
-
-## B站批量私信
-- <https://www.modelscope.cn/studios/kakamond/bili_dark_tools>
+## 依赖项
+| 前置插件 | 安装来源                                                                                           | 备注                                     |
+| :------- | :------------------------------------------------------------------------------------------------- | :--------------------------------------- |
+| USB2JFFS | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 需安装并挂载                             |
+| 虚拟内存 | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 需安装并挂载                             |
+| Entware  | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 需安装并挂载                             |
+| 科学上网 | [GitHub](https://github.com/hq450/fancyss?tab=readme-ov-file#%E6%8F%92%E4%BB%B6%E4%B8%8B%E8%BD%BD) | 推荐下载 lite 版 tar.gz 包并离线安装开启 |
 
 ## 机型支持
 在 asuswrt 为基础的固件上, WeMediaMon 插件目前仅支持 aarch64 架构的路由器, 具体如下:
@@ -76,7 +70,15 @@ python build.py
 | TUF-AX3000_V2    | 512MB | BCM6756 | armv7 |   4   | 1.7GHz  |    ✔️     |
 | RT-AX57          | 256MB | BCM6756 | armv7 |   4   | 1.7GHz  |    ✔️     |
 
-## Thanks
+## 手动获取B站cookie方法
+1. 用 `VSCode` 打开工程, 选中 `cookie.py`;
+2. 在 `cookie.py` 的 `#TODO:` 处打个断点;
+3. 按 `F5` 调试 `.py` 文件, 弹出 `BiliBili` 登录页面;
+4. 用手机 `APP` 扫码登录后点击继续使其运行完毕 (断点可保留, 首次获取过 cookie 以后可用非 debug 模式重刷)
+
+注: 多账号切换获取 cookie 时推荐清理 `user_data` 文件夹而非登出, 否则会导致被登出的账号 cookie 失效
+
+## 致谢
 - <https://github.com/koolshare/rogsoft>
 - <https://nemo2011.github.io/bilibili-api>
 - <https://github.com/Nemo2011/bilibili-api>
