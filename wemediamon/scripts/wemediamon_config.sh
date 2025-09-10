@@ -293,11 +293,13 @@ check_proxy() {
 }
 
 # 自启/重启时触发开启 WeMediaMon
-if [[ $# -eq 0 || $# -eq 1 ]] && [[ "${wemediamon_enable}" == "1" ]]; then
+if [[ $# -eq 0 || $# -eq 1 ]]; then
 	set_lock
 	stop
-	check_proxy
-	start_wemediamon
+	if [[ "${wemediamon_enable}" == "1" ]]; then
+		check_proxy
+		start_wemediamon
+	fi
 	unset_lock
 # 网页传参命令触发
 elif [ $# -eq 2 ]; then
