@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.options import Options
 MAX_CK_LEN = 1024
 TMP_DIR = "__pycache__"
 CHROME = "chrome-win64"
-CHROME_URL = f"https://genius-society.asuscomm.com:81/d/archive/mirrors/{CHROME}.zip"
+CHROME_URL = f"https://geniussociety.asuscomm.com:81/d/archive/mirrors/{CHROME}.zip"
 
 
 def download_file(url: str, folder_path=f"./{TMP_DIR}"):
