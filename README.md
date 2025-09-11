@@ -70,15 +70,8 @@ python build.py
 | TUF-AX3000_V2    | 512MB | BCM6756 | armv7 |   4   | 1.7GHz  |
 | RT-AX57          | 256MB | BCM6756 | armv7 |   4   | 1.7GHz  |
 
-## 手动获取cookie脚本
-- 以B站为例
-1. 用 `VSCode` 打开工程, 选中 `cookie.py`
-2. 在 `cookie.py` 的 `#TODO:` 处打个断点
-3. 按 `F5` 调试 `.py` 文件, 弹出 `BiliBili` 登录页面
-4. 用手机 `APP` 扫码登录后点击继续使其运行完毕 (断点可保留, 首次获取过 cookie 以后可用非 debug 模式重刷)
-5. 弹出的 `cookie.txt` 中的内容即为要拷贝的 cookie
-
-注: 多账号切换获取 cookie 时推荐清理 `user_data` 文件夹而非登出, 否则会导致被登出的账号 cookie 失效
+## 获取cookie工具
+<https://www.modelscope.cn/studios/kakamond/cookies>
 
 ## 致谢
 - <https://github.com/koolshare/rogsoft>

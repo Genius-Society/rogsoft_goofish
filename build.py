@@ -2,6 +2,7 @@ import os
 import json
 import hashlib
 import subprocess
+from datetime import datetime
 
 
 def CRLF2LF():
@@ -45,6 +46,7 @@ def build(conf_path=f"./config.json"):
         open(f"./{conf['module']}/version", "w").write(conf["version"])
         output = pack(conf["module"])
         conf["md5"] = md5sum(output)
+        conf["build_date"] = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         with open(conf_path, "w", encoding="utf-8") as f:
             json.dump(conf, f, indent=4, sort_keys=True, ensure_ascii=False)
 

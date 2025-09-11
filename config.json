@@ -1,8 +1,11 @@
 {
+    "author": "admin",
+    "build_date": "2025-09-12_00:45:39",
     "description": "自媒体监控工具",
     "home_url": "Module_wemediamon.asp",
-    "md5": "ddf12d8840e23e59dc8d45d45330da4c",
+    "md5": "72e4f38097e07dd40837f5f42f72413f",
     "module": "wemediamon",
+    "tags": "Entware USB",
     "title": "WeMediaMon",
     "version": "1.1"
 }
