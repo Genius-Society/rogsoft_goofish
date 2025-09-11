@@ -1,8 +1,5 @@
 import os
-import json
-import hashlib
 import subprocess
-from datetime import datetime
 
 
 def CRLF2LF():
@@ -32,25 +29,11 @@ def pack(module_name: str):
     return f"./{output}"
 
 
-def md5sum(fpath: str):
-    with open(fpath, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()
-
-
-def build(conf_path=f"./config.json"):
+def build():
     try:
         CRLF2LF()
-        with open(conf_path, "r", encoding="utf-8") as f:
-            conf = json.loads(f.read())
-
-        open(f"./{conf['module']}/version", "w").write(conf["version"])
-        output = pack(conf["module"])
-        conf["md5"] = md5sum(output)
-        conf["build_date"] = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        with open(conf_path, "w", encoding="utf-8") as f:
-            json.dump(conf, f, indent=4, sort_keys=True, ensure_ascii=False)
-
-        print(f"{conf_path} 已更新")
+        module_name = os.path.basename(os.path.dirname(__file__)).lower()
+        pack(module_name)
 
     except Exception as e:
         print(f"打包出错: {e}")
