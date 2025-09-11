@@ -90,7 +90,7 @@
                                         </div>
                                         <div class="splitLine"></div>
                                         <div class="SimpleNote">
-                                            <li>自媒体粉丝监控工具 WeMediaMon</li>
+                                            <li>自媒体监控工具 WeMediaMon</li>
                                             <li style="color: #FC0;">请设置虚拟内存后再使用</li>
                                         </div>
                                         <div id="wemediamon_main">
