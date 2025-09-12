@@ -128,6 +128,12 @@ dbus set softcenter_module_wemediamon_install="1"
 dbus set softcenter_module_wemediamon_name="wemediamon"
 dbus set softcenter_module_wemediamon_title="WeMediaMon"
 
+dbus set wemediamon_bilimon=0
+dbus set wemediamon_hfmon=0
+dbus set wemediamon_gitmon=0
+dbus set wemediamon_cnblon=0
+dbus set wemediamon_itchion=0
+
 # 判断 Entware 是否已安装
 if [ -d "/opt" ]; then
 	install_env
