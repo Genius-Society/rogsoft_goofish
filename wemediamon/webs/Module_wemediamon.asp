@@ -212,8 +212,7 @@
                                                         <textarea class="input_ss_table" id="bilick" name="bilick"
                                                             maxlength="2048" rows="12" autocorrect="off"
                                                             autocapitalize="off"
-                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此">
-                                                        </textarea>
+                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -338,8 +337,7 @@
                                                         <textarea class="input_ss_table" id="cnblokie" name="cnblokie"
                                                             maxlength="2048" rows="12" autocorrect="off"
                                                             autocapitalize="off"
-                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态博客园主页请求标头, 拷贝 Cookie 值至此">
-                                                        </textarea>
+                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态博客园主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -373,13 +371,12 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>itch cookie<span style="color: red;"> * </span></th>
+                                                    <th>itch.io cookie<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <textarea class="input_ss_table" id="itck" name="itck"
                                                             maxlength="2048" rows="12" autocorrect="off"
                                                             autocapitalize="off"
-                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此">
-                                                        </textarea>
+                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
                                                 <tr>

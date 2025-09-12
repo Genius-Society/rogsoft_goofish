@@ -29,15 +29,10 @@ def pack(module_name: str):
     return f"./{output}"
 
 
-def build():
+if __name__ == "__main__":
     try:
         CRLF2LF()
-        module_name = os.path.basename(os.path.dirname(__file__)).lower()
-        pack(module_name)
+        pack("wemediamon")
 
     except Exception as e:
         print(f"打包出错: {e}")
-
-
-if __name__ == "__main__":
-    build()
