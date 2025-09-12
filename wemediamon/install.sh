@@ -128,11 +128,11 @@ dbus set softcenter_module_wemediamon_install="1"
 dbus set softcenter_module_wemediamon_name="wemediamon"
 dbus set softcenter_module_wemediamon_title="WeMediaMon"
 
-dbus set wemediamon_bilimon=0
-dbus set wemediamon_hfmon=0
-dbus set wemediamon_gitmon=0
-dbus set wemediamon_cnblon=0
-dbus set wemediamon_itchion=0
+[ -z "$(dbus get wemediamon_bilimon 2>/dev/null)" ] && dbus set wemediamon_bilimon=0
+[ -z "$(dbus get wemediamon_hfmon 2>/dev/null)" ] && dbus set wemediamon_hfmon=0
+[ -z "$(dbus get wemediamon_gitmon 2>/dev/null)" ] && dbus set wemediamon_gitmon=0
+[ -z "$(dbus get wemediamon_cnblon 2>/dev/null)" ] && dbus set wemediamon_cnblon=0
+[ -z "$(dbus get wemediamon_itchion 2>/dev/null)" ] && dbus set wemediamon_itchion=0
 
 # 判断 Entware 是否已安装
 if [ -d "/opt" ]; then
