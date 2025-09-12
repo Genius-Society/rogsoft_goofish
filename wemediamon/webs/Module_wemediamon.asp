@@ -136,10 +136,7 @@
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="email"
                                                             name="email" maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off" readonly
-                                                            onblur="switchType(this, false);"
-                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            value="">
+                                                            autocapitalize="off">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -174,6 +171,17 @@
                                                     <td>
                                                         <input type="number" class="input_ss_table" id="period"
                                                             name="period" min="1" max="8765" value="2">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>导入配置</th>
+                                                    <td>
+                                                        <input type="file" class="input_ss_table" id="config"
+                                                            name="config" accept=".json">
+                                                        <div id="cfg_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('EXP_CFG')">导出配置</a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </table>

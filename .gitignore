@@ -167,4 +167,5 @@ fans.7z
 chrome-win64.zip
 wemediamon.tar.gz
 cookie.txt
-test.sh
+test.*
+wemediamon_cfg.json

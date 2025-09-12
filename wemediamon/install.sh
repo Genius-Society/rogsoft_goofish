@@ -136,7 +136,7 @@ dbus set softcenter_module_wemediamon_title="WeMediaMon"
 
 # 判断 Entware 是否已安装
 if [ -d "/opt" ]; then
-	install_env
+	# install_env
 	echo_date "WeMediaMon 插件安装完毕!"
 	sh /koolshare/scripts/wemediamon_config.sh
 else

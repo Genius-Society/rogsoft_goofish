@@ -219,7 +219,8 @@ input[type="text"] {
 }
 
 #smtp_btn,
-#env_btn {
+#env_btn,
+#cfg_btn {
 	float: right;
 	margin-right: 5px;
 }

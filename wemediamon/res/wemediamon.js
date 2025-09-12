@@ -8,6 +8,31 @@ function init() {
 	get_status();
 	get_dbus_data();
 	register_event();
+	import_cfg();
+}
+
+function import_cfg() {
+	document.getElementById('config').addEventListener('change', function (e) {
+		const file = e.target.files[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = evt => {
+			try {
+				const obj = JSON.parse(evt.target.result); // 解析成对象
+				load_cfg(obj);
+			} catch (err) {
+				alert('配置文件格式错误', err);
+			}
+		};
+		reader.readAsText(file); // 按文本读
+	});
+}
+
+function load_cfg(obj) {
+	const keys = ["email", "smtp", "cache", "period", "bilick", "hftk", "papers", "gitags", "cnblokie", "itck"];
+	keys.forEach(k => {
+		if (k in obj) $(`#${k}`).val(obj[k]);
+	});
 }
 
 function register_event() {
