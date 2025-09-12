@@ -35,6 +35,18 @@ function load_cfg(obj) {
 	});
 }
 
+function export_cfg() {
+	const keys = ["email", "smtp", "cache", "period", "bilick", "hftk", "papers", "gitags", "cnblokie", "itck"];
+	const data = {};
+	for (const k of keys) {
+		data[k] = $(`#${k}`).val();
+	}
+	const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+	const url = URL.createObjectURL(blob);
+	$('<a>').attr({ href: url, download: 'wemediamon_cfg.json' }).appendTo('body')[0].click();
+	URL.revokeObjectURL(url);
+}
+
 function register_event() {
 	$(".popup_bar_bg_ks").click(function () { count_down = -1; });
 	$(window).resize(function () {

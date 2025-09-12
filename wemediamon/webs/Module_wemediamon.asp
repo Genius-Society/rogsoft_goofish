@@ -180,7 +180,7 @@
                                                             name="config" accept=".json">
                                                         <div id="cfg_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="trigger('EXP_CFG')">导出配置</a>
+                                                                onclick="export_cfg()">导出配置</a>
                                                         </div>
                                                     </td>
                                                 </tr>
