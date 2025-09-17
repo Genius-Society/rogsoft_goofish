@@ -19,22 +19,23 @@ cd wemediamon
 ```bash
 conda create -n py311 python=3.11 -y
 conda activate py311
-pip install -r requirements.txt
+pip install -r ./wemediamon/bin/requirements.txt
 ```
 
 ## 打包
 ```bash
+# 要先将 git bash 和 7z 环境变量配置好重启
 python build.py
 # 将生成的 wemediamon.tar.gz 包上传至软件中心离线安装页面进行安装
 ```
 
 ## 依赖项
-| 前置插件 (安装顺序自上而下) | 安装来源                                                                                           | 备注                                     | 必需  |
-| :-------------------------- | :------------------------------------------------------------------------------------------------- | :--------------------------------------- | :---: |
-| USB2JFFS                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |   ❌   |
-| 虚拟内存                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |   ❌   |
-| Entware                     | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |   ✔️   |
-| 科学上网                    | [GitHub](https://github.com/hq450/fancyss?tab=readme-ov-file#%E6%8F%92%E4%BB%B6%E4%B8%8B%E8%BD%BD) | 推荐下载 lite 版 tar.gz 包并离线安装开启 |   ✔️   |
+| 前置插件 (安装顺序自上而下) | 安装来源                                                                                           | 备注                                     |
+| :-------------------------- | :------------------------------------------------------------------------------------------------- | :--------------------------------------- |
+| USB2JFFS                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |
+| 虚拟内存                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |
+| Entware                     | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |
+| 科学上网                    | [GitHub](https://github.com/hq450/fancyss?tab=readme-ov-file#%E6%8F%92%E4%BB%B6%E4%B8%8B%E8%BD%BD) | 推荐下载 lite 版 tar.gz 包并离线安装开启 |
 
 ## 机型支持
 在 asuswrt 为基础的固件上, WeMediaMon 插件目前仅支持 aarch64 架构的路由器, 具体如下:

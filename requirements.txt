@@ -1,3 +1,0 @@
-bilibili-api-python==16.3
-requests
-schedule
