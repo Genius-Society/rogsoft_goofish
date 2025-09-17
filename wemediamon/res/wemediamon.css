@@ -46,7 +46,7 @@ a:focus {
 #bilick,
 #cnblokie,
 #itck {
-	-webkit-text-security: square;
+	-webkit-text-security: disc;
 }
 
 #bilick:focus,
