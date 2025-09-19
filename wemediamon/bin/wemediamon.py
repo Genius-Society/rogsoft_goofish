@@ -820,7 +820,7 @@ class GitHubMon(Monitor):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
-                f"https://api.{self.endpoint}/users/{username}/followers",
+                f"https://api.{self.endpoint}/users/{username}/followers?per_page=100&page={pn}",
                 headers=self.header,
             )
             response.raise_for_status()
