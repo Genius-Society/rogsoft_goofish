@@ -816,14 +816,38 @@ class GitHubMon(Monitor):
         self.tags = args.gitags.split(";")
         self.header = {"user-agent": self.ua}
 
-    def _list_followers(self, user: str):
-        time.sleep(random.uniform(0.5, 1))
-        response = requests.get(f"https://api.{self.endpoint}/users/{user}/followers")
-        response.raise_for_status()
-        fans = response.json()
+    def _recurse_followers(self, username, pn, trytime=3):
+        try:
+            time.sleep(random.uniform(0.5, 1))
+            response = requests.get(
+                f"https://api.{self.endpoint}/users/{username}/followers",
+                headers=self.header,
+            )
+            response.raise_for_status()
+            return response.json()
+
+        except Exception as e:
+            if trytime > 0:
+                print(f"获取 {username} 用户第 {pn} 页粉丝出错: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
+                trytime -= 1
+                return self._recurse_followers(username, pn, trytime)
+
+            else:
+                raise ConnectionError(f"重试获取 {username} 用户的粉丝列表过多次!")
+
+    def _list_followers(self, username: str):
+        pn = 1
         followers = {}
-        for follower in fans:
-            followers[str(follower["id"])] = str(follower["login"])
+        while True:
+            fans = self._recurse_followers(username, pn)
+            if not fans:
+                break
+
+            for follower in fans:
+                followers[str(follower["id"])] = str(follower["login"])
+
+            pn += 1
 
         return followers
 
@@ -839,13 +863,13 @@ class GitHubMon(Monitor):
 
         except Exception as e:
             if trytime > 0:
-                print(f"获取 {username} 用户第 {pn} 页关注者出错: {e}, 重试中...")
+                print(f"获取 {username} 用户第 {pn} 页仓库出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
                 return self._recurse_user_repos(username, pn, trytime)
 
             else:
-                raise ConnectionError("重试获取收藏者列表过多次!")
+                raise ConnectionError(f"重试获取 {username} 用户的仓库列表过多次!")
 
     # 获取用户所有仓库
     def _list_user_repos(self, username):
@@ -879,7 +903,7 @@ class GitHubMon(Monitor):
                 return self._recurse_repo_stargazers(repo, pn, trytime)
 
             else:
-                raise ConnectionError("重试获取收藏者列表过多次!")
+                raise ConnectionError(f"重试获取 {repo} 仓库收藏者列表过多次!")
 
     # 获取仓库收藏者
     def _list_repo_stargazers(self, repo):
