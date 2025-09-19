@@ -816,11 +816,11 @@ class GitHubMon(Monitor):
         self.tags = args.gitags.split(";")
         self.header = {"user-agent": self.ua}
 
-    def _recurse_followers(self, username, pn, trytime=3):
+    def _recurse_followers(self, username, pn, step=100, trytime=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
-                f"https://api.{self.endpoint}/users/{username}/followers?per_page=100&page={pn}",
+                f"https://api.{self.endpoint}/users/{username}/followers?per_page={step}&page={pn}",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -831,7 +831,7 @@ class GitHubMon(Monitor):
                 print(f"获取 {username} 用户第 {pn} 页粉丝出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
-                return self._recurse_followers(username, pn, trytime)
+                return self._recurse_followers(username, pn, step, trytime)
 
             else:
                 raise ConnectionError(f"重试获取 {username} 用户的粉丝列表过多次!")
@@ -851,11 +851,11 @@ class GitHubMon(Monitor):
 
         return followers
 
-    def _recurse_user_repos(self, username, pn, trytime=3):
+    def _recurse_user_repos(self, username, pn, step=100, trytime=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
-                f"https://api.{self.endpoint}/users/{username}/repos?per_page=100&page={pn}",
+                f"https://api.{self.endpoint}/users/{username}/repos?per_page={step}&page={pn}",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -866,7 +866,7 @@ class GitHubMon(Monitor):
                 print(f"获取 {username} 用户第 {pn} 页仓库出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
-                return self._recurse_user_repos(username, pn, trytime)
+                return self._recurse_user_repos(username, pn, step, trytime)
 
             else:
                 raise ConnectionError(f"重试获取 {username} 用户的仓库列表过多次!")
@@ -885,11 +885,11 @@ class GitHubMon(Monitor):
 
         return repos
 
-    def _recurse_repo_stargazers(self, repo, pn, trytime=3):
+    def _recurse_repo_stargazers(self, repo, pn, step=100, trytime=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
-                f"https://api.{self.endpoint}/repos/{repo}/stargazers?per_page=100&page={pn}",
+                f"https://api.{self.endpoint}/repos/{repo}/stargazers?per_page={step}&page={pn}",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -900,7 +900,7 @@ class GitHubMon(Monitor):
                 print(f"获取 {repo} 仓库第 {pn} 页收藏者出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
-                return self._recurse_repo_stargazers(repo, pn, trytime)
+                return self._recurse_repo_stargazers(repo, pn, step, trytime)
 
             else:
                 raise ConnectionError(f"重试获取 {repo} 仓库收藏者列表过多次!")
