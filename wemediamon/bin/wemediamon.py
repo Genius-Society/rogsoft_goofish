@@ -431,7 +431,7 @@ class BiliMon(Monitor):
     def clean_subscriptions(self):
         favlists = self._get_favlists()
         for favlist in self._tqdm(favlists, desc=f"筛选用户 {self.uid} 的已失效订阅"):
-            if favlist["title"] == "该合集已失效":
+            if favlist["title"] == "该合集已失效" or favlist["media_count"] == 0:
                 fid = favlist["id"]
                 url = f"https://space.{self.endpoint}/{favlist['upper']['mid']}/lists/{fid}"
                 if self._unsubscribe(fid):
