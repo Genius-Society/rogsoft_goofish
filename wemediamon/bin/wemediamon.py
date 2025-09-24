@@ -433,7 +433,7 @@ class BiliMon(Monitor):
         for favlist in self._tqdm(favlists, desc=f"筛选用户 {self.uid} 的已失效订阅"):
             if favlist["title"] == "该合集已失效":
                 fid = favlist["id"]
-                url = f"https://space.{self.endpoint}/{favlists['mid']}/lists/{fid}"
+                url = f"https://space.{self.endpoint}/{favlist['upper']['mid']}/lists/{fid}"
                 if self._unsubscribe(fid):
                     print(f"清理失效订阅 {url} 成功!")
                 else:
