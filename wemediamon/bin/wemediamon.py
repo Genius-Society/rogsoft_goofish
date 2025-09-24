@@ -320,6 +320,16 @@ class BiliMon(Monitor):
 
         return response["data"]["list"]
 
+    def _split_lists(self, favlists: list):
+        seasons, folders = {}, {}
+        for favlist in favlists:
+            if favlist["fid"] == 0:
+                seasons[favlist["id"]] = favlist
+            else:
+                folders[favlist["id"]] = favlist
+
+        return list(seasons.values()), list(folders.values())
+
     def _get_favlists(self, uid=None):  # 获取追的合集/收藏夹
         if not uid:
             uid = self.uid
@@ -332,7 +342,7 @@ class BiliMon(Monitor):
             pn += 1
             favlist = self._recurse_favlist(pn, uid)
 
-        return favlists
+        return self._split_lists(favlists)
 
     def _unsubscribe(self, season_id: int):  # seasons <- subscriptions
         time.sleep(random.uniform(0.5, 1))
@@ -348,6 +358,16 @@ class BiliMon(Monitor):
             ).json()["code"]
             == 0
         )
+
+    def _uncollect(self, media_id: int):  # folders <- collections
+        time.sleep(random.uniform(0.5, 1))
+        response = requests.post(
+            f"https://api.{self.endpoint}/x/v3/fav/folder/unfav",
+            data={"media_id": media_id, "csrf": self.bili_jct},
+            headers=self.header,
+        )
+        response.raise_for_status()
+        return response.json()["code"] == 0
 
     def check_login(self):
         response = requests.get(
@@ -417,9 +437,7 @@ class BiliMon(Monitor):
 
     def clean_followings(self):
         followings = self._get_followings()
-        for following in self._tqdm(
-            followings, desc=f"筛选用户 {self.uid} 所有已注销关注"
-        ):
+        for following in self._tqdm(followings, desc=f"筛选用户 {self.uid} 已注销关注"):
             uid = int(following["mid"])
             if following["uname"] == "账号已注销":
                 url = f"https://space.{self.endpoint}/{uid}"
@@ -428,22 +446,33 @@ class BiliMon(Monitor):
                 else:
                     print(f"清理已注销关注 {url} 失败...")
 
-    def clean_subscriptions(self):
-        favlists = self._get_favlists()
-        for favlist in self._tqdm(favlists, desc=f"筛选用户 {self.uid} 的已失效订阅"):
-            if favlist["title"] == "该合集已失效" or favlist["media_count"] == 0:
-                fid = favlist["id"]
-                url = f"https://space.{self.endpoint}/{favlist['upper']['mid']}/lists/{fid}"
+    def clean_favlists(self):
+        subs, favs = self._get_favlists()
+        for sub in self._tqdm(subs, desc=f"筛选用户 {self.uid} 的已失效订阅合集"):
+            if sub["title"] == "该合集已失效" or sub["media_count"] == 0:
+                fid, mid = sub["id"], sub["mid"]
+                url = f"https://space.{self.endpoint}/{mid}/lists/{fid}" if mid else fid
                 if self._unsubscribe(fid):
-                    print(f"清理失效订阅 {url} 成功!")
+                    print(f"清理失效订阅合集 {url} 成功!")
                 else:
-                    print(f"清理失效订阅 {url} 失败...")
+                    print(f"清理失效订阅合集 {url} 失败...")
+
+        for fav in self._tqdm(favs, desc=f"筛选用户 {self.uid} 的已失效订阅收藏"):
+            if fav["title"] == "收藏夹失效" or fav["media_count"] == 0:
+                fid, mid = fav["id"], fav["mid"]
+                url = (
+                    f"https://space.{self.endpoint}/{mid}/favlist?fid={fid}"
+                    if mid
+                    else fid
+                )
+                if self._uncollect(fid):
+                    print(f"清理失效订阅收藏 {url} 成功!")
+                else:
+                    print(f"清理失效订阅收藏 {url} 失败...")
 
     def clean_folders(self):
         folders = self._get_folders()
-        for folder in self._tqdm(
-            folders, desc=f"清理用户 {self.uid} 所有收藏夹中失效视频"
-        ):
+        for folder in self._tqdm(folders, desc=f"清理用户 {self.uid} 收藏夹失效视频"):
             time.sleep(random.uniform(0.5, 1))
             fid = folder["id"]
             retcode = sync(
@@ -458,7 +487,7 @@ class BiliMon(Monitor):
             self.upd_fans()
             self.clean_folders()
             self.clean_followings()
-            self.clean_subscriptions()
+            self.clean_favlists()
 
         except Exception as e:
             print(f"B站监控器触发出错: {e}, 重试中...")
