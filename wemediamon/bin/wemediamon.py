@@ -13,7 +13,14 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from bilibili_api import ResponseCodeException, Credential, favorite_list, user, sync
+from bilibili_api import (
+    ResponseCodeException,
+    Credential,
+    favorite_list,
+    video,
+    user,
+    sync,
+)
 
 # 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="WeMediaMon 配置脚本")
@@ -101,8 +108,8 @@ def send_email(
         else:
             print(f"邮件发送失败: {e}")
 
-    except Exception as ex:
-        print(ex)
+    except Exception as e:
+        print(e)
 
 
 class Monitor:
@@ -368,6 +375,24 @@ class BiliMon(Monitor):
         )
         response.raise_for_status()
         return response.json()["code"] == 0
+
+    def _daily_share(self):
+        try:
+            status = sync(
+                video.Video(bvid="BV1CiYSzmEv6", credential=self.credential).share()
+            )
+            if status == 1:
+                print("✅ 分享成功: +5 经验已到账!")
+            elif status == 2:
+                print("分享成功: 今日经验已获取过")
+            else:
+                raise Exception(f"{status}")
+
+            return True
+
+        except Exception as e:
+            print(f"❌ 分享失败: {e}")
+            return False
 
     def check_login(self):
         response = requests.get(
