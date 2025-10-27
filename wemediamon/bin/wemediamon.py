@@ -166,6 +166,7 @@ class BiliMon(Monitor):
             bili_jct=self.bili_jct,
             buvid3=self.buvid3,
         )
+        self.me = user.User(uid=self.uid, credential=self.credential)
 
     def _get_fans(self, pn, trytime=3):
         try:
@@ -221,9 +222,7 @@ class BiliMon(Monitor):
                 raise ResponseCodeException(f"{e}")
 
     def _is_fans(self, uid):
-        relation = sync(
-            user.User(uid=self.uid, credential=self.credential).get_relation(uid)
-        )
+        relation = sync(self.me.get_relation(uid))
         followed_status = relation["be_relation"]["attribute"]
         return followed_status == 2 or followed_status == 6  # 2=已关注, 6=互粉
 
@@ -288,9 +287,7 @@ class BiliMon(Monitor):
     def _recurse_following(self, pn: int):
         print(f"递归用户 {self.uid} 关注列表第 {pn} 页...")
         time.sleep(random.uniform(0.5, 1))
-        return sync(
-            user.User(uid=self.uid, credential=self.credential).get_followings(pn=pn)
-        )["list"]
+        return sync(self.me.get_followings(pn=pn))["list"]
 
     def _get_followings(self):
         pn = 1
@@ -376,11 +373,19 @@ class BiliMon(Monitor):
         response.raise_for_status()
         return response.json()["code"] == 0
 
-    def _daily_share(self):
+    def _daily_sign(self):
+        response = requests.get(
+            f"https://api.{self.endpoint}/x/member/web/exp/reward",
+            headers=self.header,
+        )
+        response.raise_for_status()
+        data = response.json()["data"]
+        print(data)
+        return data["watch"], data["coins"] > 0, data["share"]
+
+    def _daily_share(self, bvid="BV1iWrgYaEqa"):
         try:
-            status = sync(
-                video.Video(bvid="BV1CiYSzmEv6", credential=self.credential).share()
-            )
+            status = sync(video.Video(bvid=bvid, credential=self.credential).share())
             if status == 1:
                 print("✅ 分享成功: +5 经验已到账!")
             elif status == 2:
@@ -393,6 +398,51 @@ class BiliMon(Monitor):
         except Exception as e:
             print(f"❌ 分享失败: {e}")
             return False
+
+    def _rand_video(self):
+        return ""
+
+    def _daily_coin(self, delay=2):
+        coins = self.me.get_user_info_sync()["coins"]
+        to_add = min(5, coins)
+        if to_add == 0:
+            print("⚠️ 硬币已空, 跳过投币")
+            return
+
+        print(f"💰 剩余硬币: {coins} → 将投: {to_add}")
+        for i in range(to_add):
+            bvid = self._rand_video()
+            status = sync(video.Video(bvid=bvid, credential=self.credential).pay_coin())
+            print(f"✅ 投币 {i+1}/{to_add}: {status}")
+            time.sleep(delay)
+
+        print("✅ 投币任务完成")
+
+    def _daily_watch(self, bvid="BV1iWrgYaEqa"):
+        response = requests.post(
+            f"https://api.{self.endpoint}/x/click-interface/web/heartbeat",
+            headers=self.header,
+            data={
+                "bvid": bvid,
+                "played_time": random.randint(10, 90),
+                "realtime": random.randint(10, 90),
+                "start_ts": int(time.time()) - 90,
+                "type": 3,
+            },
+        )
+        response.raise_for_status()
+        print(f"观看视频结果: {response.json()}")
+
+    def daily_tasks(self):
+        watched, coined, shared = self._daily_sign()
+        if not watched:
+            self._daily_watch()
+
+        if not coined:
+            self._daily_coin()
+
+        if not shared:
+            self._daily_share()
 
     def check_login(self):
         response = requests.get(
