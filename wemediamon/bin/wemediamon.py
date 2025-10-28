@@ -429,7 +429,7 @@ class BiliMon(Monitor):
                 print(f"✅ 投币 {i}/{to_add}: {status}")
                 time.sleep(delay)
 
-        print("✅ 投币任务完成")
+        print(f"✅ 投币任务完成, +{to_add * 10} 经验到手!")
 
     def _daily_watch(self, bvid="BV1iWrgYaEqa"):
         response = requests.post(
