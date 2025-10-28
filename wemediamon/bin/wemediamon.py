@@ -399,22 +399,35 @@ class BiliMon(Monitor):
             print(f"❌ 分享失败: {e}")
             return False
 
-    def _rand_video(self):
-        return ""
+    def _rand_video(self, region=1010):
+        response = requests.get(
+            f"https://api.{self.endpoint}/x/web-interface/region/feed/rcmd",
+            params={
+                "request_cnt": 1,
+                "from_region": region,  # 知识区
+            },
+            headers=self.header,
+        )
+        response.raise_for_status()
+        return response.json()["data"]["archives"][0]["bvid"]
 
     def _daily_coin(self, delay=2):
         coins = self.me.get_user_info_sync()["coins"]
         to_add = min(5, coins)
-        if to_add == 0:
+        if to_add < 1:
             print("⚠️ 硬币已空, 跳过投币")
             return
 
         print(f"💰 剩余硬币: {coins} → 将投: {to_add}")
-        for i in range(to_add):
+        i = 0
+        while i < to_add:
             bvid = self._rand_video()
-            status = sync(video.Video(bvid=bvid, credential=self.credential).pay_coin())
-            print(f"✅ 投币 {i+1}/{to_add}: {status}")
-            time.sleep(delay)
+            v = video.Video(bvid=bvid, credential=self.credential)
+            if sync(v.get_pay_coins()) < 1:
+                status = sync(v.pay_coin())
+                i += 1
+                print(f"✅ 投币 {i}/{to_add}: {status}")
+                time.sleep(delay)
 
         print("✅ 投币任务完成")
 
