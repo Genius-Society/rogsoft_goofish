@@ -601,14 +601,17 @@ class HFMon(Monitor):
             if token:
                 self.header["Authorization"] = f"Bearer {token}"
 
-        def list_user_following(self, username: str):
+        def list_user_followings(self, username: str):
             return self._get(f"{self.endpoint}/users/{username}/following")
 
-        def list_user_follower(self, user_type: str, username: str):
+        def list_followers(self, user_type: str, username: str):
             return self._get(f"{self.endpoint}/{user_type}s/{username}/followers")
 
-        def list_user_org(self, username: str):
+        def list_user_following_orgs(self, username: str):
             return self._get(f"{self.endpoint}/users/{username}/following/orgs")
+
+        def list_user_orgs(self, username: str):
+            return self.get_user_overview(username)["orgs"]
 
         def list_models(self, author: str = None):
             return self._get(f"{self.endpoint}/models", params={"author": author})
@@ -706,7 +709,7 @@ class HFMon(Monitor):
         tokens = hftks.replace(" ", "").split(";")
         for tk in tokens:
             tags[tk] = [self.api.whoami(token=tk)["name"]]
-            orgs = self.api.list_user_org(tags[tk][0])
+            orgs = self.api.list_user_orgs(tags[tk][0])
             for org in orgs:
                 tags[tk].append(org["name"])
 
@@ -741,7 +744,7 @@ class HFMon(Monitor):
             response.raise_for_status()
 
     def _get_followers(self, tag_type: str, tag: str):
-        fans = self.api.list_user_follower(tag_type, tag)
+        fans = self.api.list_followers(tag_type, tag)
         followers = {}
         for follower in fans:
             followers[str(follower["_id"])] = str(follower["user"])
@@ -892,15 +895,15 @@ class HFMon(Monitor):
         if logs:
             print(f"抱脸空间 {logs}激活完成!")
 
-        content = ""
+        logs = ""
         for failure in failures:
             errepo: str = failure
             errepo = errepo.replace(self.endpoint, "")
-            content += f"<br><a href='{failure}'>{errepo[1:]}</a><br>"
+            logs += f"<br><a href='{failure}'>{errepo[1:]}</a><br>"
 
-        if content:
+        if logs:
             send_email(
-                f"激活以下抱脸空间失败: {content}",
+                f"激活以下抱脸空间失败: {logs}",
                 "[WeMediaMon 插件] 运行错误",
                 "空间激活出现问题",
             )
