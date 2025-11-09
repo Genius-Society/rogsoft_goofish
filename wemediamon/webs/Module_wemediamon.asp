@@ -261,7 +261,7 @@
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            placeholder="若多个token则以;隔开">
+                                                            placeholder="若多个则用;隔开">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -269,8 +269,7 @@
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="papers"
                                                             name="papers" maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off"
-                                                            placeholder="username/space1;username/space2;...">
+                                                            autocapitalize="off" placeholder="若多个则用;隔开">
                                                     </td>
                                                 </tr>
                                                 <tr>

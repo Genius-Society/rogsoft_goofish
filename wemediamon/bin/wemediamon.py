@@ -1473,6 +1473,7 @@ def start_monitor(period=args.period):
         update()
         print(f"监控开启中...每 {period} 小时触发一次")
         schedule.every(period).hours.do(update)
+        schedule.every().day.at("00:01").do(BiliMon().daily_tasks)
         while True:
             schedule.run_pending()
             time.sleep(1)
