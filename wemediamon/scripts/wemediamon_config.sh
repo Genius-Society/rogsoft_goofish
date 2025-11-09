@@ -82,7 +82,7 @@ load_params() {
 	wemediamon_bilimon=$(dbus get wemediamon_bilimon)
 	wemediamon_bilick=$(dbus get wemediamon_bilick)
 	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
-	wemediamon_hftk=$(dbus get wemediamon_hftk)
+	wemediamon_hftks=$(dbus get wemediamon_hftks)
 	wemediamon_papers=$(dbus get wemediamon_papers)
 	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
 	wemediamon_gitags=$(dbus get wemediamon_gitags)
@@ -123,11 +123,11 @@ check_params() {
 		wemediamon_bilick=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
-		if [[ -z "${wemediamon_hftk}" ]]; then
+		if [[ -z "${wemediamon_hftks}" ]]; then
 			close_with_echo "请输入有效抱脸Token!"
 		fi
 	else
-		wemediamon_hftk=''
+		wemediamon_hftks=''
 		wemediamon_papers=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
@@ -177,7 +177,7 @@ start_wemediamon() {
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
-		--hftk "${wemediamon_hftk}" \
+		--hftks "${wemediamon_hftks}" \
 		--papers "${wemediamon_papers}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
@@ -198,7 +198,7 @@ trigger_once() {
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
-		--hftk "${wemediamon_hftk}" \
+		--hftks "${wemediamon_hftks}" \
 		--papers "${wemediamon_papers}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \

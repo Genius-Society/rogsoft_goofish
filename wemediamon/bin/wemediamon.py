@@ -31,7 +31,7 @@ parser.add_argument("--email", type=str, required=True)
 parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
-parser.add_argument("--hftk", type=str, default="")
+parser.add_argument("--hftks", type=str, default="")
 parser.add_argument("--papers", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
 parser.add_argument("--cnblokie", type=str, default="")
@@ -692,7 +692,7 @@ class HFMon(Monitor):
         super().__init__("hf")
         self.endpoint = "https://huggingface.co"
         self.papers = args.papers.replace(" ", "").split(";")
-        self.token = args.hftk.strip()
+        self.token = args.hftks.strip()
         self.header = {"User-Agent": self.ua, "Authorization": f"Bearer {self.token}"}
         self.api = self.HfApi(user_agent=self.ua, proxy=self.proxy)
         self.me = self.api.whoami(token=self.token)["name"]
@@ -1440,7 +1440,7 @@ def update():
     if args.bilick:
         BiliMon().trigger()
 
-    if args.hftk:
+    if args.hftks:
         HFMon().trigger()
 
     if args.gitags:

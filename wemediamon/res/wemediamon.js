@@ -30,7 +30,7 @@ function import_cfg() {
 
 function load_cfg(obj) {
 	const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"]
-	const keys = ["email", "smtp", "cache", "period", "bilick", "hftk", "papers", "gitags", "cnblokie", "itck"];
+	const keys = ["email", "smtp", "cache", "period", "bilick", "hftks", "papers", "gitags", "cnblokie", "itck"];
 	keys.forEach(k => {
 		if (k in obj) $(`#${k}`).val(obj[k]);
 	});
@@ -41,7 +41,7 @@ function load_cfg(obj) {
 
 function export_cfg() {
 	const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"]
-	const keys = ["email", "smtp", "cache", "period", "bilick", "hftk", "papers", "gitags", "cnblokie", "itck"];
+	const keys = ["email", "smtp", "cache", "period", "bilick", "hftks", "papers", "gitags", "cnblokie", "itck"];
 	const data = {};
 	for (const k of keys) data[k] = $(`#${k}`).val();
 	for (const k of chks) data[k] = $(`#${k}`).val();
