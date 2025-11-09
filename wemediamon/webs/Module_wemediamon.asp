@@ -254,14 +254,14 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>Token<span style="color: red;"> * </span></th>
+                                                    <th>Token(s)<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input type="password" class="input_ss_table" id="hftks"
                                                             name="hftks" maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            placeholder="https://huggingface.co/settings/tokens">
+                                                            placeholder="若多个token则以;隔开">
                                                     </td>
                                                 </tr>
                                                 <tr>

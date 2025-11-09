@@ -692,48 +692,50 @@ class HFMon(Monitor):
         super().__init__("hf")
         self.endpoint = "https://huggingface.co"
         self.papers = args.papers.replace(" ", "").split(";")
-        self.token = args.hftks.strip()
-        self.header = {"User-Agent": self.ua, "Authorization": f"Bearer {self.token}"}
         self.api = self.HfApi(user_agent=self.ua, proxy=self.proxy)
-        self.me = self.api.whoami(token=self.token)["name"]
-        self.tag_users, self.tag_orgs = self._parse_tags()
+        self.targets = self._parse_tags(args.hftks)
 
-    def _parse_tags(self):
-        following_users = [self.me]
-        followings = self.api.list_user_following(self.me)
-        for following in followings:
-            following_users.append(following["user"])
+    def _headers(self, token=None):
+        if token:
+            return {"User-Agent": self.ua, "Authorization": f"Bearer {token}"}
+        else:
+            return {"User-Agent": self.ua}
 
-        following_orgs = []
-        orgs = self.api.list_user_org(self.me)
-        for org in orgs:
-            following_orgs.append(org["name"])
+    def _parse_tags(self, hftks: str):
+        tags = {}
+        tokens = hftks.replace(" ", "").split(";")
+        for tk in tokens:
+            tags[tk] = [self.api.whoami(token=tk)["name"]]
+            orgs = self.api.list_user_org(tags[tk][0])
+            for org in orgs:
+                tags[tk].append(org["name"])
 
-        return following_users, following_orgs
+        return tags
 
-    def _move_repo(self, from_repo, to_repo, type="space"):
+    def _move_repo(self, from_repo, to_repo, token, type="space"):
         response = requests.post(
             f"{self.endpoint}/api/repos/move",
-            headers=self.header,
+            headers=self._headers(token),
             json={
                 "fromRepo": from_repo,
                 "toRepo": to_repo,
                 "type": type,
             },
+            proxies=self.proxy,
         )
         response.raise_for_status()
 
-    def _activate_space(self, space_id: str):
-        static = self.api.space_info(space_id, self.token)["sdk"] == "static"
+    def _activate_space(self, space_id: str, token: str):
+        static = self.api.space_info(space_id, token)["sdk"] == "static"
         response = requests.get(
             f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
-            headers=self.header,
+            headers=self._headers(token),
         )
         if response.status_code == 412:
             tmp_repo = f"{space_id}_{int(time.time())}"
-            self._move_repo(space_id, tmp_repo)
+            self._move_repo(space_id, tmp_repo, token)
             time.sleep(random.uniform(3, 5))
-            self._move_repo(tmp_repo, space_id)
+            self._move_repo(tmp_repo, space_id, token)
 
         else:
             response.raise_for_status()
@@ -746,24 +748,24 @@ class HFMon(Monitor):
 
         return followers
 
-    def _list_repos(self, username):
+    def _list_repos(self, name):  # user or org name
         repos = []
-        models = self.api.list_models(author=username)
+        models = self.api.list_models(author=name)
         for model in models:
             if not model["private"]:
                 repos.append({"repo_id": model["id"], "repo_type": "model"})
 
-        datasets = self.api.list_datasets(author=username)
+        datasets = self.api.list_datasets(author=name)
         for dataset in datasets:
             if not dataset["private"]:
                 repos.append({"repo_id": dataset["id"], "repo_type": "dataset"})
 
-        spaces = self.api.list_spaces(author=username)
+        spaces = self.api.list_spaces(author=name)
         for space in spaces:
             if not space["private"]:
                 repos.append({"repo_id": space["id"], "repo_type": "space"})
 
-        collects = self.api.list_collections(owner=username)
+        collects = self.api.list_collections(owner=name)
         for collect in collects:
             if not collect["private"]:
                 repos.append({"repo_id": collect["slug"], "repo_type": "collection"})
@@ -821,39 +823,43 @@ class HFMon(Monitor):
 
     def _get_latest_data(self):
         data = {}
-        for user in self.tag_users:
-            data[user] = self._get_followers("user", user)
-            repos = self._list_repos(user)
-            for repo in self._tqdm(repos, desc=f"分析 {user} 用户仓库中"):
+        for token in self.targets:
+            admin = self.targets[token][0]
+            data[admin] = self._get_followers("user", admin)
+            repos = self._list_repos(admin)
+            for repo in self._tqdm(repos, desc=f"分析用户 {admin} 仓库中"):
                 data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
-        for org in self.tag_orgs:
-            data[org] = self._get_followers("organization", org)
-            repos = self._list_repos(org)
-            for repo in self._tqdm(repos, desc=f"分析 {org} 组织仓库中"):
-                data[self._mapo(repo)] = self._list_repo_stargazers(repo)
+            if len(self.targets[token]) > 1:
+                orgs = self.targets[token][1:]
+                for org in orgs:
+                    data[org] = self._get_followers("organization", org)
+                    repos = self._list_repos(org)
+                    for repo in self._tqdm(repos, desc=f"分析组织 {org} 仓库中"):
+                        data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
         for paper in self.papers:
             data[f"papers/{paper}"] = self._list_upvoters("paper", paper)
 
         return data
 
-    def _list_spaces(self, username: str):
+    def _list_spaces(self, name: str, token: str):
         sleepings, errors = [], []
-        spaces = self.api.list_spaces(username, self.token)
+        spaces = self.api.list_spaces(name, token)
         for space in spaces:
-            status = self.api.get_space_runtime(space["id"], self.token)["stage"]
+            space_id = space["id"]
+            status = self.api.get_space_runtime(space_id, token)["stage"]
             if status == "SLEEPING":
-                sleepings.append(space["id"])
+                sleepings.append(space_id)
             elif "ERROR" in status:
-                errors.append(f"{self.endpoint}/spaces/{space['id']}")
+                errors.append(f"{self.endpoint}/spaces/{space_id}")
 
         return sleepings, errors
 
     def _is_deleted(self, uid):
         response = requests.get(
             f"{self.endpoint}/api/users/{uid}/overview",
-            headers=self.header,
+            headers=self._headers(),
             proxies=self.proxy,
         )
         retcode = response.status_code
@@ -865,17 +871,23 @@ class HFMon(Monitor):
         response.raise_for_status()
 
     def activate(self):
-        spaces, failures = [], []
-        targets = self.tag_users + self.tag_orgs
-        for tag in self._tqdm(targets, desc="搜集抱脸空间中"):
-            sleeps, errors = self._list_spaces(tag)
-            spaces += sleeps
-            failures += errors
-
         logs = ""
-        for space in self._tqdm(spaces, desc="激活抱脸空间中"):
-            self._activate_space(space)
-            logs += f"{space} "
+        spaces, failures = [], []
+        for token in self.targets:
+            for name in self._tqdm(
+                self.targets[token],
+                desc=f"搜集 {self.targets[token][0]} 管理的抱脸空间中",
+            ):
+                sleeps, errors = self._list_spaces(name, token)
+                spaces += sleeps
+                failures += errors
+
+            for space in self._tqdm(
+                spaces,
+                desc=f"激活 {self.targets[token][0]} 管理的抱脸空间中",
+            ):
+                self._activate_space(space, token)
+                logs += f"{space} "
 
         if logs:
             print(f"抱脸空间 {logs}激活完成!")
@@ -952,11 +964,11 @@ class GitHubMon(Monitor):
         self.tags = args.gitags.split(";")
         self.header = {"user-agent": self.ua}
 
-    def _recurse_followers(self, username, pn, step=100, trytime=3):
+    def _recurse_followers(self, name, pn, step=100, trytime=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
-                f"https://api.{self.endpoint}/users/{username}/followers?per_page={step}&page={pn}",
+                f"https://api.{self.endpoint}/users/{name}/followers?per_page={step}&page={pn}",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -964,13 +976,13 @@ class GitHubMon(Monitor):
 
         except Exception as e:
             if trytime > 0:
-                print(f"获取 {username} 用户第 {pn} 页粉丝出错: {e}, 重试中...")
+                print(f"获取 {name} 第 {pn} 页粉丝出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
-                return self._recurse_followers(username, pn, step, trytime)
+                return self._recurse_followers(name, pn, step, trytime)
 
             else:
-                raise ConnectionError(f"重试获取 {username} 用户的粉丝列表过多次!")
+                raise ConnectionError(f"重试获取 {name} 的粉丝列表过多次!")
 
     def _list_followers(self, username: str):
         pn = 1
@@ -987,11 +999,11 @@ class GitHubMon(Monitor):
 
         return followers
 
-    def _recurse_user_repos(self, username, pn, step=100, trytime=3):
+    def _recurse_repos(self, name, pn, step=100, trytime=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
-                f"https://api.{self.endpoint}/users/{username}/repos?per_page={step}&page={pn}",
+                f"https://api.{self.endpoint}/users/{name}/repos?per_page={step}&page={pn}",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -999,20 +1011,20 @@ class GitHubMon(Monitor):
 
         except Exception as e:
             if trytime > 0:
-                print(f"获取 {username} 用户第 {pn} 页仓库出错: {e}, 重试中...")
+                print(f"获取 {name} 用户第 {pn} 页仓库出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 trytime -= 1
-                return self._recurse_user_repos(username, pn, step, trytime)
+                return self._recurse_repos(name, pn, step, trytime)
 
             else:
-                raise ConnectionError(f"重试获取 {username} 用户的仓库列表过多次!")
+                raise ConnectionError(f"重试获取 {name} 用户的仓库列表过多次!")
 
-    # 获取用户所有仓库
-    def _list_user_repos(self, username):
+    # 获取用户/组织所有仓库
+    def _list_repos(self, username):
         pn = 1
         repos = []
         while True:
-            data = self._recurse_user_repos(username, pn)
+            data = self._recurse_repos(username, pn)
             if not data:
                 break
 
@@ -1083,7 +1095,7 @@ class GitHubMon(Monitor):
         try:
             for tag in tags:
                 data[tag] = self._list_followers(tag)
-                repos = self._list_user_repos(tag)
+                repos = self._list_repos(tag)
                 for repo in self._tqdm(repos, desc=f"解析 {tag} 仓库中"):
                     data[repo] = self._list_repo_stargazers(repo)
 
