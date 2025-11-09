@@ -711,13 +711,32 @@ class HFMon(Monitor):
 
         return following_users, following_orgs
 
+    def _move_repo(self, from_repo, to_repo, type="space"):
+        response = requests.post(
+            f"{self.endpoint}/api/repos/move",
+            headers=self.header,
+            json={
+                "fromRepo": from_repo,
+                "toRepo": to_repo,
+                "type": type,
+            },
+        )
+        response.raise_for_status()
+
     def _activate_space(self, space_id: str):
         static = self.api.space_info(space_id, self.token)["sdk"] == "static"
         response = requests.get(
             f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
             headers=self.header,
         )
-        response.raise_for_status()
+        if response.status_code == 412:
+            tmp_repo = f"{space_id}_{int(time.time())}"
+            self._move_repo(space_id, tmp_repo)
+            time.sleep(random.uniform(3, 5))
+            self._move_repo(tmp_repo, space_id)
+
+        else:
+            response.raise_for_status()
 
     def _get_followers(self, tag_type: str, tag: str):
         fans = self.api.list_user_follower(tag_type, tag)
