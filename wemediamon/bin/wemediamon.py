@@ -412,7 +412,7 @@ class BiliMon(Monitor):
         return response.json()["data"]["archives"][0]["bvid"]
 
     def _daily_coin(self, delay=2):
-        coins = self.me.get_user_info_sync()["coins"]
+        coins = sync(self.me.get_user_info())["coins"]
         to_add = min(5, coins)
         if to_add < 1:
             print("⚠️ 硬币已空, 跳过投币")
