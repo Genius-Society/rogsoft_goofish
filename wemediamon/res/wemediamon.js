@@ -75,15 +75,6 @@ function show_hide_el(w) {
 	}
 }
 
-function show_hide_btn(id) {
-	if ($('#' + id).is(':checked')) {
-		$('#' + id).nextAll('a').show();
-	}
-	else {
-		$('#' + id).nextAll('a').hide();
-	}
-}
-
 function conf2obj() {
 	var count = 0;
 	$('input[type="checkbox"][id]').each(function (_, el) {

@@ -148,7 +148,7 @@
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
                                                             value="">
-                                                        <div id="smtp_btn">
+                                                        <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="trigger('TEST_SMTP')">邮件测试</a>
                                                         </div>
@@ -160,7 +160,7 @@
                                                         <input type="text" class="input_ss_table" id="cache"
                                                             name="cache" maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off">
-                                                        <div id="env_btn">
+                                                        <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="trigger('FIX_ENV')">环境修复</a>
                                                         </div>
@@ -178,7 +178,7 @@
                                                     <td>
                                                         <input type="file" class="input_ss_table" id="config"
                                                             name="config" accept=".json">
-                                                        <div id="cfg_btn">
+                                                        <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="export_cfg()">导出配置</a>
                                                         </div>
@@ -224,12 +224,20 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
+                                                    <th>每日自动签到</th>
+                                                    <td>
+                                                        <input type="checkbox" id="bilitsk">
+                                                    </td>
+                                                </tr>
+                                                <tr>
                                                     <th>手动触发</th>
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('TEST_BILI_CK')">Cookie有效测试</a>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('UPD_BILI_FANS')">单轮粉丝扫描</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('TEST_BILI_TASKS')">测试一键签到</a>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -239,15 +247,6 @@
                                                             onclick="trigger('SEE_BILI_BLACKS')">查看取关狗名单</a>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('UPD_BILI_BLACKS')">清理已注销狗</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>每日自动签到</th>
-                                                    <td>
-                                                        <input type="checkbox" id="bilitsk"
-                                                            onchange="show_hide_btn('bilitsk')">
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('TEST_BILI_TASKS')">手动一键签到</a>
                                                     </td>
                                                 </tr>
                                             </table>

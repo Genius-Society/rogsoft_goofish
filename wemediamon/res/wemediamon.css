@@ -43,10 +43,6 @@ a:focus {
 	border-width: 0.5px;
 }
 
-#bilitsk {
-	vertical-align: middle;
-}
-
 #bilick,
 #cnblokie,
 #itck {
@@ -222,9 +218,7 @@ input[type="text"] {
 	margin-right: 5px;
 }
 
-#smtp_btn,
-#env_btn,
-#cfg_btn {
+.right_btn {
 	float: right;
 	margin-right: 5px;
 }
