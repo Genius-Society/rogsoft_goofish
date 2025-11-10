@@ -135,7 +135,7 @@
                                                     <th>提示邮箱(QQ/Foxmail)<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="email"
-                                                            name="email" maxlength="100" value="" autocorrect="off"
+                                                            maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off">
                                                     </td>
                                                 </tr>
@@ -143,7 +143,7 @@
                                                     <th>SMTP密钥<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input type="password" class="input_ss_table" id="smtp"
-                                                            name="smtp" maxlength="100" value="" autocorrect="off"
+                                                            maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
@@ -158,7 +158,7 @@
                                                     <th>缓存路径<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="cache"
-                                                            name="cache" maxlength="100" value="" autocorrect="off"
+                                                            maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off">
                                                         <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
@@ -169,15 +169,15 @@
                                                 <tr>
                                                     <th>刷新周期(小时)<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <input type="number" class="input_ss_table" id="period"
-                                                            name="period" min="1" max="8765" value="2">
+                                                        <input type="number" class="input_ss_table" id="period" min="1"
+                                                            max="8765" value="2">
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th>导入配置</th>
                                                     <td>
                                                         <input type="file" class="input_ss_table" id="config"
-                                                            name="config" accept=".json">
+                                                            accept=".json">
                                                         <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="export_cfg()">导出配置</a>
@@ -217,19 +217,18 @@
                                                 <tr>
                                                     <th>B站Cookie<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <textarea class="input_ss_table" id="bilick" name="bilick"
-                                                            maxlength="2048" rows="12" autocorrect="off"
-                                                            autocapitalize="off"
+                                                        <textarea class="input_ss_table" id="bilick" maxlength="2048"
+                                                            rows="12" autocorrect="off" autocapitalize="off"
                                                             placeholder="浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th>每日自动签到</th>
                                                     <td>
-                                                        <input type="checkbox" id="bilitsk"
-                                                            onchange="show_hide('bilitsk')">
-                                                        <input type="time" class="input_ss_table" id="taskat"
-                                                            name="taskat" value="00:01">
+                                                        <input type="checkbox" id="btskon"
+                                                            onchange="show_hide('btskon')">
+                                                        <input type="time" class="input_ss_table" id="btskat"
+                                                            value="00:00">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -268,7 +267,7 @@
                                                     <th>Token(s)<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input type="password" class="input_ss_table" id="hftks"
-                                                            name="hftks" maxlength="100" value="" autocorrect="off"
+                                                            maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
@@ -279,7 +278,7 @@
                                                     <th>监控论文<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="papers"
-                                                            name="papers" maxlength="100" value="" autocorrect="off"
+                                                            maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" placeholder="若多个则用;隔开">
                                                     </td>
                                                 </tr>
@@ -317,7 +316,7 @@
                                                     <th>监控目标<span style="color: red;"> * </span></th>
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="gitags"
-                                                            name="gitags" maxlength="100" value="" autocorrect="off"
+                                                            maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" placeholder="target1;target2;...">
                                                     </td>
                                                 </tr>
@@ -352,9 +351,8 @@
                                                 <tr>
                                                     <th>博客园Cookie<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <textarea class="input_ss_table" id="cnblokie" name="cnblokie"
-                                                            maxlength="2048" rows="12" autocorrect="off"
-                                                            autocapitalize="off"
+                                                        <textarea class="input_ss_table" id="cnblokie" maxlength="2048"
+                                                            rows="12" autocorrect="off" autocapitalize="off"
                                                             placeholder="浏览器-开发者工具-网络, 查看已登陆状态博客园主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
@@ -391,9 +389,8 @@
                                                 <tr>
                                                     <th>itch.io cookie<span style="color: red;"> * </span></th>
                                                     <td>
-                                                        <textarea class="input_ss_table" id="itck" name="itck"
-                                                            maxlength="2048" rows="12" autocorrect="off"
-                                                            autocapitalize="off"
+                                                        <textarea class="input_ss_table" id="itck" maxlength="2048"
+                                                            rows="12" autocorrect="off" autocapitalize="off"
                                                             placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>

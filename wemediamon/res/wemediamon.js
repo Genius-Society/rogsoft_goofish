@@ -3,8 +3,8 @@ var count_down;
 var _responseLen;
 var _show_mon_log;
 
-const chks = ["bilimon", "bilitsk", "hfmon", "gitmon", "cnblon", "itchion"]
-const keys = ["email", "smtp", "cache", "period", "bilick", "hftks", "papers", "gitags", "cnblokie", "itck"];
+const chks = ["bilimon", "btskon", "hfmon", "gitmon", "cnblon", "itchion"]
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "hftks", "papers", "gitags", "cnblokie", "itck"];
 
 function init() {
 	show_menu(menu_hook);
@@ -97,7 +97,7 @@ function conf2obj() {
 		show_hide_el(i);
 	}
 
-	$('textarea[name][id], input[type="text"][id], input[type="password"][id], input[type="number"][id]').each(function (_, el) {
+	$('textarea[class][id][placeholder], input[type="text"][id], input[type="password"][id], input[type="number"][id], input[type="time"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["wemediamon_" + id]) {
 			E(id).value = dbus["wemediamon_" + id];
@@ -119,7 +119,7 @@ function obj2conf(cmd) {
 		get_run_log(1);
 	}
 
-	$('textarea[name][id], input[type="text"][id], input[type="password"][id], input[type="number"][id]').each(function (_, el) {
+	$('textarea[class][id][placeholder], input[type="text"][id], input[type="password"][id], input[type="number"][id], input[type="time"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id) {
 			dbus_new["wemediamon_" + id] = E(id).value;;
