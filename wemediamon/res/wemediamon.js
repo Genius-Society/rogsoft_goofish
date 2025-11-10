@@ -3,6 +3,9 @@ var count_down;
 var _responseLen;
 var _show_mon_log;
 
+const chks = ["bilimon", "bilitsk", "hfmon", "gitmon", "cnblon", "itchion"]
+const keys = ["email", "smtp", "cache", "period", "bilick", "hftks", "papers", "gitags", "cnblokie", "itck"];
+
 function init() {
 	show_menu(menu_hook);
 	get_status();
@@ -29,8 +32,6 @@ function import_cfg() {
 }
 
 function load_cfg(obj) {
-	const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"]
-	const keys = ["email", "smtp", "cache", "period", "bilick", "hftks", "papers", "gitags", "cnblokie", "itck"];
 	keys.forEach(k => {
 		if (k in obj) $(`#${k}`).val(obj[k]);
 	});
@@ -40,8 +41,6 @@ function load_cfg(obj) {
 }
 
 function export_cfg() {
-	const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"]
-	const keys = ["email", "smtp", "cache", "period", "bilick", "hftks", "papers", "gitags", "cnblokie", "itck"];
 	const data = {};
 	for (const k of keys) data[k] = $(`#${k}`).val();
 	for (const k of chks) data[k] = $(`#${k}`).val();
@@ -73,6 +72,15 @@ function show_hide_el(w) {
 	}
 	else {
 		$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
+	}
+}
+
+function show_hide_btn(id) {
+	if ($('#' + id).is(':checked')) {
+		$('#' + id).nextAll('a').show();
+	}
+	else {
+		$('#' + id).nextAll('a').hide();
 	}
 }
 

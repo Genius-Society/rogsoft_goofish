@@ -43,6 +43,10 @@ a:focus {
 	border-width: 0.5px;
 }
 
+#bilitsk {
+	vertical-align: middle;
+}
+
 #bilick,
 #cnblokie,
 #itck {

@@ -241,6 +241,15 @@
                                                             onclick="trigger('UPD_BILI_BLACKS')">清理已注销狗</a>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <th>每日自动签到</th>
+                                                    <td>
+                                                        <input type="checkbox" id="bilitsk"
+                                                            onchange="show_hide_btn('bilitsk')">
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('TEST_BILI_TASKS')">手动一键签到</a>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </div>
                                         <div id="tablet_1" style="display: none;">

@@ -31,6 +31,7 @@ parser.add_argument("--email", type=str, required=True)
 parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
+parser.add_argument("--bilitsk", type=bool, default=False)
 parser.add_argument("--hftks", type=str, default="")
 parser.add_argument("--papers", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
@@ -1468,12 +1469,15 @@ def update():
         ItchMon().trigger()
 
 
-def start_monitor(period=args.period):
+def start_monitor(period=args.period, taskon=args.bilitsk, at="00:01"):
     try:
         update()
         print(f"监控开启中...每 {period} 小时触发一次")
         schedule.every(period).hours.do(update)
-        schedule.every().day.at("00:01").do(BiliMon().daily_tasks)
+        if taskon:
+            print(f"B站每日自动签到开启中...每天 {at} 触发一次")
+            schedule.every().day.at(at).do(BiliMon().daily_tasks)
+
         while True:
             schedule.run_pending()
             time.sleep(1)
@@ -1499,6 +1503,9 @@ if __name__ == "__main__":
 
             case "UPD_BILI_BLACKS":
                 BiliMon().clean_traitors()
+
+            case "TEST_BILI_TASKS":
+                BiliMon().daily_tasks()
 
             case "UPD_HF_FANS":
                 HFMon().upd_fans()

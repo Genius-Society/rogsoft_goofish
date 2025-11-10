@@ -81,6 +81,7 @@ load_params() {
 	wemediamon_cache=$(dbus get wemediamon_cache)
 	wemediamon_bilimon=$(dbus get wemediamon_bilimon)
 	wemediamon_bilick=$(dbus get wemediamon_bilick)
+	wemediamon_bilitsk=$(dbus get wemediamon_bilitsk)
 	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
 	wemediamon_hftks=$(dbus get wemediamon_hftks)
 	wemediamon_papers=$(dbus get wemediamon_papers)
@@ -121,6 +122,7 @@ check_params() {
 		fi
 	else
 		wemediamon_bilick=''
+		wemediamon_bilitsk='0'
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftks}" ]]; then
@@ -177,6 +179,7 @@ start_wemediamon() {
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
+		--bilitsk "${wemediamon_bilitsk}" \
 		--hftks "${wemediamon_hftks}" \
 		--papers "${wemediamon_papers}" \
 		--gitags "${wemediamon_gitags}" \
@@ -198,6 +201,7 @@ trigger_once() {
 		--smtp "${wemediamon_smtp}" \
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
+		--bilitsk "${wemediamon_bilitsk}" \
 		--hftks "${wemediamon_hftks}" \
 		--papers "${wemediamon_papers}" \
 		--gitags "${wemediamon_gitags}" \
