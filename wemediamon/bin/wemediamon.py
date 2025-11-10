@@ -32,7 +32,7 @@ parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--btskon", type=bool, default=False)
-parser.add_argument("--btskat", type=str, default="00:00")
+parser.add_argument("--btskat", type=str, default="00:01")
 parser.add_argument("--hftks", type=str, default="")
 parser.add_argument("--papers", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
@@ -382,7 +382,6 @@ class BiliMon(Monitor):
         )
         response.raise_for_status()
         data = response.json()["data"]
-        print(data)
         return data["watch"], data["coins"] > 0, data["share"]
 
     def _daily_share(self, bvid="BV1iWrgYaEqa"):
@@ -450,13 +449,19 @@ class BiliMon(Monitor):
 
     def daily_tasks(self):
         watched, coined, shared = self._daily_sign()
-        if not watched:
+        if watched:
+            print("每日观看视频已完成")
+        else:
             self._daily_watch()
 
-        if not coined:
+        if coined:
+            print("每日投币已完成")
+        else:
             self._daily_coin()
 
-        if not shared:
+        if shared:
+            print("每日分享视频已完成")
+        else:
             self._daily_share()
 
     def check_login(self):

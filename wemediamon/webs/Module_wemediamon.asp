@@ -228,7 +228,7 @@
                                                         <input type="checkbox" id="btskon"
                                                             onchange="show_hide('btskon')">
                                                         <input type="time" class="input_ss_table" id="btskat"
-                                                            value="00:00">
+                                                            value="00:01">
                                                     </td>
                                                 </tr>
                                                 <tr>
