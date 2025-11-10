@@ -75,6 +75,15 @@ function show_hide_el(w) {
 	}
 }
 
+function show_hide(id) {
+	if ($('#' + id).is(':checked')) {
+		$('#' + id).nextAll('input[type=time]').show();
+	}
+	else {
+		$('#' + id).nextAll('input[type=time]').hide();
+	}
+}
+
 function conf2obj() {
 	var count = 0;
 	$('input[type="checkbox"][id]').each(function (_, el) {

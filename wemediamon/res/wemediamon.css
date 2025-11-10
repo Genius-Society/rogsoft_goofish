@@ -55,6 +55,10 @@ a:focus {
 	-webkit-text-security: none;
 }
 
+#bilitsk {
+	vertical-align: middle;
+}
+
 #tablets input[type="button"] {
 	font-size: 10pt;
 	color: #fff;

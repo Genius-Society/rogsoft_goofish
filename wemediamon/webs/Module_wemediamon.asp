@@ -226,7 +226,10 @@
                                                 <tr>
                                                     <th>每日自动签到</th>
                                                     <td>
-                                                        <input type="checkbox" id="bilitsk">
+                                                        <input type="checkbox" id="bilitsk"
+                                                            onchange="show_hide('bilitsk')">
+                                                        <input type="time" class="input_ss_table" id="taskat"
+                                                            name="taskat" value="00:01">
                                                     </td>
                                                 </tr>
                                                 <tr>
