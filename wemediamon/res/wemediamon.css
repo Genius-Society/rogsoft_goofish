@@ -55,7 +55,7 @@ a:focus {
 	-webkit-text-security: none;
 }
 
-#btskon {
+input[type="checkbox"] {
 	vertical-align: middle;
 }
 

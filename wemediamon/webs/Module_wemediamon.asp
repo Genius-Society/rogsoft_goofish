@@ -211,7 +211,7 @@
                                                     <th>B站监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_0" id="bilimon"
-                                                            onchange="show_hide_el(0)">
+                                                            onchange="show_hide(0)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -225,8 +225,7 @@
                                                 <tr>
                                                     <th>每日自动签到</th>
                                                     <td>
-                                                        <input type="checkbox" id="btskon"
-                                                            onchange="show_hide('btskon')">
+                                                        <input type="checkbox" id="btskon">
                                                         <input type="time" class="input_ss_table" id="btskat"
                                                             value="00:01">
                                                     </td>
@@ -260,7 +259,7 @@
                                                     <th>抱脸监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_1" id="hfmon"
-                                                            onchange="show_hide_el(1)">
+                                                            onchange="show_hide(1)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -309,7 +308,7 @@
                                                     <th>GitHub监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_2" id="gitmon"
-                                                            onchange="show_hide_el(2)">
+                                                            onchange="show_hide(2)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -345,7 +344,7 @@
                                                     <th>博客园监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_3" id="cnblon"
-                                                            onchange="show_hide_el(3)">
+                                                            onchange="show_hide(3)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -383,7 +382,7 @@
                                                     <th>itch.io监控开关</th>
                                                     <td>
                                                         <input type="checkbox" class="check_4" id="itchion"
-                                                            onchange="show_hide_el(4)">
+                                                            onchange="show_hide(4)">
                                                     </td>
                                                 </tr>
                                                 <tr>

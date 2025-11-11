@@ -14,7 +14,7 @@ function init() {
 	import_cfg();
 }
 
-function import_cfg() {
+function import_cfg() { // 导入配置
 	document.getElementById('config').addEventListener('change', function (e) {
 		const file = e.target.files[0];
 		if (!file) return;
@@ -31,7 +31,7 @@ function import_cfg() {
 	});
 }
 
-function load_cfg(obj) {
+function load_cfg(obj) { // 加载配置
 	keys.forEach(k => {
 		if (k in obj) $(`#${k}`).val(obj[k]);
 	});
@@ -40,7 +40,7 @@ function load_cfg(obj) {
 	});
 }
 
-function export_cfg() {
+function export_cfg() { // 导出配置
 	const data = {};
 	for (const k of keys) data[k] = $(`#${k}`).val();
 	for (const k of chks) data[k] = $(`#${k}`).val();
@@ -66,7 +66,7 @@ function register_event() {
 	});
 }
 
-function show_hide_el(w) {
+function show_hide(w) { // 各面板开关显隐连动
 	if ($('.check_' + w).is(':checked')) {
 		$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
 	}
@@ -75,27 +75,18 @@ function show_hide_el(w) {
 	}
 }
 
-function show_hide(id) {
-	if ($('#' + id).is(':checked')) {
-		$('#' + id).nextAll('input[type=time]').show();
-	}
-	else {
-		$('#' + id).nextAll('input[type=time]').hide();
-	}
-}
-
-function conf2obj() {
-	var count = 0;
+function conf2obj() { // dbus 变量转控件值
+	var i = 0;
 	$('input[type="checkbox"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["wemediamon_" + id]) {
 			E(id).checked = (dbus["wemediamon_" + id] == "1");
-			count++;
+		}
+		if ($(el).attr("class")) {
+			show_hide(i);
+			i++;
 		}
 	});
-	for (var i = 0; i < count; i++) {
-		show_hide_el(i);
-	}
 
 	$('textarea[class][id][placeholder], input[type="text"][id], input[type="password"][id], input[type="number"][id], input[type="time"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
@@ -105,7 +96,7 @@ function conf2obj() {
 	});
 }
 
-function obj2conf(cmd) {
+function obj2conf(cmd) { // 控件值转 dbus 变量
 	var dbus_new = {};
 	if (cmd == "WEB_SUBMIT") {
 		$('input[type="checkbox"][id]').each(function (_, el) {
@@ -284,15 +275,11 @@ function showWBLoadingBar() {
 function hideWBLoadingBar() {
 	E("LoadingBar").style.visibility = "hidden";
 	E("ok_button").style.visibility = "hidden";
-	if (refresh_flag == "1") {
-		refreshpage();
-	}
+	if (refresh_flag == "1") refreshpage();
 }
 
 function count_down_close() {
-	if (count_down == "0") {
-		hideWBLoadingBar();
-	}
+	if (count_down == "0") hideWBLoadingBar();
 	if (count_down < 0) {
 		E("ok_btn").value = "手动关闭";
 		return false;
