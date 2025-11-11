@@ -447,22 +447,37 @@ class BiliMon(Monitor):
         response.raise_for_status()
         print(f"观看视频结果: {response.json()}")
 
-    def daily_tasks(self):
-        watched, coined, shared = self._daily_sign()
-        if watched:
-            print("每日观看视频已完成")
-        else:
-            self._daily_watch()
+    def daily_tasks(self, delay=3, retry=3):
+        try:
+            watched, coined, shared = self._daily_sign()
+            if watched:
+                print("每日观看视频已完成")
+            else:
+                self._daily_watch()
 
-        if coined:
-            print("每日投币已完成")
-        else:
-            self._daily_coin()
+            if coined:
+                print("每日投币已完成")
+            else:
+                self._daily_coin()
 
-        if shared:
-            print("每日分享视频已完成")
-        else:
-            self._daily_share()
+            if shared:
+                print("每日分享视频已完成")
+            else:
+                self._daily_share()
+
+        except Exception as e:
+            if retry > 0:
+                print(f"{e}, 剩余 {retry} 次重试...")
+                time.sleep(delay)
+                retry -= 1
+                self.daily_tasks(delay, retry)
+
+            else:
+                send_email(
+                    f"{e}",
+                    "[WeMediaMon 插件] 自动完成B站每日任务出错",
+                    "已重试过多次",
+                )
 
     def check_login(self):
         response = requests.get(
@@ -1476,8 +1491,7 @@ def update():
 
 
 def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
-    try:
-        update()
+    try:  # update()
         print(f"监控开启中...每 {period} 小时触发一次")
         schedule.every(period).hours.do(update)
         if taskon:

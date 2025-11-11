@@ -106,7 +106,7 @@
                                                     <td colspan="2">
                                                         <div class="switch_field">
                                                             <label for="enable">
-                                                                <input id="enable" class="switch" type="checkbox">
+                                                                <input id="enable" type="checkbox">
                                                                 <div class="switch_container">
                                                                     <div class="switch_bar"></div>
                                                                     <div class="switch_circle transition_style">
