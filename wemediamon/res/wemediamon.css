@@ -65,9 +65,7 @@ input[type="checkbox"] {
 	padding: 10px 3.75px;
 	border-radius: 5px 5px 0px 0px;
 	width: 12%;
-	border-left: 1px solid #67767d;
-	border-top: 1px solid #67767d;
-	border-right: 1px solid #67767d;
+	border: 1px solid #67767d;
 	border-bottom: none;
 	background: #67767d;
 	cursor: pointer;
@@ -75,13 +73,8 @@ input[type="checkbox"] {
 
 #tablets input[type="button"]:hover,
 #tablets .active {
-	border: 1px solid #2f3a3e;
+	border-color: #2f3a3e;
 	background: #2f3a3e !important;
-}
-
-.ks_btn {
-	border: none;
-	cursor: pointer;
 }
 
 #LoadingBar {

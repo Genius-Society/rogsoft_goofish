@@ -170,7 +170,7 @@ class BiliMon(Monitor):
         )
         self.me = user.User(uid=self.uid, credential=self.credential)
 
-    def _get_fans(self, pn, trytime=3):
+    def _get_fans(self, pn, retry=3):
         try:
             response = requests.get(
                 f"https://api.{self.endpoint}/x/relation/followers?vmid={self.uid}&pn={pn}",
@@ -192,11 +192,10 @@ class BiliMon(Monitor):
                 )
 
         except requests.exceptions.RequestException as e:
-            if trytime > 0:
+            if retry > 0:
                 print(f"获取B站粉丝失败: {e}, 重试中...")
                 time.sleep(random.uniform(4.5, 5))
-                trytime -= 1
-                return self._get_fans(pn, trytime)
+                return self._get_fans(pn, retry - 1)
 
             else:
                 raise ConnectionError("获取B站粉丝失败过多次!")
@@ -469,8 +468,7 @@ class BiliMon(Monitor):
             if retry > 0:
                 print(f"{e}, 剩余 {retry} 次重试...")
                 time.sleep(delay)
-                retry -= 1
-                self.daily_tasks(delay, retry)
+                self.daily_tasks(delay, retry - 1)
 
             else:
                 send_email(
@@ -592,7 +590,7 @@ class BiliMon(Monitor):
             if retcode != 0:
                 print(f"清理收藏夹 {url} 已失效视频出错: {retcode}")
 
-    def trigger(self, trytime=3):
+    def trigger(self, retry=3):
         try:
             self.upd_fans()
             self.clean_folders()
@@ -601,10 +599,8 @@ class BiliMon(Monitor):
 
         except Exception as e:
             print(f"B站监控器触发出错: {e}, 重试中...")
-            if trytime > 0:
-                trytime -= 1
-                self.trigger(trytime)
-
+            if retry > 0:
+                self.trigger(retry - 1)
             else:
                 send_email(
                     f"{e}",
@@ -688,7 +684,7 @@ class HFMon(Monitor):
 
             return self._get(f"{self.endpoint}/spaces/{space_id}", headers=header)
 
-        def _get(self, url, headers=None, params=None, trytime=3):
+        def _get(self, url, headers=None, params=None, retry=3):
             try:
                 time.sleep(random.uniform(0.5, 1))
                 if not headers:
@@ -704,11 +700,10 @@ class HFMon(Monitor):
                 return response.json()
 
             except Exception as e:
-                if trytime > 0:
+                if retry > 0:
                     print(f"调用 HfApi 失败: {e}, 重试中...")
                     time.sleep(random.uniform(14.5, 15))
-                    trytime -= 1
-                    return self._get(url, headers, params, trytime)
+                    return self._get(url, headers, params, retry - 1)
 
                 else:
                     raise ConnectionError("调用 HfApi 失败过多次!")
@@ -963,17 +958,15 @@ class HFMon(Monitor):
         if cleaned_traitors != traitors:
             self._save_traitors(cleaned_traitors)
 
-    def trigger(self, trytime=3):
+    def trigger(self, retry=3):
         try:
             self.activate()
             self.upd_fans()
 
         except Exception as e:
             print(f"抱脸监控器触发失败: {e}, 重试中...")
-            if trytime > 0:
-                trytime -= 1
-                self.trigger(trytime)
-
+            if retry > 0:
+                self.trigger(retry - 1)
             else:
                 send_email(
                     f"{e}",
@@ -989,7 +982,7 @@ class GitHubMon(Monitor):
         self.tags = args.gitags.split(";")
         self.header = {"user-agent": self.ua}
 
-    def _recurse_followers(self, name, pn, step=100, trytime=3):
+    def _recurse_followers(self, name, pn, step=100, retry=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
@@ -1000,11 +993,10 @@ class GitHubMon(Monitor):
             return response.json()
 
         except Exception as e:
-            if trytime > 0:
+            if retry > 0:
                 print(f"获取 {name} 第 {pn} 页粉丝出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
-                trytime -= 1
-                return self._recurse_followers(name, pn, step, trytime)
+                return self._recurse_followers(name, pn, step, retry - 1)
 
             else:
                 raise ConnectionError(f"重试获取 {name} 的粉丝列表过多次!")
@@ -1024,7 +1016,7 @@ class GitHubMon(Monitor):
 
         return followers
 
-    def _recurse_repos(self, name, pn, step=100, trytime=3):
+    def _recurse_repos(self, name, pn, step=100, retry=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
@@ -1035,11 +1027,10 @@ class GitHubMon(Monitor):
             return response.json()
 
         except Exception as e:
-            if trytime > 0:
+            if retry > 0:
                 print(f"获取 {name} 用户第 {pn} 页仓库出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
-                trytime -= 1
-                return self._recurse_repos(name, pn, step, trytime)
+                return self._recurse_repos(name, pn, step, retry - 1)
 
             else:
                 raise ConnectionError(f"重试获取 {name} 用户的仓库列表过多次!")
@@ -1058,7 +1049,7 @@ class GitHubMon(Monitor):
 
         return repos
 
-    def _recurse_repo_stargazers(self, repo, pn, step=100, trytime=3):
+    def _recurse_repo_stargazers(self, repo, pn, step=100, retry=3):
         try:
             time.sleep(random.uniform(0.5, 1))
             response = requests.get(
@@ -1069,11 +1060,10 @@ class GitHubMon(Monitor):
             return response.json()
 
         except Exception as e:
-            if trytime > 0:
+            if retry > 0:
                 print(f"获取 {repo} 仓库第 {pn} 页收藏者出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
-                trytime -= 1
-                return self._recurse_repo_stargazers(repo, pn, step, trytime)
+                return self._recurse_repo_stargazers(repo, pn, step, retry - 1)
 
             else:
                 raise ConnectionError(f"重试获取 {repo} 仓库收藏者列表过多次!")
@@ -1115,7 +1105,7 @@ class GitHubMon(Monitor):
 
         print(logs)
 
-    def _get_latest_data(self, tags: list, trytime=3):
+    def _get_latest_data(self, tags: list, retry=3):
         data = {}
         try:
             for tag in tags:
@@ -1125,11 +1115,10 @@ class GitHubMon(Monitor):
                     data[repo] = self._list_repo_stargazers(repo)
 
         except Exception as e:
-            if trytime > 0:
+            if retry > 0:
                 print(f"获取最新 GitHub 数据失败: {e}, 重试中...")
                 time.sleep(random.uniform(4.5, 5))
-                trytime -= 1
-                return self._get_latest_data(self.tags, trytime)
+                return self._get_latest_data(self.tags, retry - 1)
 
             else:
                 raise ConnectionError("重试获取最新 GitHub 数据过多次!")
@@ -1182,16 +1171,14 @@ class GitHubMon(Monitor):
 
             print("GitHub 数据已更新")
 
-    def trigger(self, trytime=3):
+    def trigger(self, retry=3):
         try:
             self.upd_fans()
 
         except Exception as e:
             print(f"GitHub监控器触发出错: {e}, 重试中...")
-            if trytime > 0:
-                trytime -= 1
-                self.trigger(trytime)
-
+            if retry > 0:
+                self.trigger(retry - 1)
             else:
                 send_email(
                     f"{e}",
@@ -1324,16 +1311,14 @@ class CnblogsMon(Monitor):
 
             print("博客园数据已更新")
 
-    def trigger(self, trytime=3):
+    def trigger(self, retry=3):
         try:
             self.upd_fans()
 
         except Exception as e:
             print(f"博客园监控器触发出错: {e}, 重试中...")
-            if trytime > 0:
-                trytime -= 1
-                self.trigger(trytime)
-
+            if retry > 0:
+                self.trigger(retry - 1)
             else:
                 send_email(
                     f"{e}",
@@ -1454,16 +1439,14 @@ class ItchMon(Monitor):
 
             print("itch.io数据已更新")
 
-    def trigger(self, trytime=3):
+    def trigger(self, retry=3):
         try:
             self.upd_fans()
 
         except Exception as e:
             print(f"itch.io监控器触发出错: {e}, 重试中...")
-            if trytime > 0:
-                trytime -= 1
-                self.trigger(trytime)
-
+            if retry > 0:
+                self.trigger(retry - 1)
             else:
                 send_email(
                     f"{e}",
@@ -1491,7 +1474,7 @@ def update():
 
 
 def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
-    try:  # update()
+    try:
         print(f"监控开启中...每 {period} 小时触发一次")
         schedule.every(period).hours.do(update)
         if taskon:
