@@ -82,7 +82,7 @@ function conf2obj() { // dbus 变量转控件值
 		if (id && dbus["wemediamon_" + id]) {
 			E(id).checked = (dbus["wemediamon_" + id] == "1");
 		}
-		if ($(el).attr("class")) {
+		if ($(el).attr("onchange")) {
 			show_hide(i);
 			i++;
 		}
