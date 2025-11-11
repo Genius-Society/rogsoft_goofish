@@ -1202,7 +1202,7 @@ class CnblogsMon(Monitor):
 
     def _list_followers(self):
         fans = {}
-        if self.check_login():
+        if self.check_login(False):
             response = requests.get(
                 f"https://home.{self.endpoint}/u/{self.username}/followers",
                 headers=self.header,
@@ -1259,7 +1259,7 @@ class CnblogsMon(Monitor):
         return False
 
     def upd_traitors(self):
-        if not self.check_login():
+        if not self.check_login(False):
             return
 
         cleaned_traitors = []
@@ -1278,7 +1278,7 @@ class CnblogsMon(Monitor):
         if cleaned_traitors != traitors:
             self._save_traitors(cleaned_traitors)
 
-    def check_login(self):
+    def check_login(self, log=True):
         response = requests.get(
             f"https://account.{self.endpoint}/user/userinfo",
             headers=self.header,
@@ -1289,7 +1289,9 @@ class CnblogsMon(Monitor):
         if blog_lnk:
             self.username = blog_lnk["href"].split(f"{self.endpoint}/")[-1][:-1]
             if self.username:
-                print("已登录博客园")
+                if log:
+                    print("已登录博客园")
+
                 return True
 
         print("未登录博客园")
@@ -1342,7 +1344,7 @@ class ItchMon(Monitor):
 
     def _list_followers(self):
         fans = {}
-        isLogin, response_txt = self.check_login()
+        isLogin, response_txt = self.check_login(False)
         if isLogin:
             soup = BeautifulSoup(response_txt, "html.parser")
             fan_lnks = soup.find("div", class_="followers_list").find_all(
@@ -1408,7 +1410,7 @@ class ItchMon(Monitor):
         if cleaned_traitors != traitors:
             self._save_traitors(cleaned_traitors)
 
-    def check_login(self):
+    def check_login(self, log=True):
         response = requests.get(
             f"https://{self.endpoint}/my-followers",
             headers=self.header,
@@ -1419,9 +1421,10 @@ class ItchMon(Monitor):
             print("未登录itch.io")
             return False, ""
 
-        else:
+        if log:
             print("已登录itch.io")
-            return True, response.text
+
+        return True, response.text
 
     def upd_fans(self):
         prev_data = {}
