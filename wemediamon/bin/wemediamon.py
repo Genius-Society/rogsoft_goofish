@@ -449,6 +449,11 @@ class BiliMon(Monitor):
     def daily_tasks(self, delay=3, retry=3):
         try:
             watched, coined, shared = self._daily_sign()
+            if shared:
+                print("每日分享视频已完成")
+            else:
+                self._daily_share()
+                
             if watched:
                 print("每日观看视频已完成")
             else:
@@ -458,11 +463,6 @@ class BiliMon(Monitor):
                 print("每日投币已完成")
             else:
                 self._daily_coin()
-
-            if shared:
-                print("每日分享视频已完成")
-            else:
-                self._daily_share()
 
         except Exception as e:
             if retry > 0:
