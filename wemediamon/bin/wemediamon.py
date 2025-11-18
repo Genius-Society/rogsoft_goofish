@@ -453,7 +453,7 @@ class BiliMon(Monitor):
                 print("每日分享视频已完成")
             else:
                 self._daily_share()
-                
+
             if watched:
                 print("每日观看视频已完成")
             else:
@@ -747,18 +747,19 @@ class HFMon(Monitor):
 
     def _activate_space(self, space_id: str, token: str):
         static = self.api.space_info(space_id, token)["sdk"] == "static"
-        response = requests.get(
-            f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
-            headers=self._headers(token),
-        )
-        if response.status_code == 412:
+        try:
+            response = requests.get(
+                f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
+                headers=self._headers(token),
+            )
+            response.raise_for_status()
+
+        except Exception as e:
+            print(f"Renaming space {space_id}: {e}")
             tmp_repo = f"{space_id}_{int(time.time())}"
             self._move_repo(space_id, tmp_repo, token)
             time.sleep(random.uniform(3, 5))
             self._move_repo(tmp_repo, space_id, token)
-
-        else:
-            response.raise_for_status()
 
     def _get_followers(self, tag_type: str, tag: str):
         fans = self.api.list_followers(tag_type, tag)
