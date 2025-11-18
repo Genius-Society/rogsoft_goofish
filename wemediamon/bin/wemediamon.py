@@ -446,7 +446,7 @@ class BiliMon(Monitor):
         response.raise_for_status()
         print(f"观看视频结果: {response.json()}")
 
-    def daily_tasks(self, delay=3, retry=3):
+    def daily_tasks(self, retry=3):
         try:
             watched, coined, shared = self._daily_sign()
             if shared:
@@ -467,8 +467,8 @@ class BiliMon(Monitor):
         except Exception as e:
             if retry > 0:
                 print(f"{e}, 剩余 {retry} 次重试...")
-                time.sleep(delay)
-                self.daily_tasks(delay, retry - 1)
+                time.sleep(random.uniform(3, 3.5))
+                self.daily_tasks(retry - 1)
 
             else:
                 send_email(
@@ -598,9 +598,11 @@ class BiliMon(Monitor):
             self.clean_favlists()
 
         except Exception as e:
-            print(f"B站监控器触发出错: {e}, 重试中...")
             if retry > 0:
+                print(f"B站监控器触发出错: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
                 self.trigger(retry - 1)
+
             else:
                 send_email(
                     f"{e}",
@@ -732,18 +734,32 @@ class HFMon(Monitor):
 
         return tags
 
-    def _move_repo(self, from_repo, to_repo, token, type="space"):
-        response = requests.post(
-            f"{self.endpoint}/api/repos/move",
-            headers=self._headers(token),
-            json={
-                "fromRepo": from_repo,
-                "toRepo": to_repo,
-                "type": type,
-            },
-            proxies=self.proxy,
-        )
-        response.raise_for_status()
+    def _move_repo(self, from_repo, to_repo, token, type="space", retry=3):
+        try:
+            response = requests.post(
+                f"{self.endpoint}/api/repos/move",
+                headers=self._headers(token),
+                json={
+                    "fromRepo": from_repo,
+                    "toRepo": to_repo,
+                    "type": type,
+                },
+                proxies=self.proxy,
+            )
+            response.raise_for_status()
+
+        except Exception as e:
+            if retry > 0:
+                print(f"抱脸空间重命名出错: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
+                self._move_repo(from_repo, to_repo, token, type, retry - 1)
+
+            else:
+                send_email(
+                    f"{e}",
+                    "[WeMediaMon 插件] 抱脸空间重命名出错",
+                    "已重试过多次",
+                )
 
     def _activate_space(self, space_id: str, token: str):
         static = self.api.space_info(space_id, token)["sdk"] == "static"
@@ -965,9 +981,11 @@ class HFMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(f"抱脸监控器触发失败: {e}, 重试中...")
             if retry > 0:
+                print(f"抱脸监控器触发失败: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
                 self.trigger(retry - 1)
+
             else:
                 send_email(
                     f"{e}",
@@ -1177,9 +1195,11 @@ class GitHubMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(f"GitHub监控器触发出错: {e}, 重试中...")
             if retry > 0:
+                print(f"GitHub监控器触发出错: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
                 self.trigger(retry - 1)
+
             else:
                 send_email(
                     f"{e}",
@@ -1319,9 +1339,11 @@ class CnblogsMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(f"博客园监控器触发出错: {e}, 重试中...")
             if retry > 0:
+                print(f"博客园监控器触发出错: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
                 self.trigger(retry - 1)
+
             else:
                 send_email(
                     f"{e}",
@@ -1448,9 +1470,11 @@ class ItchMon(Monitor):
             self.upd_fans()
 
         except Exception as e:
-            print(f"itch.io监控器触发出错: {e}, 重试中...")
             if retry > 0:
+                print(f"itch.io监控器触发出错: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
                 self.trigger(retry - 1)
+
             else:
                 send_email(
                     f"{e}",
