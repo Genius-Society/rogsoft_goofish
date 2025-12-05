@@ -186,6 +186,10 @@ input[type="text"] {
 	width: 300px;
 }
 
+#btskon {
+	width: 260px !important;
+}
+
 #log_info {
 	text-align: center;
 	font-size: 18px;
