@@ -8,6 +8,7 @@ import smtplib
 import argparse
 import requests
 import schedule
+import subprocess
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -31,7 +32,7 @@ parser.add_argument("--email", type=str, required=True)
 parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
-parser.add_argument("--btskon", type=bool, default=False)
+parser.add_argument("--btskon", type=str, default="")
 parser.add_argument("--btskat", type=str, default="00:01")
 parser.add_argument("--hftks", type=str, default="")
 parser.add_argument("--papers", type=str, default="")
@@ -154,19 +155,22 @@ class BiliMon(Monitor):
     def __init__(self):
         super().__init__("bili")
         self.endpoint = "bilibili.com"
-        self._parse_cookie(args.bilick)
+        self._parse_cookie(args.bilick, args.btskon)
         self.header = {"User-Agent": self.ua, "Cookie": self.ck}
 
-    def _parse_cookie(self, ck: str):
+    def _parse_cookie(self, ck: str, ac_time: str):
         self.uid = ck.split("DedeUserID=")[1].split(";")[0]
         self.sessdata = ck.split("SESSDATA=")[1].split(";")[0]
         self.bili_jct = ck.split("bili_jct=")[1].split(";")[0]
         self.buvid3 = ck.split("buvid3=")[1].split(";")[0]
         self.ck = ck
+        self.act = ac_time if ac_time else None
         self.credential = Credential(
             sessdata=self.sessdata,
             bili_jct=self.bili_jct,
             buvid3=self.buvid3,
+            dedeuserid=self.uid,
+            ac_time_value=self.act,
         )
         self.me = user.User(uid=self.uid, credential=self.credential)
 
@@ -446,18 +450,33 @@ class BiliMon(Monitor):
         response.raise_for_status()
         print(f"观看视频结果: {response.json()}")
 
+    def _refresh_ck(self):
+        try:
+            if self.act:
+                res = sync(self.credential.refresh())
+                self.act = self.credential.ac_time_value
+                subprocess.run(
+                    ["dbus", "set", f"wemediamon_btskon={self.act}"],
+                    check=True,
+                )
+                print(res)
+
+        except Exception as e:
+            print(f"刷新 Cookie 出错: {e}")
+
     def daily_tasks(self, retry=3):
         try:
+            self._refresh_ck()
             watched, coined, shared = self._daily_sign()
-            if shared:
-                print("每日分享视频已完成")
-            else:
-                self._daily_share()
-
             if watched:
                 print("每日观看视频已完成")
             else:
                 self._daily_watch()
+
+            if shared:
+                print("每日分享视频已完成")
+            else:
+                self._daily_share()
 
             if coined:
                 print("每日投币已完成")

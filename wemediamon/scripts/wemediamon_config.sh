@@ -123,7 +123,7 @@ check_params() {
 		fi
 	else
 		wemediamon_bilick=''
-		wemediamon_btskon='0'
+		wemediamon_btskon=''
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftks}" ]]; then

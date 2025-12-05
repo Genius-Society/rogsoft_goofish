@@ -225,7 +225,12 @@
                                                 <tr>
                                                     <th>每日自动签到</th>
                                                     <td>
-                                                        <input type="checkbox" id="btskon">
+                                                        <input type="password" class="input_ss_table" id="btskon"
+                                                            maxlength="32" value="" autocorrect="off"
+                                                            autocapitalize="off" readonly
+                                                            onblur="switchType(this, false);"
+                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
+                                                            placeholder="留空则不开启">
                                                         <input type="time" class="input_ss_table" id="btskat"
                                                             value="00:01">
                                                     </td>
