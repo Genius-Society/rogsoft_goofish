@@ -230,7 +230,7 @@
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            placeholder="留空则不开启, 浏览器控制台输入window.localStorage.ac_time_value访问B站主页获取">
+                                                            placeholder="ac_time_value 留空则不开启, 浏览器访问B站主页控制台输入 window.localStorage.ac_time_value 获取">
                                                         <input type="time" class="input_ss_table" id="btskat"
                                                             value="00:01">
                                                     </td>
