@@ -186,8 +186,8 @@ input[type="text"] {
 	width: 300px;
 }
 
-#btskon {
-	width: 260px !important;
+input[type="time"] {
+	width: fit-content !important;
 }
 
 #log_info {
