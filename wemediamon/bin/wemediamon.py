@@ -385,7 +385,7 @@ class BiliMon(Monitor):
         )
         response.raise_for_status()
         data = response.json()["data"]
-        return data["watch"], data["coins"] > 0, data["share"]
+        return data["watch"], data["share"], data["coins"] > 0
 
     def _daily_share(self):
         try:
@@ -472,7 +472,7 @@ class BiliMon(Monitor):
     def daily_tasks(self, retry=3):
         try:
             self._refresh_ck()
-            watched, coined, shared = self._daily_sign()
+            watched, shared, coined = self._daily_sign()
             if watched:
                 print("每日观看视频已完成")
             else:
