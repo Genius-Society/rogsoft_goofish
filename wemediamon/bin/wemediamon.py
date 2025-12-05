@@ -387,9 +387,14 @@ class BiliMon(Monitor):
         data = response.json()["data"]
         return data["watch"], data["coins"] > 0, data["share"]
 
-    def _daily_share(self, bvid="BV1iWrgYaEqa"):
+    def _daily_share(self):
         try:
-            status = sync(video.Video(bvid=bvid, credential=self.credential).share())
+            status = sync(
+                video.Video(
+                    bvid=self._rand_video(),
+                    credential=self.credential,
+                ).share()
+            )
             if status == 1:
                 print("✅ 分享成功: +5 经验已到账!")
             elif status == 2:
@@ -435,12 +440,12 @@ class BiliMon(Monitor):
 
         print(f"✅ 投币任务完成, +{to_add * 10} 经验到手!")
 
-    def _daily_watch(self, bvid="BV1iWrgYaEqa"):
+    def _daily_watch(self):
         response = requests.post(
             f"https://api.{self.endpoint}/x/click-interface/web/heartbeat",
             headers=self.header,
             data={
-                "bvid": bvid,
+                "bvid": self._rand_video(),
                 "played_time": random.randint(10, 90),
                 "realtime": random.randint(10, 90),
                 "start_ts": int(time.time()) - 90,
