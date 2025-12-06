@@ -286,8 +286,8 @@
                                                 </tr>
                                                 <tr>
                                                     <th><a onclick="hint(2.2)" class="hintstyle"
-                                                            href="javascript:void(0);">Token(s)</a><span
-                                                            style="color: red;"> * </span></th>
+                                                            href="javascript:void(0);">Token(s)<span
+                                                                style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <input type="password" class="input_ss_table" id="hftks"
                                                             maxlength="100" value="" autocorrect="off"
@@ -331,14 +331,17 @@
                                             <table id="table_2" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th>GitHub监控开关</th>
+                                                    <th><a onclick="hint(3.1)" class="hintstyle"
+                                                            href="javascript:void(0);">GitHub监控开关</a></th>
                                                     <td>
                                                         <input type="checkbox" class="check_2" id="gitmon"
                                                             onchange="show_hide(2)">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>监控目标<span style="color: red;"> * </span></th>
+                                                    <th><a onclick="hint(3.2)" class="hintstyle"
+                                                            href="javascript:void(0);">监控目标<span style="color: red;"> *
+                                                            </span></a></th>
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="gitags"
                                                             maxlength="100" value="" autocorrect="off"
@@ -367,14 +370,17 @@
                                             <table id="table_3" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th>博客园监控开关</th>
+                                                    <th><a onclick="hint(4.1)" class="hintstyle"
+                                                            href="javascript:void(0);">博客园监控开关</a></th>
                                                     <td>
                                                         <input type="checkbox" class="check_3" id="cnblon"
                                                             onchange="show_hide(3)">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>博客园Cookie<span style="color: red;"> * </span></th>
+                                                    <th><a onclick="hint(4.2)" class="hintstyle"
+                                                            href="javascript:void(0);">博客园Cookie<span
+                                                                style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <textarea class="input_ss_table" id="cnblokie" maxlength="2048"
                                                             rows="12" autocorrect="off" autocapitalize="off"
@@ -405,14 +411,17 @@
                                             <table id="table_4" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th>itch.io监控开关</th>
+                                                    <th><a onclick="hint(5.1)" class="hintstyle"
+                                                            href="javascript:void(0);">itch.io监控开关</a></th>
                                                     <td>
                                                         <input type="checkbox" class="check_4" id="itchion"
                                                             onchange="show_hide(4)">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>itch.io cookie<span style="color: red;"> * </span></th>
+                                                    <th><a onclick="hint(5.2)" class="hintstyle"
+                                                            href="javascript:void(0);">itch.io cookie<span
+                                                                style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <textarea class="input_ss_table" id="itck" maxlength="2048"
                                                             rows="12" autocorrect="off" autocapitalize="off"

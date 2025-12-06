@@ -324,59 +324,84 @@ function tabSelect(w) {
 }
 
 function hint(itemNum) {
+	_caption = "";
 	statusmenu = "";
 	width = "350px";
 	if (itemNum == 0.1) {
-		statusmenu = "点击“监控日志”按钮可查看当前插件所有日志信息。<br>"
 		_caption = "插件总开关";
+		statusmenu = "点击“监控日志”按钮可查看当前插件所有日志信息。<br>";
 	}
 	else if (itemNum == 0.2) {
-		statusmenu = "点击“执行日志”按钮可查看最新手动单次触发执行指令的日志信息。<br>"
 		_caption = "当前插件 Python 主程序实时运行状态信息";
+		statusmenu = "点击“执行日志”按钮可查看最新手动单次触发执行指令的日志信息。<br>";
 	}
 	else if (itemNum == 0.3) {
-		statusmenu = "支持邮箱后缀域有：@qq.com、@foxmail.com、@vip.qq.com。<br>"
 		_caption = "用于接收插件重要级提示的 QQ 系邮箱";
+		statusmenu = "支持邮箱后缀域有：@qq.com、@foxmail.com、@vip.qq.com。<br>";
 	}
 	else if (itemNum == 0.4) {
-		statusmenu = "浏览器登陆 QQ 邮箱后进入“账号与安全-安全设置”，找到“POP3/IMAP/SMTP/Exchange/CardDAV 服务”，点击“生成授权码”获取；点击“邮件测试”按钮可测试提示邮箱有效性。<br>"
 		_caption = "用于接收插件重要级提示的 QQ 系邮箱的 SMTP 应用密钥";
+		statusmenu = "浏览器登陆 QQ 邮箱后进入“账号与安全-安全设置”，找到“POP3/IMAP/SMTP/Exchange/CardDAV 服务”，点击“生成授权码”获取；点击“邮件测试”按钮可测试提示邮箱有效性。<br>";
 	}
 	else if (itemNum == 0.5) {
-		statusmenu = "请填写路由器本地存在的路径且容量足够可写入；点击“环境修复”按钮可修复 pip 依赖环境。<br>"
 		_caption = "插件产生的缓存文件在路由器本地的储存路径";
+		statusmenu = "请填写路由器本地存在且容量足够可写入的路径；点击“环境修复”按钮可修复 pip 依赖环境。<br>"
 	}
 	else if (itemNum == 0.6) {
-		statusmenu = "以小时为单位，默认值为2小时，即每2小时触发一次。<br>"
 		_caption = "插件监控器的刷新周期";
+		statusmenu = "以小时为单位，默认值为2小时，即每2小时触发一次。<br>";
 	}
 	else if (itemNum == 0.7) {
-		statusmenu = "包含 WeMediaMon 设定及下属各自媒体面板设置，仅支持导入本插件导出的 json 格式配置文件；点击“导出配置”按钮可将插件当前整体配置状态导出为单个 json 配置文件。<br>"
 		_caption = "一键导入插件的整体配置";
+		statusmenu = "包含 WeMediaMon 设定及下属各自媒体面板设置，仅支持导入本插件导出的 json 格式配置文件；点击“导出配置”按钮可将插件当前整体配置状态导出为单个 json 配置文件。<br>";
 	}
 	else if (itemNum == 1.1) {
-		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
-		_caption = "B站监B站自媒体面板总开关控开关";
+		_caption = "B站自媒体面板总开关";
+		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>";
 	}
 	else if (itemNum == 1.2) {
-		statusmenu = "获取方式：浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此。<br>"
 		_caption = "被监控B站账号的 Cookie 缓存值";
+		statusmenu = "获取方式：浏览器打开“开发者工具-网络”，查看已登陆状态B站主页请求标头，拷贝 Cookie 值至此。<br>";
 	}
 	else if (itemNum == 1.3) {
-		statusmenu = "左侧输入框填入与上述 Cookie 对应的有效的 AC 时间值才可开启，留空则不开启，可通过浏览器访问上述 Cookie 已登录状态下的B站主页控制台输入 window.localStorage.ac_time_value 获取；右侧时间输入框为触发每日签到的触发时间。<br>"
 		_caption = "B站自动完成每日任务功能";
+		statusmenu = "左侧输入框填入与上述 Cookie 对应的有效 AC 时间值才可开启，留空则不开启，可通过浏览器访问上述 Cookie 已登录状态下的B站主页控制台输入 window.localStorage.ac_time_value 获取；右侧时间选择框内为每日签到的触发时间。<br>";
 	}
 	else if (itemNum == 2.1) {
-		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
 		_caption = "HuggingFace 自媒体面板总开关";
+		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>";
 	}
 	else if (itemNum == 2.2) {
-		statusmenu = "登录状态下可在 https://huggingface.co/settings/tokens 页面创建，创建时一定要勾选个人和被管理组织的 Repositories 权限，若填写多个账号 Token 需以;隔开。<br>"
 		_caption = "HuggingFace 组织管理员账号的 Token 密钥令牌";
+		statusmenu = "登录状态下可在 https://huggingface.co/settings/tokens 页面创建，创建时一定要勾选个人和被管理组织的 Repositories 权限，若填写多个账号 Token 需以;隔开。<br>";
 	}
 	else if (itemNum == 2.3) {
-		statusmenu = "格式为 XXXX.XXXXX，若填写多个需以;隔开。<br>"
 		_caption = "HuggingFace 上被监控的 arXiv 论文编号";
+		statusmenu = "格式为 XXXX.XXXXX，若填写多个需以;隔开。<br>";
+	}
+	else if (itemNum == 3.1) {
+		_caption = "GitHub 自媒体面板总开关";
+		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>";
+	}
+	else if (itemNum == 3.2) {
+		_caption = "被监控的 GitHub 用户名";
+		statusmenu = "多个用户名需以;隔开。<br>";
+	}
+	else if (itemNum == 4.1) {
+		_caption = "博客园自媒体面板总开关";
+		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>";
+	}
+	else if (itemNum == 4.2) {
+		_caption = "被监控博客园账号的 Cookie 缓存值";
+		statusmenu = "获取方式：浏览器打开“开发者工具-网络”，查看已登陆状态博客园主页请求标头，拷贝 Cookie 值至此。<br>";
+	}
+	else if (itemNum == 5.1) {
+		_caption = "itch.io 自媒体面板总开关";
+		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>";
+	}
+	else if (itemNum == 5.2) {
+		_caption = "被监控 itch.io 账号的 Cookie 缓存值";
+		statusmenu = "获取方式：浏览器打开“开发者工具-网络”，查看已登陆状态下 https://itch.io/my-followers 页面请求标头，拷贝 Cookie 值至此。<br>";
 	}
 
 	return overlib(statusmenu, OFFSETX, 10, OFFSETY, 10, RIGHT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');
