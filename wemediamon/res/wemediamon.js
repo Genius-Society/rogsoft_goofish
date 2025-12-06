@@ -327,101 +327,56 @@ function open_wemediamon_hint(itemNum) {
 	statusmenu = "";
 	width = "350px";
 	if (itemNum == 0.1) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;1. 此处填写cloudreve二进制程序在路由器后台的部署位置。请注意: 部署位置的存储容量将直接影响到cloudreve网盘的容量上限, 建议将目录位置设置在路由器USB挂载的外置大容量存储设备中!<br/><br/>"
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;2. 该目录将承载所有cloudreve用户的上传文件, 因此网盘使用久了若修改该路径将会牵一发而动全身, 还请谨慎操作。<br/><br/>"
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;3. 卸载插件不会清理此目录, 可用SSH连入路由器或使用FileBrowser插件等方法进入该路径手动下载备份或清除用户数据。<br/><br/>"
-		_caption = "部署目录";
+		statusmenu = "插件总开关；点击“监控日志”按钮可查看当前插件所有日志信息。<br>"
+		_caption = "开关";
 	}
-	if (itemNum == 0.2) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;1. 此处显示cloudreve二进制程序在路由器后台的简要运行情况, 详细运行日志可以点击顶部的<b>cloudreve运行日志</b>查看。<br/><br/>"
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;2. 当开启了实时进程守护后, 可以看到cloudreve二进制运行时长, 即守护运行时间。<br/><br/>"
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;3. 当出现<b>获取运行状态失败</b>时, 可能是路由器后台登陆超时或者httpd进程崩溃导致, 如果是后者, 请等待路由器httpd进程恢复, 或者自行使用ssh命令: server restart_httpd重启httpd。<br/><br/>"
+	else if (itemNum == 0.2) {
+		statusmenu = "当前插件 Python 主程序实时运行状态信息；点击“执行日志”按钮可查看最新手动单次触发执行指令的日志信息。<br>"
 		_caption = "运行状态";
 	}
-	if (itemNum == 2) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;1. 此处显示cloudreve二进制程序的版本号及其内置的cloudreve面板版本号。<br/><br/>"
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;2. cloudreve二进制程序下载自cloudreve的github项目release页面的cloudreve-linux-arm64版本。<br/><br/>"
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;3.目前只支持hnd机型中的armv8机型, 比如cpu型号为BCM4906、BCM4908、BCM4912等armv8机型。<br/><br/>"
-		_caption = "运行状态";
+	else if (itemNum == 0.3) {
+		statusmenu = "用于接收插件重要级提示的 QQ 系邮箱，支持邮箱后缀域有：@qq.com、@foxmail.com、@vip.qq.com。<br>"
+		_caption = "提示邮箱(QQ/Foxmail)";
 	}
-	if (itemNum == 4) {
-		width = "780px";
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;在不同的配置和网络环境下, 点击【访问Cloudreve面板】进入的是不同地址: ";
-		statusmenu += "<br/><br/>";
-		statusmenu += "1️⃣<font color='#F00'>局域网访问 (http) </font><br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;1. cloudreve插件内: 关闭公网访问<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;2. 开启cloudreve插件<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;3. 此时点击【访问Cloudreve面板】就是访问局域网地址: https://192.168.50.1:5212, 或: http://router.asus.com:5212";
-		statusmenu += "<br/><br/>";
-		statusmenu += "2️⃣<font color='#F00'>公网ddns访问 (http) </font><br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;0. 路由器已经配置了ddns, 如域名 ax86.ddns.com 解析到路由器的公网ip<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;1. cloudreve插件内: 开启公网访问<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;2. cloudreve插件内: 关闭https<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;3. cloudreve插件内: 网站URL可以不填写, 或者填 http://ax86.ddns.com:5212<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;4. 开启cloudreve插件<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;5. 网站URL不填的话, 此时点击【访问Cloudreve面板】就是访问局域网地址: http://192.168.50.1:5212<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;6. 网站URL要填的话, 填: http://ax86.ddns.com:5212, 此时点击【访问Cloudreve面板】就是通过填写的url访问";
-		statusmenu += "<br/><br/>";
-		statusmenu += "3️⃣<font color='#F00'>公网ddns访问 (https) </font><br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;0. 路由器已经配置了ddns, 如域名 ax86.ddns.com, 且配置了https证书<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;1. cloudreve插件内: 开启公网访问<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;2. cloudreve插件内: 开启https, 证书公钥填/etc/cert.pem, 证书私钥填: /etc/key.pem<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;3. cloudreve插件内: 网站URL可以不填写, 或者填https://ax86.ddns.com:5212<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;4. 开启cloudreve插件<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;5. 网站URL不填的话, 此时点击【访问Cloudreve面板】就是访问局域网地址: https://192.168.50.1:5212, 不过会提示证书不安全<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;6. 网站URL要填的话, 填: https://ax86.ddns.com:5212, 此时点击【访问Cloudreve面板】就是通过填写的url访问<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;7. 注意开启https后, 所有http的访问方式将失效";
-		statusmenu += "<br/><br/>";
-		statusmenu += "4️⃣<font color='#F00'>ddnsto穿透访问</font><br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;0. 路由器已经配置了ddnsto, 如域名 ax86.ddnsto.com<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;1. cloudreve插件内: 关闭公网访问关<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;2. ddnsto后台配置主域名: ax86-cloudreve, ax86要换成自己的主域名<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;3. ddnsto后台配置目标主机地址: http://192.168.60.1:5212<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;4. 开启cloudreve插件<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;5. 此时点击【访问Cloudreve面板】就是访问ddnsto地址: https://ax86-cloudreve.ddnsto.com<br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;6. 你也可以开启公网访问后填写https://ax86-cloudreve.ddnsto.com到网站URL";
-		statusmenu += "</div>";
-		_caption = "说明: ";
-		return overlib(statusmenu, OFFSETX, -160, OFFSETY, 10, RIGHT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');
+	else if (itemNum == 0.4) {
+		statusmenu = "用于接收插件重要级提示的 QQ 系邮箱的 SMTP 应用密钥，浏览器登陆 QQ 邮箱后进入“账号与安全-安全设置”，找到“POP3/IMAP/SMTP/Exchange/CardDAV 服务”，点击“生成授权码”获取；点击“邮件测试”按钮可测试提示邮箱有效性。<br>"
+		_caption = "SMTP密钥";
 	}
-	if (itemNum == 5) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;采用perp对cloudreve进程进行实时进程守护, 这比一些定时检查脚本更有效率, 当然如果cloudreve程序在你的路由器上运行良好, 完全可以不使用进程守护。"
-		statusmenu += "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;由于cloudreve对路由器资源占用较多, 所以强烈建议为路由器配置1G及以上的虚拟内存, 以保证cloudreve的稳定运行!"
-		_caption = "实时进程守护";
+	else if (itemNum == 0.5) {
+		statusmenu = "插件产生的缓存文件在路由器本地的储存路径，请填写路由器本地存在的路径且容量足够可写入；点击“环境修复”按钮可修复 pip 依赖环境。<br>"
+		_caption = "缓存路径";
 	}
-	if (itemNum == 6) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;开启公网访问后, cloudreve将监听在0.0.0.0地址, 这样就能从WAN外部访问路由器内的cloudreve面板。<br/><br/>"
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;关闭公网访问后, cloudreve将监听在局域网地址如: 192.168.50.1上, 这样cloudreve面板仅能从局域网内部访问, "
-		_caption = "开启公网访问";
+	else if (itemNum == 0.6) {
+		statusmenu = "插件监控器的刷新周期，以小时为单位，默认值为2小时，即每2小时触发一次。<br>"
+		_caption = "刷新周期(小时)";
 	}
-	if (itemNum == 7) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;cloudreve面板默认端口为5212, 你可以自行更改为其它端口。请注意: 如果你需要配置webdav, 同样应该使用该端口!。<br/><br/>"
-		_caption = "面板端口";
+	else if (itemNum == 0.7) {
+		statusmenu = "一键导入插件的整体配置，包含 WeMediaMon 设定及下属各自媒体面板设置，仅支持导入本插件导出的 json 格式配置文件；点击“导出配置”按钮可将插件当前整体配置状态导出为单个 json 配置文件。<br>"
+		_caption = "导入配置";
 	}
-	if (itemNum == 8) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;cloudreve面板默认端口为5213, 你可以自行更改为其它端口。请注意: 如果你需要配置webdav, 同样应该使用该端口!。<br/><br/>"
-		_caption = "面板端口";
+	else if (itemNum == 1.1) {
+		statusmenu = "B站自媒体面板总开关，选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
+		_caption = "B站监控开关";
 	}
-	if (itemNum == 9) {
-		width = "690px";
-		statusmenu = "1️⃣只有当开启公网访问时才能启用https, 且建议路由器已经配置了DDNS + https证书的情况下才启用https选项!<br/><br/>";
-		statusmenu += "2️⃣启用https后, 下面的<b>证书公钥Cert文件</b>和<b>证书私钥Key文件</b>选项也必须正确填写, 才能起作用!<br/><br/>";
-		statusmenu += "3️⃣https启用成功后, 后台面板就无法使用http地址进行访问了!<br/><br/>";
-		statusmenu += "4️⃣如果你为路由器配置了DDNS和https证书, cloudreve可以使用相同的证书, 即: <br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;证书Cert文件路径(绝对路径): <font color='#CC0066'>/etc/cert.pem</font><br/>";
-		statusmenu += "&nbsp;&nbsp;&nbsp;&nbsp;证书Key文件路径(绝对路径): <font color='#CC0066'>/etc/key.pem</font><br/><br/>";
-		statusmenu += "5️⃣如果你使用ddnsto内网穿透服务, 请不要开启https选项!<br/><br/>";
-		_caption = "启用https: ";
-		return overlib(statusmenu, OFFSETX, -30, OFFSETY, 10, RIGHT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');
+	else if (itemNum == 1.2) {
+		statusmenu = "被监控B站账号的 Cookie 缓存值，获取方式：浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此。<br>"
+		_caption = "B站Cookie";
 	}
-	if (itemNum == 10) {
-		statusmenu = "&nbsp;&nbsp;&nbsp;&nbsp;开启系统检测功能可以防止因对路由器性能理解不足而出现的各种异常情况"
-		statusmenu += "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;如果关闭系统检测，请确保可以理解并能处理路由器出现的各种异常情况"
-		statusmenu += "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;目前检测项目："
-		statusmenu += "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;内存大小和虚拟内存挂载情况 (物理内存低于1G, 强制挂载虚拟内存) "
-		statusmenu += "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;已开启插件检测并提示"
-		statusmenu += "<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;由于cloudreve对路由器资源占用较多, 所以强烈建议为路由器配置1G及以上的虚拟内存, 以保证cloudreve的稳定运行!"
-		_caption = "关闭系统检测";
+	else if (itemNum == 1.3) {
+		statusmenu = "B站自动完成每日任务功能，左侧输入框填入与上述 Cookie 对应的有效的 AC 时间值才可开启，留空则不开启，可通过浏览器访问上述 Cookie 已登录状态下的B站主页控制台输入 window.localStorage.ac_time_value 获取；右侧时间输入框为触发每日签到的触发时间。<br>"
+		_caption = "每日自动签到";
+	}
+	else if (itemNum == 2.1) {
+		statusmenu = "HuggingFace 自媒体面板总开关，选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
+		_caption = "抱脸监控开关";
+	}
+	else if (itemNum == 2.2) {
+		statusmenu = "HuggingFace 组织管理员账号的 Token 密钥令牌，登录状态下可在 https://huggingface.co/settings/tokens 页面创建，创建时一定要勾选个人和被管理组织的 Repositories 权限，若填写多个账号 Token 需以;隔开。<br>"
+		_caption = "Token(s)";
+	}
+	else if (itemNum == 2.3) {
+		statusmenu = "HuggingFace 上被监控的 arXiv 论文编号，若填写多个需以;隔开。<br>"
+		_caption = "Token(s)";
 	}
 
 	return overlib(statusmenu, OFFSETX, 10, OFFSETY, 10, RIGHT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');
