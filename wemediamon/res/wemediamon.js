@@ -3,8 +3,8 @@ var count_down;
 var _responseLen;
 var _show_mon_log;
 
-const chks = ["bilimon", "btskon", "hfmon", "gitmon", "cnblon", "itchion"]
-const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "hftks", "papers", "gitags", "cnblokie", "itck"];
+const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"]
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskon", "btskat", "hftks", "papers", "gitags", "cnblokie", "itck"];
 
 function init() {
 	show_menu(menu_hook);
@@ -323,77 +323,61 @@ function tabSelect(w) {
 	$('#tablet_' + w).show();
 }
 
-function open_wemediamon_hint(itemNum) {
+function hint(itemNum) {
 	statusmenu = "";
 	width = "350px";
 	if (itemNum == 0.1) {
-		statusmenu = "插件总开关；点击“监控日志”按钮可查看当前插件所有日志信息。<br>"
-		_caption = "开关";
+		statusmenu = "点击“监控日志”按钮可查看当前插件所有日志信息。<br>"
+		_caption = "插件总开关";
 	}
 	else if (itemNum == 0.2) {
-		statusmenu = "当前插件 Python 主程序实时运行状态信息；点击“执行日志”按钮可查看最新手动单次触发执行指令的日志信息。<br>"
-		_caption = "运行状态";
+		statusmenu = "点击“执行日志”按钮可查看最新手动单次触发执行指令的日志信息。<br>"
+		_caption = "当前插件 Python 主程序实时运行状态信息";
 	}
 	else if (itemNum == 0.3) {
-		statusmenu = "用于接收插件重要级提示的 QQ 系邮箱，支持邮箱后缀域有：@qq.com、@foxmail.com、@vip.qq.com。<br>"
-		_caption = "提示邮箱(QQ/Foxmail)";
+		statusmenu = "支持邮箱后缀域有：@qq.com、@foxmail.com、@vip.qq.com。<br>"
+		_caption = "用于接收插件重要级提示的 QQ 系邮箱";
 	}
 	else if (itemNum == 0.4) {
-		statusmenu = "用于接收插件重要级提示的 QQ 系邮箱的 SMTP 应用密钥，浏览器登陆 QQ 邮箱后进入“账号与安全-安全设置”，找到“POP3/IMAP/SMTP/Exchange/CardDAV 服务”，点击“生成授权码”获取；点击“邮件测试”按钮可测试提示邮箱有效性。<br>"
-		_caption = "SMTP密钥";
+		statusmenu = "浏览器登陆 QQ 邮箱后进入“账号与安全-安全设置”，找到“POP3/IMAP/SMTP/Exchange/CardDAV 服务”，点击“生成授权码”获取；点击“邮件测试”按钮可测试提示邮箱有效性。<br>"
+		_caption = "用于接收插件重要级提示的 QQ 系邮箱的 SMTP 应用密钥";
 	}
 	else if (itemNum == 0.5) {
-		statusmenu = "插件产生的缓存文件在路由器本地的储存路径，请填写路由器本地存在的路径且容量足够可写入；点击“环境修复”按钮可修复 pip 依赖环境。<br>"
-		_caption = "缓存路径";
+		statusmenu = "请填写路由器本地存在的路径且容量足够可写入；点击“环境修复”按钮可修复 pip 依赖环境。<br>"
+		_caption = "插件产生的缓存文件在路由器本地的储存路径";
 	}
 	else if (itemNum == 0.6) {
-		statusmenu = "插件监控器的刷新周期，以小时为单位，默认值为2小时，即每2小时触发一次。<br>"
-		_caption = "刷新周期(小时)";
+		statusmenu = "以小时为单位，默认值为2小时，即每2小时触发一次。<br>"
+		_caption = "插件监控器的刷新周期";
 	}
 	else if (itemNum == 0.7) {
-		statusmenu = "一键导入插件的整体配置，包含 WeMediaMon 设定及下属各自媒体面板设置，仅支持导入本插件导出的 json 格式配置文件；点击“导出配置”按钮可将插件当前整体配置状态导出为单个 json 配置文件。<br>"
-		_caption = "导入配置";
+		statusmenu = "包含 WeMediaMon 设定及下属各自媒体面板设置，仅支持导入本插件导出的 json 格式配置文件；点击“导出配置”按钮可将插件当前整体配置状态导出为单个 json 配置文件。<br>"
+		_caption = "一键导入插件的整体配置";
 	}
 	else if (itemNum == 1.1) {
-		statusmenu = "B站自媒体面板总开关，选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
-		_caption = "B站监控开关";
+		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
+		_caption = "B站监B站自媒体面板总开关控开关";
 	}
 	else if (itemNum == 1.2) {
-		statusmenu = "被监控B站账号的 Cookie 缓存值，获取方式：浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此。<br>"
-		_caption = "B站Cookie";
+		statusmenu = "获取方式：浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此。<br>"
+		_caption = "被监控B站账号的 Cookie 缓存值";
 	}
 	else if (itemNum == 1.3) {
-		statusmenu = "B站自动完成每日任务功能，左侧输入框填入与上述 Cookie 对应的有效的 AC 时间值才可开启，留空则不开启，可通过浏览器访问上述 Cookie 已登录状态下的B站主页控制台输入 window.localStorage.ac_time_value 获取；右侧时间输入框为触发每日签到的触发时间。<br>"
-		_caption = "每日自动签到";
+		statusmenu = "左侧输入框填入与上述 Cookie 对应的有效的 AC 时间值才可开启，留空则不开启，可通过浏览器访问上述 Cookie 已登录状态下的B站主页控制台输入 window.localStorage.ac_time_value 获取；右侧时间输入框为触发每日签到的触发时间。<br>"
+		_caption = "B站自动完成每日任务功能";
 	}
 	else if (itemNum == 2.1) {
-		statusmenu = "HuggingFace 自媒体面板总开关，选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
-		_caption = "抱脸监控开关";
+		statusmenu = "选中后为打开状态，且后续隐藏折叠内容会自动显示。<br>"
+		_caption = "HuggingFace 自媒体面板总开关";
 	}
 	else if (itemNum == 2.2) {
-		statusmenu = "HuggingFace 组织管理员账号的 Token 密钥令牌，登录状态下可在 https://huggingface.co/settings/tokens 页面创建，创建时一定要勾选个人和被管理组织的 Repositories 权限，若填写多个账号 Token 需以;隔开。<br>"
-		_caption = "Token(s)";
+		statusmenu = "登录状态下可在 https://huggingface.co/settings/tokens 页面创建，创建时一定要勾选个人和被管理组织的 Repositories 权限，若填写多个账号 Token 需以;隔开。<br>"
+		_caption = "HuggingFace 组织管理员账号的 Token 密钥令牌";
 	}
 	else if (itemNum == 2.3) {
-		statusmenu = "HuggingFace 上被监控的 arXiv 论文编号，若填写多个需以;隔开。<br>"
-		_caption = "Token(s)";
+		statusmenu = "格式为 XXXX.XXXXX，若填写多个需以;隔开。<br>"
+		_caption = "HuggingFace 上被监控的 arXiv 论文编号";
 	}
 
 	return overlib(statusmenu, OFFSETX, 10, OFFSETY, 10, RIGHT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');
-}
-
-function mOver(obj, hint) {
-	$(obj).css({
-		"color": "#00ffe4",
-		"text-decoration": "underline"
-	});
-	open_wemediamon_hint(hint);
-}
-
-function mOut(obj) {
-	$(obj).css({
-		"color": "#fff",
-		"text-decoration": ""
-	});
-	E("overDiv").style.visibility = "hidden";
 }

@@ -103,8 +103,8 @@
                                                     </tr>
                                                 </thead>
                                                 <tr id="switch_tr">
-                                                    <th><a onmouseover="mOver(this, 0.1)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">开关</a></th>
+                                                    <th><a onclick="hint(0.1)" class="hintstyle"
+                                                            href="javascript:void(0);">开关</a></th>
                                                     <td colspan="2">
                                                         <div class="switch_field">
                                                             <label for="enable">
@@ -125,8 +125,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 0.2)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">运行状态</a></th>
+                                                    <th><a onclick="hint(0.2)" class="hintstyle"
+                                                            href="javascript:void(0);">运行状态</a></th>
                                                     <td><span id="status"></span>
                                                         <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
@@ -135,8 +135,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 0.3)" onmouseout="mOut(this)"
-                                                            class="hintstyle"
+                                                    <th><a onclick="hint(0.3)" class="hintstyle"
                                                             href="javascript:void(0);">提示邮箱(QQ/Foxmail)<span
                                                                 style="color: red;"> * </span></a></th>
                                                     <td>
@@ -146,9 +145,9 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 0.4)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">SMTP密钥<span
-                                                                style="color: red;"> * </span></a></th>
+                                                    <th><a onclick="hint(0.4)" class="hintstyle"
+                                                            href="javascript:void(0);">SMTP密钥<span style="color: red;">
+                                                                * </span></a></th>
                                                     <td>
                                                         <input type="password" class="input_ss_table" id="smtp"
                                                             maxlength="100" value="" autocorrect="off"
@@ -163,9 +162,9 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 0.5)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">缓存路径<span
-                                                                style="color: red;"> * </span></a></th>
+                                                    <th><a onclick="hint(0.5)" class="hintstyle"
+                                                            href="javascript:void(0);">缓存路径<span style="color: red;"> *
+                                                            </span></a></th>
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="cache"
                                                             maxlength="100" value="" autocorrect="off"
@@ -177,8 +176,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 0.6)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">刷新周期(小时)<span
+                                                    <th><a onclick="hint(0.6)" class="hintstyle"
+                                                            href="javascript:void(0);">刷新周期(小时)<span
                                                                 style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <input type="number" class="input_ss_table" id="period" min="1"
@@ -186,8 +185,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 0.7)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">导入配置</a></th>
+                                                    <th><a onclick="hint(0.7)" class="hintstyle"
+                                                            href="javascript:void(0);">导入配置</a></th>
                                                     <td>
                                                         <input type="file" class="input_ss_table" id="config"
                                                             accept=".json">
@@ -221,16 +220,16 @@
                                             <table id="table_0" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 1.1)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">B站监控开关</a></th>
+                                                    <th><a onclick="hint(1.1)" class="hintstyle"
+                                                            href="javascript:void(0);">B站监控开关</a></th>
                                                     <td>
                                                         <input type="checkbox" class="check_0" id="bilimon"
                                                             onchange="show_hide(0)">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 1.2)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">B站Cookie<span
+                                                    <th><a onclick="hint(1.2)" class="hintstyle"
+                                                            href="javascript:void(0);">B站Cookie<span
                                                                 style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <textarea class="input_ss_table" id="bilick" maxlength="2048"
@@ -239,7 +238,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onclick="mOver(this, 1.3)" class="hintstyle"
+                                                    <th><a onclick="hint(1.3)" class="hintstyle"
                                                             href="javascript:void(0);">每日自动签到</a></th>
                                                     <td>
                                                         <input type="password" class="input_ss_table" id="btskon"
@@ -247,7 +246,7 @@
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            placeholder="ac_time_value 留空则不开启, 浏览器访问B站主页控制台输入 window.localStorage.ac_time_value 获取">
+                                                            placeholder="ac_time_value 留空则不开启">
                                                         <input type="time" class="input_ss_table" id="btskat"
                                                             value="00:01">
                                                     </td>
@@ -278,15 +277,15 @@
                                             <table id="table_1" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 2.1)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">抱脸监控开关</a></th>
+                                                    <th><a onclick="hint(2.1)" class="hintstyle"
+                                                            href="javascript:void(0);">抱脸监控开关</a></th>
                                                     <td>
                                                         <input type="checkbox" class="check_1" id="hfmon"
                                                             onchange="show_hide(1)">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onclick="mOver(this, 2.2)" class="hintstyle"
+                                                    <th><a onclick="hint(2.2)" class="hintstyle"
                                                             href="javascript:void(0);">Token(s)</a><span
                                                             style="color: red;"> * </span></th>
                                                     <td>
@@ -299,9 +298,9 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onmouseover="mOver(this, 2.3)" onmouseout="mOut(this)"
-                                                            class="hintstyle" href="javascript:void(0);">监控论文<span
-                                                                style="color: red;"> * </span></a></th>
+                                                    <th><a onclick="hint(2.3)" class="hintstyle"
+                                                            href="javascript:void(0);">监控论文<span style="color: red;"> *
+                                                            </span></a></th>
                                                     <td>
                                                         <input type="text" class="input_ss_table" id="papers"
                                                             maxlength="100" value="" autocorrect="off"
