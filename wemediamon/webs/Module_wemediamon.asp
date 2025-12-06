@@ -11,16 +11,17 @@
     <title>软件中心 - WeMediaMon</title>
     <link rel="stylesheet" type="text/css" href="index_style.css" />
     <link rel="stylesheet" type="text/css" href="form_style.css" />
-    <link rel="stylesheet" type="text/css" href="css/element.css">
-    <link rel="stylesheet" type="text/css" href="/res/softcenter.css">
-    <link rel="stylesheet" type="text/css" href="/res/wemediamon.css">
-    <link rel="stylesheet" type="text/css" href="/res/layer/theme/default/layer.css">
-    <script language="JavaScript" type="text/javascript" src="/js/jquery.js"></script>
-    <script type="text/javascript" src="/res/softcenter.js"></script>
-    <script type="text/javascript" src="/state.js"></script>
-    <script type="text/javascript" src="/general.js"></script>
-    <script type="text/javascript" src="/popup.js"></script>
-    <script type="text/javascript" src="/res/wemediamon.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/element.css" />
+    <link rel="stylesheet" type="text/css" href="res/softcenter.css" />
+    <link rel="stylesheet" type="text/css" href="res/wemediamon.css" />
+    <link rel="stylesheet" type="text/css" href="res/layer/theme/default/layer.css" />
+    <script language="JavaScript" type="text/javascript" src="js/jquery.js"></script>
+    <script language="JavaScript" type="text/javascript" src="res/softcenter.js"></script>
+    <script language="JavaScript" type="text/javascript" src="state.js"></script>
+    <script language="JavaScript" type="text/javascript" src="popup.js"></script>
+    <script language="JavaScript" type="text/javascript" src="help.js"></script>
+    <script language="JavaScript" type="text/javascript" src="general.js"></script>
+    <script language="JavaScript" type="text/javascript" src="res/wemediamon.js"></script>
 </head>
 
 <body onload="init();">
@@ -84,7 +85,7 @@
                                         </div>
                                         <div id="return_center">
                                             <img id="return_btn" onclick="reload_Soft_Center();" align="right"
-                                                title="返回软件中心" src="/images/backprev.png"
+                                                title="返回软件中心" src="images/backprev.png"
                                                 onMouseOver="this.src='/images/backprevclick.png'"
                                                 onMouseOut="this.src='/images/backprev.png'">
                                         </div>
@@ -102,7 +103,8 @@
                                                     </tr>
                                                 </thead>
                                                 <tr id="switch_tr">
-                                                    <th>开关</th>
+                                                    <th><a onmouseover="mOver(this, 0.1)" onmouseout="mOut(this)"
+                                                            class="hintstyle" href="javascript:void(0);">开关</a></th>
                                                     <td colspan="2">
                                                         <div class="switch_field">
                                                             <label for="enable">
@@ -123,7 +125,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th>运行状态</th>
+                                                    <th><a onmouseover="mOver(this, 0.2)" onmouseout="mOut(this)"
+                                                            class="hintstyle" href="javascript:void(0);">运行状态</a></th>
                                                     <td><span id="status"></span>
                                                         <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"

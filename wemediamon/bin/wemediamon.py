@@ -464,7 +464,7 @@ class BiliMon(Monitor):
                     ["dbus", "set", f"wemediamon_btskon={self.act}"],
                     check=True,
                 )
-                print(res)
+                print(f"刷新 Cookie 成功: {res}")
 
         except Exception as e:
             print(f"刷新 Cookie 出错: {e}")
