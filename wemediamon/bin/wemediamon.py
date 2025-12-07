@@ -173,6 +173,20 @@ class BiliMon(Monitor):
             ac_time_value=self.act,
         )
         self.me = user.User(uid=self.uid, credential=self.credential)
+        self._simplify_ck(self.credential)
+
+    def _simplify_ck(self, credential: Credential, exclude="ac_time_value"):
+        parsed_ck = credential.get_cookies()
+        del parsed_ck[exclude]
+        pure_ck = set()
+        for key in parsed_ck:
+            if parsed_ck[key]:
+                pure_ck.add(f"{key}={parsed_ck[key]}")
+
+        subprocess.run(
+            ["dbus", "set", f"wemediamon_bilick={';'.join(pure_ck)}"],
+            check=True,
+        )
 
     def _get_fans(self, pn, retry=3):
         try:
