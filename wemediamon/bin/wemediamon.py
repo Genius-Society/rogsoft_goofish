@@ -1002,9 +1002,16 @@ class HFMon(Monitor):
         if not traitors:
             raise LookupError("当前抱脸狗库为空!")
 
+        fanstr = ""
+        if os.path.exists(self.fans):
+            with open(self.fans, "r", encoding="utf-8") as file:
+                fanstr += file.read()
+
         for traitor in self._tqdm(traitors, desc="清理已注销的抱脸取关狗"):
             if self._is_deleted(traitor):
                 print(f"抱脸取关狗 {traitor} 已被清理!")
+            elif traitor in fanstr:
+                print(f"抱脸误判者 {traitor} 已被清理!")
             else:
                 cleaned_traitors.append(traitor)
 
@@ -1201,9 +1208,16 @@ class GitHubMon(Monitor):
         if not traitors:
             raise LookupError("当前GitHub狗库为空!")
 
+        fanstr = ""
+        if os.path.exists(self.fans):
+            with open(self.fans, "r", encoding="utf-8") as file:
+                fanstr += file.read()
+
         for traitor in self._tqdm(traitors, desc="清理已注销的GitHub取关狗"):
             if self._is_deleted(traitor):
                 print(f"GitHub取关狗 {traitor} 已被清理!")
+            elif traitor in fanstr:
+                print(f"GitHub误判者 {traitor} 已被清理!")
             else:
                 cleaned_traitors.append(traitor)
 
