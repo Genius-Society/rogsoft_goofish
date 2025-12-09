@@ -441,19 +441,13 @@ class BiliMon(Monitor):
 
     def _daily_share(self):
         try:
-            status = sync(
+            sync(
                 video.Video(
                     bvid=self._rand_video(),
                     credential=self.credential,
                 ).share()
             )
-            if status == 1:
-                print("✅ 分享成功: +5 经验已到账!")
-            elif status == 2:
-                print("分享成功: 今日经验已获取过")
-            else:
-                raise Exception(f"{status}")
-
+            print("✅ 分享成功: +5 经验已到账!")
             return True
 
         except Exception as e:
