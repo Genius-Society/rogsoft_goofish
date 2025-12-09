@@ -138,17 +138,15 @@ class Monitor:
         with open(self.blacks, "r", encoding="utf-8") as file:
             lines = file.readlines()
 
-        return [line.strip() for line in lines]
+        return set([line.strip() for line in lines])
 
-    def _save_traitors(self, traitors: list):
+    def _save_traitors(self, traitors: set):
         with open(self.blacks, "w", encoding="utf-8") as file:
             for url in traitors:
                 file.write(f"{url}\n")
 
-    def _add_traitors(self, traitors: list):
-        old_traitors = self._txt2lst()
-        merged_traitors = list(set(old_traitors + traitors))
-        self._save_traitors(merged_traitors)
+    def _add_traitors(self, traitors: set):
+        self._save_traitors(self._txt2lst() | traitors)
 
     def _is_deleted(self, _):
         return  # @override
@@ -290,14 +288,14 @@ class BiliMon(Monitor):
             with open(self.fans, "r", encoding="utf-8") as file:
                 out1000.update(json.load(file)["out1000"])
 
-        traitors_out1000 = []
+        traitors_out1000 = set()
         out1000_keys = list(out1000.keys())
         for item in self._tqdm(out1000_keys, desc=f"过滤 {self.uid} B站1K以外粉丝列表"):
             if item in new_fans:
                 del out1000[item]
 
             elif not self._is_fans(item):
-                traitors_out1000.append(item)
+                traitors_out1000.add(item)
                 del out1000[item]
 
         if traitors_out1000:
@@ -570,13 +568,13 @@ class BiliMon(Monitor):
             unfollows, out1000 = self._filter_unfollows(unfollows)
             if unfollows:
                 content = f"B站以下狗取关了 {self.uid}:"
-                traitors = []
+                traitors = set()
                 for user in unfollows:
                     url = f'https://space.{self.endpoint}/{user["uid"]}'
                     content += f'<br><a href="{url}">{user["uname"]}</a><br>'
-                    traitors.append(user["uid"])
+                    traitors.add(user["uid"])
 
-                if content:
+                if traitors:
                     self._add_traitors(traitors)
                     send_email(
                         content,
@@ -882,13 +880,13 @@ class HFMon(Monitor):
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
-        traitors = []
+        traitors = set()
         for tag in prev_data:
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
-                    traitors.append(id)
+                    traitors.add(id)
                     logs += f"<br><a href='{self.endpoint}/{dog}'>{dog}</a>取关了<a href='{self.endpoint}/{tag}'>{tag}</a>!<br>"
 
         if traitors:
@@ -1137,13 +1135,13 @@ class GitHubMon(Monitor):
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
-        traitors = []
+        traitors = set()
         for tag in prev_data:
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
                     dog = prev_data[tag][id]
-                    traitors.append(id)
+                    traitors.add(id)
                     logs += f"<br><a href='https://{self.endpoint}/{dog}'>{dog}</a>取关了<a href='https://{self.endpoint}/{tag}'>{tag}</a>!<br>"
 
         if traitors:
@@ -1261,11 +1259,11 @@ class CnblogsMon(Monitor):
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
-        traitors = []
+        traitors = set()
         diff = set(prev_data.keys()) - set(data.keys())
         for id in diff:
             dog = prev_data[id]
-            traitors.append(id)
+            traitors.add(id)
             logs += f"<br><a href='https://home.{self.endpoint}/u/{id}'>{dog}</a><br>"
 
         if traitors:
@@ -1380,11 +1378,11 @@ class ItchMon(Monitor):
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
-        traitors = []
+        traitors = set()
         diff = set(prev_data.keys()) - set(data.keys())
         for id in diff:
             dog = prev_data[id]
-            traitors.append(id)
+            traitors.add(id)
             logs += f"<br><a href='https://{self.endpoint}/profile/{dog}'>{dog}</a><br>"
 
         if traitors:
