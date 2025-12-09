@@ -123,8 +123,9 @@ class Monitor:
             "https": "http://127.0.0.1:23456",
         }
         self.cache = args.cache if args.cache[-1] != "/" else args.cache[:-1]
-        self.fans = f"{self.cache}/{name}_followers.json"
-        self.blacks = f"{self.cache}/{name}_blacklist.txt"
+        self.name = name
+        self.fans = f"{self.cache}/{self.name}_followers.json"
+        self.blacks = f"{self.cache}/{self.name}_blacklist.txt"
 
     def _tqdm(self, *args, **kwargs):  # 强制使用 Unicode 样式
         kwargs.setdefault("ascii", False)
@@ -149,12 +150,31 @@ class Monitor:
         merged_traitors = list(set(old_traitors + traitors))
         self._save_traitors(merged_traitors)
 
+    def _is_deleted(self, _):
+        return  # @override
+
+    def clean_traitors(self):
+        cleaned_traitors = []
+        traitors = self._txt2lst()
+        if not traitors:
+            raise LookupError(f"当前 {self.name} 狗库为空!")
+
+        for traitor in self._tqdm(traitors, desc=f"清理已注销的 {self.name} 取关狗"):
+            if self._is_deleted(traitor):
+                print(f"{self.name} 取关狗 {traitor} 已被清理!")
+            else:
+                cleaned_traitors.append(traitor)
+
+        if cleaned_traitors != traitors:
+            self._save_traitors(cleaned_traitors)
+
 
 class BiliMon(Monitor):
     def __init__(self):
         super().__init__("bili")
         self.endpoint = "bilibili.com"
         self._parse_cookie(args.bilick, args.btskon)
+        self._upd_ck(self.credential)
         self.header = {"User-Agent": self.ua, "Cookie": self.ck}
 
     def _parse_cookie(self, ck: str, ac_time: str):
@@ -172,20 +192,41 @@ class BiliMon(Monitor):
             ac_time_value=self.act,
         )
         self.me = user.User(uid=self.uid, credential=self.credential)
-        self._simplify_ck(self.credential)
 
-    def _simplify_ck(self, credential: Credential, exclude="ac_time_value"):
-        parsed_ck = credential.get_cookies()
-        del parsed_ck[exclude]
-        pure_ck = set()
-        for key in parsed_ck:
-            if parsed_ck[key]:
-                pure_ck.add(f"{key}={parsed_ck[key]}")
+    def _upd_ck(self, credential: Credential, exclude="ac_time_value"):
+        ck_dict = credential.get_cookies()
+        del ck_dict[exclude]
+        ck_set = set()
+        for key in ck_dict:
+            if ck_dict[key]:
+                ck_set.add(f"{key}={ck_dict[key]}")
 
-        subprocess.run(
-            ["dbus", "set", f"wemediamon_bilick={';'.join(pure_ck)}"],
-            check=True,
-        )
+        pure_ck = ";".join(ck_set)
+        if self.ck != pure_ck:
+            self.ck = pure_ck
+            subprocess.run(
+                ["dbus", "set", f"wemediamon_bilick={self.ck}"],
+                check=True,
+            )
+
+    def _refresh_ck(self):
+        try:
+            if self.act:
+                res = sync(self.credential.refresh())
+                if self.act != self.credential.ac_time_value:
+                    self.act = self.credential.ac_time_value
+                    subprocess.run(
+                        ["dbus", "set", f"wemediamon_btskon={self.act}"],
+                        check=True,
+                    )
+                    self._upd_ck(self.credential)
+                    print(f"刷新 Cookie 成功: {res}")
+
+                else:
+                    print("无需刷新 Cookie")
+
+        except Exception as e:
+            print(f"{e}")
 
     def _get_fans(self, pn, retry=3):
         try:
@@ -468,20 +509,6 @@ class BiliMon(Monitor):
         response.raise_for_status()
         print(f"观看视频结果: {response.json()}")
 
-    def _refresh_ck(self):
-        try:
-            if self.act:
-                res = sync(self.credential.refresh())
-                self.act = self.credential.ac_time_value
-                subprocess.run(
-                    ["dbus", "set", f"wemediamon_btskon={self.act}"],
-                    check=True,
-                )
-                print(f"刷新 Cookie 成功: {res}")
-
-        except Exception as e:
-            print(f"刷新 Cookie 出错: {e}")
-
     def daily_tasks(self, retry=3):
         try:
             self._refresh_ck()
@@ -564,21 +591,6 @@ class BiliMon(Monitor):
 
         else:
             print(f"暂未发现B站取关 {self.uid} 者")
-
-    def clean_traitors(self):
-        cleaned_traitors = []
-        traitors = self._txt2lst()
-        if not traitors:
-            raise LookupError("当前B站狗库为空!")
-
-        for traitor in self._tqdm(traitors, desc="清理已注销的B站取关狗"):
-            if self._is_deleted(traitor):
-                print(f"B站取关狗 {traitor} 已被清理!")
-            else:
-                cleaned_traitors.append(traitor)
-
-        if cleaned_traitors != traitors:
-            self._save_traitors(cleaned_traitors)
 
     def clean_followings(self):
         followings = self._get_followings()
@@ -995,30 +1007,6 @@ class HFMon(Monitor):
 
             print("抱脸数据已更新!")
 
-    def upd_traitors(self):
-        cleaned_traitors = []
-        traitors = self._txt2lst()
-        if not traitors:
-            raise LookupError("当前抱脸狗库为空!")
-
-        fanstr = ""
-        if os.path.exists(self.fans):
-            with open(self.fans, "r", encoding="utf-8") as file:
-                fanstr += file.read()
-
-        for traitor in self._tqdm(traitors, desc="清理已注销的抱脸取关狗"):
-            if self._is_deleted(traitor):
-                print(f"抱脸取关狗 {traitor} 已被清理!")
-            elif traitor in fanstr:
-                print(f"抱脸误判者 {traitor} 已被清理!")
-            else:
-                cleaned_traitors.append(traitor)
-
-            time.sleep(random.uniform(0.5, 1))
-
-        if cleaned_traitors != traitors:
-            self._save_traitors(cleaned_traitors)
-
     def trigger(self, retry=3):
         try:
             self.activate()
@@ -1201,30 +1189,6 @@ class GitHubMon(Monitor):
 
         response.raise_for_status()
 
-    def upd_traitors(self):
-        cleaned_traitors = []
-        traitors = self._txt2lst()
-        if not traitors:
-            raise LookupError("当前GitHub狗库为空!")
-
-        fanstr = ""
-        if os.path.exists(self.fans):
-            with open(self.fans, "r", encoding="utf-8") as file:
-                fanstr += file.read()
-
-        for traitor in self._tqdm(traitors, desc="清理已注销的GitHub取关狗"):
-            if self._is_deleted(traitor):
-                print(f"GitHub取关狗 {traitor} 已被清理!")
-            elif traitor in fanstr:
-                print(f"GitHub误判者 {traitor} 已被清理!")
-            else:
-                cleaned_traitors.append(traitor)
-
-            time.sleep(random.uniform(0.5, 1))
-
-        if cleaned_traitors != traitors:
-            self._save_traitors(cleaned_traitors)
-
     def upd_fans(self):
         prev_data = {}
         if os.path.exists(self.fans):
@@ -1329,26 +1293,6 @@ class CnblogsMon(Monitor):
                 raise LookupError(f"{err_div}")
 
         return False
-
-    def upd_traitors(self):
-        if not self.check_login(False):
-            return
-
-        cleaned_traitors = []
-        traitors = self._txt2lst()
-        if not traitors:
-            raise LookupError("当前博客园狗库为空!")
-
-        for traitor in self._tqdm(traitors, desc="清理已注销的博客园取关狗"):
-            if self._is_deleted(traitor):
-                print(f"博客园取关狗 {traitor} 已被清理!")
-            else:
-                cleaned_traitors.append(traitor)
-
-            time.sleep(random.uniform(0.5, 1))
-
-        if cleaned_traitors != traitors:
-            self._save_traitors(cleaned_traitors)
 
     def check_login(self, log=True):
         response = requests.get(
@@ -1467,23 +1411,6 @@ class ItchMon(Monitor):
 
         response.raise_for_status()
 
-    def upd_traitors(self):
-        cleaned_traitors = []
-        traitors = self._txt2lst()
-        if not traitors:
-            raise LookupError("当前itch.io狗库为空!")
-
-        for traitor in self._tqdm(traitors, desc="清理已注销的itch.io取关狗"):
-            if self._is_deleted(traitor):
-                print(f"itch.io取关狗 {traitor} 已被清理!")
-            else:
-                cleaned_traitors.append(traitor)
-
-            time.sleep(random.uniform(0.5, 1))
-
-        if cleaned_traitors != traitors:
-            self._save_traitors(cleaned_traitors)
-
     def check_login(self, log=True):
         response = requests.get(
             f"https://{self.endpoint}/my-followers",
@@ -1596,13 +1523,13 @@ if __name__ == "__main__":
                 HFMon().activate()
 
             case "UPD_HF_BLACKS":
-                HFMon().upd_traitors()
+                HFMon().clean_traitors()
 
             case "UPD_GIT_FANS":
                 GitHubMon().upd_fans()
 
             case "UPD_GIT_BLACKS":
-                GitHubMon().upd_traitors()
+                GitHubMon().clean_traitors()
 
             case "TEST_CNBLOGS_CK":
                 CnblogsMon().check_login()
@@ -1611,7 +1538,7 @@ if __name__ == "__main__":
                 CnblogsMon().upd_fans()
 
             case "UPD_CNBLOGS_BLACKS":
-                CnblogsMon().upd_traitors()
+                CnblogsMon().clean_traitors()
 
             case "TEST_ITCH_CK":
                 ItchMon().check_login()
@@ -1620,7 +1547,7 @@ if __name__ == "__main__":
                 ItchMon().upd_fans()
 
             case "UPD_ITCH_BLACKS":
-                ItchMon().upd_traitors()
+                ItchMon().clean_traitors()
 
             case _:
                 print(f"未知指令: {args.cmd}")

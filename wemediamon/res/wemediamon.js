@@ -361,7 +361,7 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 1.2) {
 		_caption = "被监控B站账号的 Cookie 缓存值";
-		statusmenu = "获取方式：浏览器打开“开发者工具-网络”，查看已登陆状态B站主页请求标头，拷贝 Cookie 值至此。<br>";
+		statusmenu = "获取方式：浏览器打开“开发者工具-网络”，查看已登陆状态B站请求标头，拷贝 Cookie 值至此。1年长生存期 Cookie 获取走 passport.bilibili.com 协议登录；7天短生存期的走B站主页 Web 登录，但需配合下面每日签到的 AC 时间值协同使用。<br>";
 	}
 	else if (itemNum == 1.3) {
 		_caption = "B站自动完成每日任务功能";
