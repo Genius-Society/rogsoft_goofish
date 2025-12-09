@@ -210,7 +210,7 @@ class BiliMon(Monitor):
     def _refresh_ck(self):
         try:
             if self.act:
-                res = sync(self.credential.refresh())
+                sync(self.credential.refresh())
                 if self.act != self.credential.ac_time_value:
                     self.act = self.credential.ac_time_value
                     subprocess.run(
@@ -218,7 +218,7 @@ class BiliMon(Monitor):
                         check=True,
                     )
                     self._upd_ck(self.credential)
-                    print(f"刷新 Cookie 成功: {res}")
+                    print("刷新 Cookie 成功")
 
                 else:
                     print("无需刷新 Cookie")
