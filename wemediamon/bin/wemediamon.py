@@ -885,9 +885,10 @@ class HFMon(Monitor):
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
-                    dog = prev_data[tag][id]
-                    traitors.add(id)
-                    logs += f"<br><a href='{self.endpoint}/{dog}'>{dog}</a>取关了<a href='{self.endpoint}/{tag}'>{tag}</a>!<br>"
+                    if not id in f"{data}":
+                        dog = prev_data[tag][id]
+                        traitors.add(id)
+                        logs += f"<br><a href='{self.endpoint}/{dog}'>{dog}</a>取关了<a href='{self.endpoint}/{tag}'>{tag}</a>!<br>"
 
         if traitors:
             self._add_traitors(traitors)
@@ -1140,9 +1141,10 @@ class GitHubMon(Monitor):
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
-                    dog = prev_data[tag][id]
-                    traitors.add(id)
-                    logs += f"<br><a href='https://{self.endpoint}/{dog}'>{dog}</a>取关了<a href='https://{self.endpoint}/{tag}'>{tag}</a>!<br>"
+                    if not id in f"{data}":
+                        dog = prev_data[tag][id]
+                        traitors.add(id)
+                        logs += f"<br><a href='https://{self.endpoint}/{dog}'>{dog}</a>取关了<a href='https://{self.endpoint}/{tag}'>{tag}</a>!<br>"
 
         if traitors:
             self._add_traitors(traitors)
