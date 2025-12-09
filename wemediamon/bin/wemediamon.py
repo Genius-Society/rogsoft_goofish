@@ -136,9 +136,8 @@ class Monitor:
 
         with open(self.blacks, "r", encoding="utf-8") as file:
             lines = file.readlines()
-        # 去掉每行末尾的换行符
-        lines = [line.strip() for line in lines]
-        return list(set(lines))
+
+        return [line.strip() for line in lines]
 
     def _save_traitors(self, traitors: list):
         with open(self.blacks, "w", encoding="utf-8") as file:
