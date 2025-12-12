@@ -925,15 +925,25 @@ class HFMon(Monitor):
         return data
 
     def _list_spaces(self, name: str, token: str):
-        pauses = []
+        logs = ""
+        sleeps = []
         spaces = self.api.list_spaces(name, token)
         for space in spaces:
             space_id = space["id"]
             status = self.api.get_space_runtime(space_id, token)["stage"]
-            if status == "SLEEPING" or "ERROR" in status:
-                pauses.append(space_id)
+            if status == "SLEEPING":
+                sleeps.append(space_id)
+            elif "ERROR" in status:
+                logs += f"<br><a href='{space_id}'>{self.endpoint}/spaces/{space_id}</a><br>"
 
-        return pauses
+        if logs:
+            send_email(
+                f"以下抱脸空间出错: {logs}",
+                "[WeMediaMon 插件] 发现出错抱脸空间",
+                "建议手动排查问题",
+            )
+
+        return sleeps
 
     def _is_deleted(self, uid):
         response = requests.get(
