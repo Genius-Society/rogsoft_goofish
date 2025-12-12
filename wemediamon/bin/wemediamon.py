@@ -818,6 +818,8 @@ class HFMon(Monitor):
             time.sleep(random.uniform(3, 5))
             self._move_repo(tmp_repo, space_id, token)
 
+        return f"{space_id} "
+
     def _get_followers(self, tag_type: str, tag: str):
         fans = self.api.list_followers(tag_type, tag)
         followers = {}
@@ -923,17 +925,15 @@ class HFMon(Monitor):
         return data
 
     def _list_spaces(self, name: str, token: str):
-        sleepings, errors = [], []
+        pauses = []
         spaces = self.api.list_spaces(name, token)
         for space in spaces:
             space_id = space["id"]
             status = self.api.get_space_runtime(space_id, token)["stage"]
-            if status == "SLEEPING":
-                sleepings.append(space_id)
-            elif "ERROR" in status:
-                errors.append(f"{self.endpoint}/spaces/{space_id}")
+            if status == "SLEEPING" or "ERROR" in status:
+                pauses.append(space_id)
 
-        return sleepings, errors
+        return pauses
 
     def _is_deleted(self, uid):
         response = requests.get(
@@ -951,38 +951,18 @@ class HFMon(Monitor):
 
     def activate(self):
         logs = ""
-        spaces, failures = [], []
         for token in self.targets:
-            for name in self._tqdm(
-                self.targets[token],
-                desc=f"搜集 {self.targets[token][0]} 管理的抱脸空间中",
-            ):
-                sleeps, errors = self._list_spaces(name, token)
-                spaces += sleeps
-                failures += errors
+            names = self.targets[token]
+            admin = names[0]
+            spaces = []
+            for name in self._tqdm(names, desc=f"搜集 {admin} 管理的抱脸空间中"):
+                spaces += self._list_spaces(name, token)
 
-            for space in self._tqdm(
-                spaces,
-                desc=f"激活 {self.targets[token][0]} 管理的抱脸空间中",
-            ):
-                self._activate_space(space, token)
-                logs += f"{space} "
+            for space in self._tqdm(spaces, desc=f"激活 {admin} 管理的抱脸空间中"):
+                logs += self._activate_space(space, token)
 
         if logs:
             print(f"抱脸空间 {logs}激活完成!")
-
-        logs = ""
-        for failure in failures:
-            errepo: str = failure
-            errepo = errepo.replace(self.endpoint, "")
-            logs += f"<br><a href='{failure}'>{errepo[1:]}</a><br>"
-
-        if logs:
-            send_email(
-                f"激活以下抱脸空间失败: {logs}",
-                "[WeMediaMon 插件] 运行错误",
-                "空间激活出现问题",
-            )
 
     def upd_fans(self):
         prev_data, data = {}, {}
