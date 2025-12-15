@@ -934,7 +934,7 @@ class HFMon(Monitor):
             if status == "SLEEPING":
                 sleeps.append(space_id)
             elif "ERROR" in status:
-                logs += f"<br><a href='{space_id}'>{self.endpoint}/spaces/{space_id}</a><br>"
+                logs += f"<br><a href='{self.endpoint}/spaces/{space_id}'>{space_id}</a><br>"
 
         if logs:
             send_email(
