@@ -819,7 +819,11 @@ class HFMon(Monitor):
                 self._move_repo(tmp_repo, space_id, token)
 
             else:
-                print(f"Failed to activate {space_id}: {e}")
+                send_email(
+                    f"激活 {space_id} 出错: {e}",
+                    "[WeMediaMon 插件] 抱脸空间激活出错",
+                    "已排除 412 错误",
+                )
 
         return f"{space_id} "
 
