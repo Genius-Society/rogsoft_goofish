@@ -812,11 +812,14 @@ class HFMon(Monitor):
             response.raise_for_status()
 
         except Exception as e:
-            print(f"Renaming space {space_id}: {e}")
-            tmp_repo = f"{space_id}_{int(time.time())}"
-            self._move_repo(space_id, tmp_repo, token)
-            time.sleep(random.uniform(3, 5))
-            self._move_repo(tmp_repo, space_id, token)
+            if response.status_code == 412:
+                tmp_repo = f"{space_id}_{int(time.time())}"
+                self._move_repo(space_id, tmp_repo, token)
+                time.sleep(random.uniform(3, 5))
+                self._move_repo(tmp_repo, space_id, token)
+
+            else:
+                print(f"Failed to activate {space_id}: {e}")
 
         return f"{space_id} "
 
