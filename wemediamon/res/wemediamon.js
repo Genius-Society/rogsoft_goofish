@@ -36,7 +36,7 @@ function load_cfg(obj) { // 加载配置
 		if (k in obj) $(`#${k}`).val(obj[k]);
 	});
 	chks.forEach(k => {
-		if (k in obj) $(`#${k}`).prop('checked', obj[k] == "on").trigger('change');;
+		if (k in obj) $(`#${k}`).prop('checked', obj[k] == "on").trigger('change');
 	});
 }
 
@@ -73,6 +73,23 @@ function show_hide(w) { // 各面板开关显隐连动
 	else {
 		$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
 	}
+}
+
+function filter_bili_ck(cookie) {
+	let ck = cookie.trim();
+	if (!ck) return "";
+	const keepKeys = ["DedeUserID", "SESSDATA", "bili_jct", "buvid3"];
+	const map = {};
+	ck.split(";").forEach(item => {
+		let [key, value] = item.trim().split("=");
+		if (keepKeys.includes(key) && value) {
+			map[key] = value;
+		}
+	});
+	return keepKeys
+		.filter(k => map[k])
+		.map(k => `${k}=${map[k]}`)
+		.join("; ");
 }
 
 function conf2obj() { // dbus 变量转控件值
@@ -113,7 +130,7 @@ function obj2conf(cmd) { // 控件值转 dbus 变量
 	$('textarea[class][id][placeholder], input[type="text"][id], input[type="password"][id], input[type="number"][id], input[type="time"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id) {
-			dbus_new["wemediamon_" + id] = E(id).value.trim();
+			dbus_new["wemediamon_" + id] = id != "bilick" ? E(id).value.trim() : filter_bili_ck(E(id).value);
 		}
 	});
 
