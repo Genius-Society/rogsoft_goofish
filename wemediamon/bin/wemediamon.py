@@ -1294,7 +1294,7 @@ class CnblogsMon(Monitor):
         soup = BeautifulSoup(response.text, "html.parser")
         blog_lnk = soup.find("a", id="user_nav_blog_link")
         if blog_lnk:
-            self.username = blog_lnk["href"].split(f"{self.endpoint}/")[-1][:-1]
+            self.username = blog_lnk["href"].split(f"{self.endpoint}/")[-1]
             if self.username:
                 if log:
                     print("已登录博客园")
