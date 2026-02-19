@@ -802,31 +802,6 @@ class HFMon(Monitor):
                     "已重试过多次",
                 )
 
-    def _activate_space(self, space_id: str, token: str):
-        static = self.api.space_info(space_id, token)["sdk"] == "static"
-        try:
-            response = requests.get(
-                f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
-                headers=self._headers(token),
-            )
-            response.raise_for_status()
-
-        except Exception as e:
-            if response.status_code == 412:
-                tmp_repo = f"{space_id}_{int(time.time())}"
-                self._move_repo(space_id, tmp_repo, token)
-                time.sleep(random.uniform(3, 5))
-                self._move_repo(tmp_repo, space_id, token)
-
-            else:
-                send_email(
-                    f"激活 {space_id} 出错: {e}",
-                    "[WeMediaMon 插件] 抱脸空间激活出错",
-                    "已排除 412 错误",
-                )
-
-        return f"{space_id} "
-
     def _get_followers(self, tag_type: str, tag: str):
         fans = self.api.list_followers(tag_type, tag)
         followers = {}
@@ -931,26 +906,41 @@ class HFMon(Monitor):
 
         return data
 
-    def _list_spaces(self, name: str, token: str):
+    def _activate_space(self, space_id: str, token: str):
+        static = self.api.space_info(space_id, token)["sdk"] == "static"
+        try:
+            response = requests.get(
+                f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
+                headers=self._headers(token),
+            )
+            response.raise_for_status()
+
+        except Exception as e:
+            if response.status_code == 412 or response.status_code == 503:
+                tmp_repo = f"{space_id}_{int(time.time())}"
+                self._move_repo(space_id, tmp_repo, token)
+                time.sleep(random.uniform(3, 5))
+                self._move_repo(tmp_repo, space_id, token)
+
+            else:
+                send_email(
+                    f"激活 {space_id} 出错: {e}",
+                    "[WeMediaMon 插件] 抱脸空间激活出错",
+                    "已排除 412 / 503 错误",
+                )
+
+        return f"{space_id} "
+
+    def _activate_spaces(self, name: str, token: str):
         logs = ""
-        sleeps = []
         spaces = self.api.list_spaces(name, token)
-        for space in spaces:
+        for space in self._tqdm(spaces, desc=f"筛选激活 {name} 的抱脸空间"):
             space_id = space["id"]
             status = self.api.get_space_runtime(space_id, token)["stage"]
-            if status == "SLEEPING":
-                sleeps.append(space_id)
-            elif "ERROR" in status:
-                logs += f"<br><a href='{self.endpoint}/spaces/{space_id}'>{space_id}</a><br>"
+            if status == "SLEEPING" or "ERROR" in status:
+                logs += self._activate_space(space_id, token)
 
-        if logs:
-            send_email(
-                f"以下抱脸空间出错: {logs}",
-                "[WeMediaMon 插件] 发现出错抱脸空间",
-                "建议手动排查问题",
-            )
-
-        return sleeps
+        return logs
 
     def _is_deleted(self, uid):
         response = requests.get(
@@ -971,12 +961,9 @@ class HFMon(Monitor):
         for token in self.targets:
             names = self.targets[token]
             admin = names[0]
-            spaces = []
-            for name in self._tqdm(names, desc=f"搜集 {admin} 管理的抱脸空间中"):
-                spaces += self._list_spaces(name, token)
-
-            for space in self._tqdm(spaces, desc=f"激活 {admin} 管理的抱脸空间中"):
-                logs += self._activate_space(space, token)
+            print(f"处理 {admin} 管理的抱脸空间")
+            for name in names:
+                logs += self._activate_spaces(name, token)
 
         if logs:
             print(f"抱脸空间 {logs}激活完成!")
