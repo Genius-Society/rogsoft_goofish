@@ -961,7 +961,7 @@ class HFMon(Monitor):
         for token in self.targets:
             names = self.targets[token]
             admin = names[0]
-            print(f"处理 {admin} 管理的抱脸空间")
+            print(f"处理 {admin} 管理的抱脸空间...")
             for name in names:
                 logs += self._activate_spaces(name, token)
 
