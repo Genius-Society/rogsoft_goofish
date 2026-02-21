@@ -1439,8 +1439,31 @@ class ItchMon(Monitor):
                 )
 
 
+def check_ss_ver():
+    loc_ver = subprocess.run(
+        ["dbus", "get", "ss_basic_version_local"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+    web_ver = subprocess.run(
+        ["dbus", "get", "ss_basic_version_web"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+    if loc_ver != web_ver:
+        send_email(
+            f"当前版本: {loc_ver}, 更新版本: {web_ver}",
+            "[WeMediaMon 插件] 发现ss版本更新",
+            "请手动升级",
+        )
+
+
 def update():
-    time.sleep(random.uniform(0.5, 5))
+    check_ss_ver()
     if args.bilick:
         BiliMon().trigger()
 
