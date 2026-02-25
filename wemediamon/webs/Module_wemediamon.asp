@@ -233,7 +233,7 @@
                                                                 style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <textarea class="input_ss_table" id="bilick" maxlength="2048"
-                                                            rows="12" autocorrect="off" autocapitalize="off"
+                                                            rows="8" autocorrect="off" autocapitalize="off"
                                                             placeholder="浏览器-开发者工具-网络, 查看已登陆状态B站主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
@@ -383,7 +383,7 @@
                                                                 style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <textarea class="input_ss_table" id="cnblokie" maxlength="2048"
-                                                            rows="12" autocorrect="off" autocapitalize="off"
+                                                            rows="22" autocorrect="off" autocapitalize="off"
                                                             placeholder="浏览器-开发者工具-网络, 查看已登陆状态博客园主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
@@ -424,7 +424,7 @@
                                                                 style="color: red;"> * </span></a></th>
                                                     <td>
                                                         <textarea class="input_ss_table" id="itck" maxlength="2048"
-                                                            rows="12" autocorrect="off" autocapitalize="off"
+                                                            rows="14" autocorrect="off" autocapitalize="off"
                                                             placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此"></textarea>
                                                     </td>
                                                 </tr>
