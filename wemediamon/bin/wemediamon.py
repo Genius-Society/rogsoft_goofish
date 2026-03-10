@@ -1421,14 +1421,14 @@ class ItchMon(Monitor):
 
             print("itch.io数据已更新")
 
-    def trigger(self, retry=3):
+    def trigger(self, retry=5):
         try:
             self.upd_fans()
 
         except Exception as e:
             if retry > 0:
                 print(f"itch.io监控器触发出错: {e}, 重试中...")
-                time.sleep(random.uniform(3.5, 4.5))
+                time.sleep(random.uniform(5, 10))
                 self.trigger(retry - 1)
 
             else:
