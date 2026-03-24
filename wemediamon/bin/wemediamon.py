@@ -1439,7 +1439,9 @@ class ItchMon(Monitor):
                 )
 
 
-def check_ss_ver():
+def check_ss_ver(
+    url="https://raw.githubusercontent.com/hq450/fancyss/3.0/packages/version.json.js",
+):
     loc_ver = subprocess.run(
         ["dbus", "get", "ss_basic_version_local"],
         capture_output=True,
@@ -1447,12 +1449,11 @@ def check_ss_ver():
         check=True,
     ).stdout.strip()
 
-    web_ver = subprocess.run(
-        ["dbus", "get", "ss_basic_version_web"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
+    response = requests.get(url)
+    response.raise_for_status()
+    txt = response.text.strip()
+    data: dict = json.loads(txt)
+    web_ver = data.get("version")
 
     if loc_ver != web_ver:
         send_email(
