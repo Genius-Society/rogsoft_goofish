@@ -1009,6 +1009,7 @@ class GitHubMon(Monitor):
         self.endpoint = "github.com"
         self.tags = args.gitags.split(";")
         self.header = {"user-agent": self.ua}
+        self.whites = self._get_whitelist(f"{self.cache}/{self.name}_whitelist.txt")
 
     def _recurse_followers(self, name, pn, step=100, retry=3):
         try:
@@ -1112,6 +1113,16 @@ class GitHubMon(Monitor):
 
         return stargazers
 
+    def _get_whitelist(self, whitelst: str):
+        whitelist = []
+        if os.path.exists(whitelst):
+            with open(whitelst, "r", encoding="utf-8") as file:
+                lines = file.readlines()
+
+            whitelist = [line.strip() for line in lines]
+
+        return set(whitelist)
+
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
         traitors = set()
@@ -1119,7 +1130,7 @@ class GitHubMon(Monitor):
             if tag in data:
                 diff = set(prev_data[tag].keys()) - set(data[tag].keys())
                 for id in diff:
-                    if not id in f"{data}":
+                    if not ((id in f"{data}") or (id in self.whites)):
                         dog = prev_data[tag][id]
                         traitors.add(id)
                         logs += f"<br><a href='https://{self.endpoint}/{dog}'>{dog}</a>取关了<a href='https://{self.endpoint}/{tag}'>{tag}</a>!<br>"
@@ -1155,6 +1166,10 @@ class GitHubMon(Monitor):
         return data
 
     def _is_deleted(self, uid):
+        if uid in self.whites:
+            print(f"{uid} 在白名单, 已排除")
+            return True
+
         response = requests.get(
             f"https://api.{self.endpoint}/user/{uid}",
             headers=self.header,
