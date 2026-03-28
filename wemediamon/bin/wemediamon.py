@@ -906,7 +906,7 @@ class HFMon(Monitor):
 
         return data
 
-    def _activate_space(self, space_id: str, token: str, retry=3):
+    def _activate_space(self, space_id: str, token: str):
         static = self.api.space_info(space_id, token)["sdk"] == "static"
         try:
             response = requests.get(
@@ -916,22 +916,18 @@ class HFMon(Monitor):
             response.raise_for_status()
 
         except Exception as e:
-            if response.status_code == 412 or response.status_code == 503:
+            retcode = response.status_code
+            if retcode == 412 or retcode == 500 or retcode == 503:
                 tmp_repo = f"{space_id}_{int(time.time())}"
                 self._move_repo(space_id, tmp_repo, token)
                 time.sleep(random.uniform(3, 5))
                 self._move_repo(tmp_repo, space_id, token)
 
-            elif response.status_code == 500 and retry > 0:
-                print(f"激活 {space_id} 出错: 遭遇服务器临时错误 {e}, 稍后重试中...")
-                time.sleep(random.uniform(5, 10))
-                return self._activate_space(space_id, token, retry - 1)
-
             else:
                 send_email(
                     f"激活 {space_id} 出错: {e}",
                     "[WeMediaMon 插件] 抱脸空间激活出错",
-                    "已排除 412 / 503 错误或三次重试 500 错误",
+                    "已排除 412 / 500 / 503 错误",
                 )
 
         return f"{space_id} "
