@@ -402,7 +402,7 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 3.2) {
 		_caption = "被监控的 GitHub 用户名";
-		statusmenu = "多个用户名需以;隔开。<br>";
+		statusmenu = "多个'用户名'或'用户名/仓库名'(可共存)需以;隔开。<br>";
 	}
 	else if (itemNum == 4.1) {
 		_caption = "博客园自媒体面板总开关";
