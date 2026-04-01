@@ -906,20 +906,16 @@ class HFMon(Monitor):
 
         return data
 
-    def _force_rebuild(self, space_id: str, token: str):
-        tmp_repo = f"{space_id}_{int(time.time())}"
-        self._move_repo(space_id, tmp_repo, token)
-        time.sleep(random.uniform(3, 5))
-        self._move_repo(tmp_repo, space_id, token)
-
     def _activate_space(self, space_id: str, token: str):
         try:
             status = self.api.get_space_runtime(space_id, token)["stage"]
             requirestart = (status == "SLEEPING") or ("ERROR" in status)
             static = self.api.space_info(space_id, token)["sdk"] == "static"
-            space_url = f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space"
             if requirestart or (static and status == "RUNNING"):
-                response = requests.get(space_url, headers=self._headers(token))
+                response = requests.get(
+                    f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
+                    headers=self._headers(token),
+                )
                 response.raise_for_status()
                 if static and response.text.strip() == "This Space has been paused.":
                     send_email(
@@ -932,7 +928,10 @@ class HFMon(Monitor):
         except Exception as e:
             retcode = response.status_code
             if retcode == 412 or retcode == 500 or retcode == 503:
-                self._force_rebuild(space_id, token)
+                tmp_repo = f"{space_id}_{int(time.time())}"
+                self._move_repo(space_id, tmp_repo, token)
+                time.sleep(random.uniform(3, 5))
+                self._move_repo(tmp_repo, space_id, token)
                 requirestart = True
 
             else:
