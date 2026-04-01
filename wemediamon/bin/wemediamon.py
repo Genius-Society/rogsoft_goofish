@@ -1021,6 +1021,24 @@ class GitHubMon(Monitor):
         self.header = {"user-agent": self.ua}
         self.whites = self._get_whitelist(f"{self.cache}/{self.name}_whitelist.txt")
 
+    def _get_tag_type(self, name: str):
+        try:
+            if ("/" in name) and len(name.split("/")) == 2:
+                return "Repo"  # 未来要考虑仓库存在性
+
+            response = requests.get(
+                f"https://api.{self.endpoint}/users/{name}",
+                headers=self.header,
+            )
+            response.raise_for_status()
+            data: dict = response.json()
+            return data.get("type")
+
+        except Exception as e:
+            print(f"{e}")
+
+        return None
+
     def _recurse_followers(self, name, pn, step=100, retry=3):
         try:
             time.sleep(random.uniform(0.5, 1))
@@ -1123,6 +1141,37 @@ class GitHubMon(Monitor):
 
         return stargazers
 
+    def _list_org_members(self, name: str):
+        ids = []
+        try:
+            response = requests.get(
+                f"https://api.{self.endpoint}/orgs/{name}/members",
+                headers=self.header,  # 未来成员多也需递归
+            )
+            response.raise_for_status()
+            members: list = response.json()
+            for member in members:
+                ids.append(member["id"])
+
+        except Exception as e:
+            print(f"获取 {name} 组织成员列表出错: {e}")
+
+        return ids
+
+    def _parse_whitelist(self, whitelst: str):
+        whitelist = []
+        for tag in self.tags:
+            if self._get_tag_type(tag) == "Organization":
+                whitelist += self._list_org_members(tag)
+
+        if whitelist:
+            os.makedirs(os.path.dirname(whitelst), exist_ok=True)
+            with open(whitelst, "a", encoding="utf-8") as f:
+                for item in whitelist:
+                    f.write(f"{item}\n")
+
+        return whitelist
+
     def _get_whitelist(self, whitelst: str):
         whitelist = []
         if os.path.exists(whitelst):
@@ -1130,6 +1179,9 @@ class GitHubMon(Monitor):
                 lines = file.readlines()
 
             whitelist = [line.strip() for line in lines]
+
+        else:
+            whitelist = self._parse_whitelist(whitelst)
 
         return set(whitelist)
 
@@ -1159,10 +1211,15 @@ class GitHubMon(Monitor):
         data = {}
         try:
             for tag in tags:
-                data[tag] = self._list_followers(tag)
-                repos = self._list_repos(tag)
-                for repo in self._tqdm(repos, desc=f"解析 {tag} 仓库中"):
-                    data[repo] = self._list_repo_stargazers(repo)
+                if self._get_tag_type(tag) == "Repo":
+                    print(f"解析仓库 {tag} 收藏者中...")
+                    data[tag] = self._list_repo_stargazers(tag)
+
+                else:
+                    data[tag] = self._list_followers(tag)
+                    repos = self._list_repos(tag)
+                    for repo in self._tqdm(repos, desc=f"解析 {tag} 仓库中"):
+                        data[repo] = self._list_repo_stargazers(repo)
 
         except Exception as e:
             if retry > 0:
