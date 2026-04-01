@@ -906,40 +906,46 @@ class HFMon(Monitor):
 
         return data
 
+    def _force_rebuild(self, space_id: str, token: str):
+        tmp_repo = f"{space_id}_{int(time.time())}"
+        self._move_repo(space_id, tmp_repo, token)
+        time.sleep(random.uniform(3, 5))
+        self._move_repo(tmp_repo, space_id, token)
+
     def _activate_space(self, space_id: str, token: str):
-        static = self.api.space_info(space_id, token)["sdk"] == "static"
         try:
-            response = requests.get(
-                f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
-                headers=self._headers(token),
-            )
-            response.raise_for_status()
+            status = self.api.get_space_runtime(space_id, token)["stage"]
+            requirestart = (status == "SLEEPING") or ("ERROR" in status)
+            static = self.api.space_info(space_id, token)["sdk"] == "static"
+            space_url = f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space"
+            if requirestart or (static and status == "RUNNING"):
+                response = requests.get(space_url, headers=self._headers(token))
+                response.raise_for_status()
+                if static and response.text.strip() == "This Space has been paused.":
+                    self._force_rebuild(space_id, token)
+                    requirestart = True
 
         except Exception as e:
             retcode = response.status_code
             if retcode == 412 or retcode == 500 or retcode == 503:
-                tmp_repo = f"{space_id}_{int(time.time())}"
-                self._move_repo(space_id, tmp_repo, token)
-                time.sleep(random.uniform(3, 5))
-                self._move_repo(tmp_repo, space_id, token)
+                self._force_rebuild(space_id, token)
+                requirestart = True
 
             else:
                 send_email(
                     f"激活 {space_id} 出错: {e}",
                     "[WeMediaMon 插件] 抱脸空间激活出错",
-                    "已排除 412 / 500 / 503 错误",
+                    "已排除 412 / 500 / 503 网络错误",
                 )
+                requirestart = False
 
-        return f"{space_id} "
+        return f"{space_id} " if requirestart else ""
 
     def _activate_spaces(self, name: str, token: str):
         logs = ""
         spaces = self.api.list_spaces(name, token)
         for space in self._tqdm(spaces, desc=f"筛选激活 {name} 的抱脸空间"):
-            space_id = space["id"]
-            status = self.api.get_space_runtime(space_id, token)["stage"]
-            if status == "SLEEPING" or "ERROR" in status:
-                logs += self._activate_space(space_id, token)
+            logs += self._activate_space(space["id"], token)
 
         return logs
 
@@ -1437,7 +1443,7 @@ class ItchMon(Monitor):
 
             print("itch.io数据已更新")
 
-    def trigger(self, retry=5):
+    def trigger(self, retry=10):
         try:
             self.upd_fans()
 
