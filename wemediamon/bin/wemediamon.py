@@ -922,8 +922,12 @@ class HFMon(Monitor):
                 response = requests.get(space_url, headers=self._headers(token))
                 response.raise_for_status()
                 if static and response.text.strip() == "This Space has been paused.":
-                    self._force_rebuild(space_id, token)
-                    requirestart = True
+                    send_email(
+                        f"激活 {space_id} 出错: {response.text}",
+                        "[WeMediaMon 插件] 抱脸空间激活出错",
+                        "请通过重建空间手动覆盖修复",
+                    )
+                    requirestart = False
 
         except Exception as e:
             retcode = response.status_code
