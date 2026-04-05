@@ -78,7 +78,7 @@ sys.stderr = tee
 def send_email(
     content="邮件发送成功!",
     subject="[WeMediaMon 插件] 测试邮件",
-    title="SMTP有效性检测",
+    title="SMTP 有效性检测",
     smtp_server="smtp.qq.com",
     smtp_port=465,
     email=args.email,
@@ -112,18 +112,18 @@ def send_email(
             print(f"邮件发送失败: {e}")
 
     except Exception as e:
-        print(e)
+        print(f"邮件系统故障: {e}")
 
 
 class Monitor:
-    def __init__(self, name: str):
+    def __init__(self):
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
         self.proxy = {
             "http": "http://127.0.0.1:23456",
             "https": "http://127.0.0.1:23456",
         }
         self.cache = args.cache if args.cache[-1] != "/" else args.cache[:-1]
-        self.name = name
+        self.name = self.__class__.__name__.lower().replace("mon", "")
         self.fans = f"{self.cache}/{self.name}_followers.json"
         self.blacks = f"{self.cache}/{self.name}_blacklist.txt"
 
@@ -157,7 +157,7 @@ class Monitor:
         if not traitors:
             raise LookupError(f"当前 {self.name} 狗库为空!")
 
-        for traitor in self._tqdm(traitors, desc=f"清理已注销的 {self.name} 取关狗"):
+        for traitor in self._tqdm(traitors, desc=f"清理已失效的 {self.name} 取关狗"):
             if self._is_deleted(traitor):
                 print(f"{self.name} 取关狗 {traitor} 已被清理!")
             else:
@@ -169,7 +169,7 @@ class Monitor:
 
 class BiliMon(Monitor):
     def __init__(self):
-        super().__init__("bili")
+        super().__init__()
         self.endpoint = "bilibili.com"
         self._parse_cookie(args.bilick, args.btskon)
         self._upd_ck(self.credential)
@@ -218,13 +218,13 @@ class BiliMon(Monitor):
                         check=True,
                     )
                     self._upd_ck(self.credential)
-                    print("刷新 Cookie 成功")
+                    print(f"刷新 {self.name} Cookie 成功!")
 
                 else:
-                    print("无需刷新 Cookie")
+                    print(f"无需刷新 {self.name} Cookie...")
 
         except Exception as e:
-            print(f"{e}")
+            print(f"刷新 {self.name} Cookie 出错: {e}")
 
     def _get_fans(self, pn, retry=3):
         try:
@@ -342,7 +342,7 @@ class BiliMon(Monitor):
                 raise ResponseCodeException(f"{e}")
 
     def _recurse_following(self, pn: int):
-        print(f"递归用户 {self.uid} 关注列表第 {pn} 页...")
+        print(f"递归至用户 {self.uid} 第 {pn} 页 {self.name} 关注列表...")
         time.sleep(random.uniform(0.5, 1))
         return sync(self.me.get_followings(pn=pn))["list"]
 
@@ -369,7 +369,7 @@ class BiliMon(Monitor):
         return response.json()["data"]["list"]
 
     def _recurse_favlist(self, pn: int, uid: int, step=50):  # 递归追的合集/收藏夹
-        print(f"递归用户 {uid} 追的合集/收藏夹列表第 {pn} 页...")
+        print(f"递归至 {self.name} 用户 {uid} 追的第 {pn} 页合集/收藏夹列表...")
         time.sleep(random.uniform(0.5, 1))
         response = requests.get(
             f"https://api.{self.endpoint}/x/v3/fav/folder/collected/list",
@@ -447,11 +447,11 @@ class BiliMon(Monitor):
                     credential=self.credential,
                 ).share()
             )
-            print("✅ 分享成功: +5 经验已到账!")
+            print(f"✅ 分享 {self.name} 视频成功: +5 经验已到账!")
             return True
 
         except Exception as e:
-            print(f"❌ 分享失败: {e}")
+            print(f"❌ 分享 {self.name} 视频失败: {e}")
             return False
 
     def _rand_video(self, region=1010):
@@ -470,10 +470,10 @@ class BiliMon(Monitor):
         coins = sync(self.me.get_user_info())["coins"]
         to_add = min(5, coins)
         if to_add < 1:
-            print("⚠️ 硬币已空, 跳过投币")
+            print(f"⚠️ 硬币已空, 跳过 {self.name} 投币")
             return
 
-        print(f"💰 剩余硬币: {coins} → 将投: {to_add}")
+        print(f"💰 剩余 {self.name} 硬币: {coins} → 将投: {to_add}")
         i = 0
         while i < to_add:
             bvid = self._rand_video()
@@ -481,10 +481,10 @@ class BiliMon(Monitor):
             if sync(v.get_pay_coins()) < 1:
                 status = sync(v.pay_coin())
                 i += 1
-                print(f"✅ 投币 {i}/{to_add}: {status}")
+                print(f"✅ {self.name} 投币 {i}/{to_add}: {status}")
                 time.sleep(delay)
 
-        print(f"✅ 投币任务完成, +{to_add * 10} 经验到手!")
+        print(f"✅ {self.name} 投币任务完成, +{to_add * 10} 经验到手!")
 
     def _daily_watch(self):
         response = requests.post(
@@ -499,30 +499,30 @@ class BiliMon(Monitor):
             },
         )
         response.raise_for_status()
-        print(f"观看视频结果: {response.json()}")
+        print(f"观看 {self.name} 视频结果: {response.text}")
 
     def daily_tasks(self, retry=3):
         try:
             self._refresh_ck()
             watched, shared, coined = self._daily_sign()
             if watched:
-                print("每日观看视频已完成")
+                print(f"每日观看 {self.name} 视频已完成!")
             else:
                 self._daily_watch()
 
             if shared:
-                print("每日分享视频已完成")
+                print(f"每日分享 {self.name} 视频已完成!")
             else:
                 self._daily_share()
 
             if coined:
-                print("每日投币已完成")
+                print(f"每日 {self.name} 视频投币已完成!")
             else:
                 self._daily_coin()
 
         except Exception as e:
             if retry > 0:
-                print(f"{e}, 剩余 {retry} 次重试...")
+                print(f"完成 {self.name} 每日任务出错: {e}, 剩余 {retry} 次重试...")
                 time.sleep(random.uniform(3, 3.5))
                 self.daily_tasks(retry - 1)
 
@@ -586,27 +586,36 @@ class BiliMon(Monitor):
 
     def clean_followings(self):
         followings = self._get_followings()
-        for following in self._tqdm(followings, desc=f"筛选用户 {self.uid} 已注销关注"):
+        for following in self._tqdm(
+            followings,
+            desc=f"筛选 {self.name} 用户 {self.uid} 已注销关注",
+        ):
             uid = int(following["mid"])
             if following["uname"] == "账号已注销":
                 url = f"https://space.{self.endpoint}/{uid}"
                 if self._unfollow(uid):
-                    print(f"清理已注销关注 {url} 成功!")
+                    print(f"清理已注销 {self.name} 关注 {url} 成功!")
                 else:
-                    print(f"清理已注销关注 {url} 失败...")
+                    print(f"清理已注销 {self.name} 关注 {url} 失败...")
 
     def clean_favlists(self):
         subs, favs = self._get_favlists()
-        for sub in self._tqdm(subs, desc=f"筛选用户 {self.uid} 的已失效订阅合集"):
+        for sub in self._tqdm(
+            subs,
+            desc=f"筛选 {self.name} 用户 {self.uid} 的已失效订阅合集",
+        ):
             if sub["title"] == "该合集已失效" or sub["media_count"] == 0:
                 fid, mid = sub["id"], sub["mid"]
                 url = f"https://space.{self.endpoint}/{mid}/lists/{fid}" if mid else fid
                 if self._unsubscribe(fid):
-                    print(f"清理失效订阅合集 {url} 成功!")
+                    print(f"清理失效 {self.name} 订阅合集 {url} 成功!")
                 else:
-                    print(f"清理失效订阅合集 {url} 失败...")
+                    print(f"清理失效 {self.name} 订阅合集 {url} 失败...")
 
-        for fav in self._tqdm(favs, desc=f"筛选用户 {self.uid} 的已失效订阅收藏"):
+        for fav in self._tqdm(
+            favs,
+            desc=f"筛选 {self.name} 用户 {self.uid} 的已失效订阅收藏",
+        ):
             if fav["title"] == "收藏夹失效" or fav["media_count"] == 0:
                 fid, mid = fav["id"], fav["mid"]
                 url = (
@@ -615,13 +624,16 @@ class BiliMon(Monitor):
                     else fid
                 )
                 if self._uncollect(fid):
-                    print(f"清理失效订阅收藏 {url} 成功!")
+                    print(f"清理失效 {self.name} 订阅收藏 {url} 成功!")
                 else:
-                    print(f"清理失效订阅收藏 {url} 失败...")
+                    print(f"清理失效 {self.name} 订阅收藏 {url} 失败...")
 
     def clean_folders(self):
         folders = self._get_folders()
-        for folder in self._tqdm(folders, desc=f"清理用户 {self.uid} 收藏夹失效视频"):
+        for folder in self._tqdm(
+            folders,
+            desc=f"清理 {self.name} 用户 {self.uid} 收藏夹失效视频",
+        ):
             time.sleep(random.uniform(0.5, 1))
             fid = folder["id"]
             retcode = sync(
@@ -629,7 +641,7 @@ class BiliMon(Monitor):
             )
             url = f"https://space.{self.endpoint}/{self.uid}/favlist?fid={fid}"
             if retcode != 0:
-                print(f"清理收藏夹 {url} 已失效视频出错: {retcode}")
+                print(f"清理 {self.name} 收藏夹 {url} 已失效视频出错: {retcode}")
 
     def trigger(self, retry=3):
         try:
@@ -752,9 +764,9 @@ class HFMon(Monitor):
                     raise ConnectionError("调用 HfApi 失败过多次!")
 
     def __init__(self):
-        super().__init__("hf")
+        super().__init__()
         self.endpoint = "https://huggingface.co"
-        self.papers = args.papers.replace(" ", "").split(";")
+        self.papers = str(args.papers).replace(" ", "").split(";")
         self.api = self.HfApi(user_agent=self.ua, proxy=self.proxy)
         self.targets = self._parse_tags(args.hftks)
 
@@ -771,7 +783,7 @@ class HFMon(Monitor):
             tags[tk] = [self.api.whoami(token=tk)["name"]]
             orgs = self.api.list_user_orgs(tags[tk][0])
             for org in orgs:
-                tags[tk].append(org["name"])
+                tags[tk] += [org["name"]]
 
         return tags
 
@@ -890,7 +902,7 @@ class HFMon(Monitor):
             admin = self.targets[token][0]
             data[admin] = self._get_followers("user", admin)
             repos = self._list_repos(admin)
-            for repo in self._tqdm(repos, desc=f"分析用户 {admin} 仓库中"):
+            for repo in self._tqdm(repos, desc=f"分析 {self.name} 用户 {admin} 仓库中"):
                 data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
             if len(self.targets[token]) > 1:
@@ -898,7 +910,10 @@ class HFMon(Monitor):
                 for org in orgs:
                     data[org] = self._get_followers("organization", org)
                     repos = self._list_repos(org)
-                    for repo in self._tqdm(repos, desc=f"分析组织 {org} 仓库中"):
+                    for repo in self._tqdm(
+                        repos,
+                        desc=f"分析 {self.name} 组织 {org} 仓库中",
+                    ):
                         data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
         for paper in self.papers:
@@ -921,7 +936,7 @@ class HFMon(Monitor):
                     send_email(
                         f"激活 {space_id} 出错: {response.text}",
                         "[WeMediaMon 插件] 抱脸空间激活出错",
-                        "请通过重建空间手动覆盖修复",
+                        "请手动修复空间",
                     )
                     requirestart = False
 
@@ -986,7 +1001,7 @@ class HFMon(Monitor):
 
         data = self._get_latest_data()
         if data == prev_data:
-            print("抱脸数据无变动")
+            print("抱脸数据无变动...")
         else:
             self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
@@ -1015,9 +1030,9 @@ class HFMon(Monitor):
 
 class GitHubMon(Monitor):
     def __init__(self):
-        super().__init__("github")
+        super().__init__()
         self.endpoint = "github.com"
-        self.tags = args.gitags.split(";")
+        self.tags = str(args.gitags).split(";")
         self.header = {"user-agent": self.ua}
         self.whites = self._get_whitelist(f"{self.cache}/{self.name}_whitelist.txt")
 
@@ -1035,7 +1050,7 @@ class GitHubMon(Monitor):
             return data.get("type")
 
         except Exception as e:
-            print(f"{e}")
+            print(f"获取 {self.name} 目标类型出错: {e}")
 
         return None
 
@@ -1051,7 +1066,7 @@ class GitHubMon(Monitor):
 
         except Exception as e:
             if retry > 0:
-                print(f"获取 {name} 第 {pn} 页粉丝出错: {e}, 重试中...")
+                print(f"获取 {name} 第 {pn} 页 {self.name} 粉丝出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 return self._recurse_followers(name, pn, step, retry - 1)
 
@@ -1085,12 +1100,12 @@ class GitHubMon(Monitor):
 
         except Exception as e:
             if retry > 0:
-                print(f"获取 {name} 用户第 {pn} 页仓库出错: {e}, 重试中...")
+                print(f"获取 {name} 第 {pn} 页 {self.name} 仓库出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 return self._recurse_repos(name, pn, step, retry - 1)
 
             else:
-                raise ConnectionError(f"重试获取 {name} 用户的仓库列表过多次!")
+                raise ConnectionError(f"重试获取 {name} 仓库列表过多次!")
 
     # 获取用户/组织所有仓库
     def _list_repos(self, username):
@@ -1118,12 +1133,12 @@ class GitHubMon(Monitor):
 
         except Exception as e:
             if retry > 0:
-                print(f"获取 {repo} 仓库第 {pn} 页收藏者出错: {e}, 重试中...")
+                print(f"获取 {repo} 第 {pn} 页 {self.name} 收藏者出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 return self._recurse_repo_stargazers(repo, pn, step, retry - 1)
 
             else:
-                raise ConnectionError(f"重试获取 {repo} 仓库收藏者列表过多次!")
+                raise ConnectionError(f"重试获取 {repo} 收藏者列表过多次!")
 
     # 获取仓库收藏者
     def _list_repo_stargazers(self, repo):
@@ -1154,7 +1169,7 @@ class GitHubMon(Monitor):
                 ids.append(member["id"])
 
         except Exception as e:
-            print(f"获取 {name} 组织成员列表出错: {e}")
+            print(f"获取 {name} 的 {self.name} 组织成员列表出错: {e}")
 
         return ids
 
@@ -1190,7 +1205,7 @@ class GitHubMon(Monitor):
         traitors = set()
         for tag in prev_data:
             if tag in data:
-                diff = set(prev_data[tag].keys()) - set(data[tag].keys())
+                diff = set(dict(prev_data[tag]).keys()) - set(dict(data[tag]).keys())
                 for id in diff:
                     if not ((id in f"{data}") or (id in self.whites)):
                         dog = prev_data[tag][id]
@@ -1212,13 +1227,16 @@ class GitHubMon(Monitor):
         try:
             for tag in tags:
                 if self._get_tag_type(tag) == "Repo":
-                    print(f"解析仓库 {tag} 收藏者中...")
+                    print(f"解析 {self.name} 仓库 {tag} 收藏者中...")
                     data[tag] = self._list_repo_stargazers(tag)
 
                 else:
                     data[tag] = self._list_followers(tag)
                     repos = self._list_repos(tag)
-                    for repo in self._tqdm(repos, desc=f"解析 {tag} 仓库中"):
+                    for repo in self._tqdm(
+                        repos,
+                        desc=f"解析 {tag} 的 {self.name} 仓库中",
+                    ):
                         data[repo] = self._list_repo_stargazers(repo)
 
         except Exception as e:
@@ -1234,7 +1252,7 @@ class GitHubMon(Monitor):
 
     def _is_deleted(self, uid):
         if uid in self.whites:
-            print(f"{uid} 在白名单, 已排除")
+            print(f"{uid} 在 {self.name} 白名单, 已被排除")
             return True
 
         response = requests.get(
@@ -1257,13 +1275,13 @@ class GitHubMon(Monitor):
 
         data = self._get_latest_data(self.tags)
         if data == prev_data:
-            print("GitHub 数据无变化")
+            print("GitHub 数据无变化...")
         else:
             self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            print("GitHub 数据已更新")
+            print("GitHub 数据已更新!")
 
     def trigger(self, retry=3):
         try:
@@ -1271,21 +1289,21 @@ class GitHubMon(Monitor):
 
         except Exception as e:
             if retry > 0:
-                print(f"GitHub监控器触发出错: {e}, 重试中...")
+                print(f"GitHub 监控器触发出错: {e}, 重试中...")
                 time.sleep(random.uniform(3.5, 4.5))
                 self.trigger(retry - 1)
 
             else:
                 send_email(
                     f"{e}",
-                    "[WeMediaMon 插件] GitHub监控器触发出错",
+                    "[WeMediaMon 插件] GitHub 监控器触发出错",
                     "已重试过多次",
                 )
 
 
 class CnblogsMon(Monitor):
     def __init__(self):
-        super().__init__("cnblogs")
+        super().__init__()
         self.endpoint = "cnblogs.com"
         self.header = {"user-agent": self.ua, "cookie": args.cnblokie}
 
@@ -1363,14 +1381,14 @@ class CnblogsMon(Monitor):
         soup = BeautifulSoup(response.text, "html.parser")
         blog_lnk = soup.find("a", id="user_nav_blog_link")
         if blog_lnk:
-            self.username = blog_lnk["href"].split(f"{self.endpoint}/")[-1]
+            self.username = str(blog_lnk["href"]).split(f"{self.endpoint}/")[-1]
             if self.username:
                 if log:
-                    print("已登录博客园")
+                    print("已登录博客园!")
 
                 return True
 
-        print("未登录博客园")
+        print("未登录博客园...")
         return False
 
     def upd_fans(self):
@@ -1381,13 +1399,13 @@ class CnblogsMon(Monitor):
 
         data = self._list_followers()
         if data == prev_data:
-            print("博客园数据无变化")
+            print("博客园数据无变化...")
         else:
             self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            print("博客园数据已更新")
+            print("博客园数据已更新!")
 
     def trigger(self, retry=3):
         try:
@@ -1409,7 +1427,7 @@ class CnblogsMon(Monitor):
 
 class ItchMon(Monitor):
     def __init__(self):
-        super().__init__("itch")
+        super().__init__()
         self.endpoint = "itch.io"
         self.header = {
             "accept-language": "zh-CN,zh;q=0.9",
@@ -1429,7 +1447,7 @@ class ItchMon(Monitor):
                 "a", attrs={"data-user_id": True}
             )
             for a in fan_lnks:
-                username = a["data-follow_url"].split("/g/")[-1].split("/-/")[0]
+                username = str(a["data-follow_url"]).split("/g/")[-1].split("/-/")[0]
                 uid = a["data-user_id"]
                 fans[uid] = username
 
@@ -1479,11 +1497,11 @@ class ItchMon(Monitor):
         )
         response.raise_for_status()
         if response.history:
-            print("未登录itch.io")
+            print("未登录 itch.io")
             return False, ""
 
         if log:
-            print("已登录itch.io")
+            print("已登录 itch.io")
 
         return True, response.text
 
@@ -1495,13 +1513,13 @@ class ItchMon(Monitor):
 
         data = self._list_followers()
         if data == prev_data:
-            print("itch.io数据无变化")
+            print("itch.io 数据无变化...")
         else:
             self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            print("itch.io数据已更新")
+            print("itch.io 数据已更新!")
 
     def trigger(self, retry=10):
         try:
@@ -1509,14 +1527,14 @@ class ItchMon(Monitor):
 
         except Exception as e:
             if retry > 0:
-                print(f"itch.io监控器触发出错: {e}, 重试中...")
+                print(f"itch.io 监控器触发出错: {e}, 重试中...")
                 time.sleep(random.uniform(5, 10))
                 self.trigger(retry - 1)
 
             else:
                 send_email(
                     f"{e}",
-                    "[WeMediaMon 插件] itch.io监控器触发出错",
+                    "[WeMediaMon 插件] itch.io 监控器触发出错",
                     "已重试过多次",
                 )
 
@@ -1637,4 +1655,4 @@ if __name__ == "__main__":
                 print(f"未知指令: {args.cmd}")
 
     except Exception as e:
-        print(f"{e}")
+        print(f"插件故障: {e}")
