@@ -528,7 +528,7 @@ class BiliMon(Monitor):
 
             else:
                 send_email(
-                    f"{e}",
+                    f"[{sys._getframe(1).f_lineno}] {e}",
                     "[WeMediaMon 插件] 自动完成B站每日任务出错",
                     "已重试过多次",
                 )
@@ -658,7 +658,7 @@ class BiliMon(Monitor):
 
             else:
                 send_email(
-                    f"{e}",
+                    f"[{sys._getframe(1).f_lineno}] {e}",
                     "[WeMediaMon 插件] B站监控器触发出错",
                     "已重试过多次",
                 )
@@ -809,7 +809,7 @@ class HFMon(Monitor):
 
             else:
                 send_email(
-                    f"{e}",
+                    f"[{sys._getframe(1).f_lineno}] {e}",
                     "[WeMediaMon 插件] 抱脸空间重命名出错",
                     "已重试过多次",
                 )
@@ -934,7 +934,7 @@ class HFMon(Monitor):
                 response.raise_for_status()
                 if static and response.text.strip() == "This Space has been paused.":
                     send_email(
-                        f"激活 {space_id} 出错: {response.text}",
+                        f"[{sys._getframe(1).f_lineno}] 激活 {space_id} 出错: {response.text}",
                         "[WeMediaMon 插件] 抱脸空间激活出错",
                         "请手动修复空间",
                     )
@@ -951,7 +951,7 @@ class HFMon(Monitor):
 
             else:
                 send_email(
-                    f"激活 {space_id} 出错: {e}",
+                    f"[{sys._getframe(1).f_lineno}] 激活 {space_id} 出错: {e}",
                     "[WeMediaMon 插件] 抱脸空间激活出错",
                     "已排除 412 / 500 / 503 网络错误",
                 )
@@ -1022,7 +1022,7 @@ class HFMon(Monitor):
 
             else:
                 send_email(
-                    f"{e}",
+                    f"[{sys._getframe(1).f_lineno}] {e}",
                     "[WeMediaMon 插件] 抱脸监控器触发失败",
                     "已重试过多次",
                 )
@@ -1295,7 +1295,7 @@ class GitHubMon(Monitor):
 
             else:
                 send_email(
-                    f"{e}",
+                    f"[{sys._getframe(1).f_lineno}] {e}",
                     "[WeMediaMon 插件] GitHub 监控器触发出错",
                     "已重试过多次",
                 )
@@ -1419,7 +1419,7 @@ class CnblogsMon(Monitor):
 
             else:
                 send_email(
-                    f"{e}",
+                    f"[{sys._getframe(1).f_lineno}] {e}",
                     "[WeMediaMon 插件] 博客园监控器触发出错",
                     "已重试过多次",
                 )
@@ -1533,7 +1533,7 @@ class ItchMon(Monitor):
 
             else:
                 send_email(
-                    f"{e}",
+                    f"[{sys._getframe(1).f_lineno}] {e}",
                     "[WeMediaMon 插件] itch.io 监控器触发出错",
                     "已重试过多次",
                 )
@@ -1570,10 +1570,8 @@ def drop_caches(value=1, cache="/proc/sys/vm/drop_caches"):
 
         print("缓存已清空!")
 
-    except FileNotFoundError:
-        print(f"当前系统不支持 {cache}，可能不是 Linux 或内核未开启该功能")
-    except PermissionError:
-        print("权限不足，请使用 root 权限运行脚本")
+    except Exception as e:
+        print(f"[{sys._getframe(1).f_lineno}] 清理缓存出错: {e}")
 
 
 def update():
@@ -1609,7 +1607,11 @@ def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
             time.sleep(1)
 
     except Exception as e:
-        send_email(f"{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
+        send_email(
+            f"[{sys._getframe(1).f_lineno}] {e}",
+            "[WeMediaMon 插件] 运行错误",
+            "请手动排查",
+        )
 
 
 if __name__ == "__main__":
