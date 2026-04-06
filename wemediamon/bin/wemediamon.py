@@ -1563,6 +1563,17 @@ def check_ss_ver(
         )
 
 
+def drop_caches(value=1):
+    """
+    清空 Linux 页面缓存。
+    value: 1 清空页缓存, 2 清空目录项和 inode 缓存, 3 清空所有。
+    """
+    with open("/proc/sys/vm/drop_caches", "w") as f:
+        f.write(str(value))
+
+    print("已一键释放内存!")
+
+
 def update():
     check_ss_ver()
     if args.bilick:
@@ -1580,15 +1591,17 @@ def update():
     if args.itck:
         ItchMon().trigger()
 
+    drop_caches()
+
 
 def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
     try:
-        print(f"监控开启中...每 {period} 小时触发一次")
-        schedule.every(period).hours.do(update)
         if taskon:
             print(f"B站每日自动签到开启中...每天 {taskat} 触发一次")
             schedule.every().day.at(taskat).do(BiliMon().daily_tasks)
 
+        print(f"监控开启中...每 {period} 小时触发一次")
+        schedule.every(period).hours.do(update)
         while True:
             schedule.run_pending()
             time.sleep(1)
