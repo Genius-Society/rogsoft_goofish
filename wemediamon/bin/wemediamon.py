@@ -74,6 +74,8 @@ tee = Tee("/tmp/upload/wemediamon_log.txt")
 sys.stdout = tee
 sys.stderr = tee
 
+L = lambda: f"(line {sys._getframe(1).f_lineno}) "
+
 
 def send_email(
     content="邮件发送成功!",
@@ -109,10 +111,10 @@ def send_email(
         if e.smtp_code == -1:
             print("邮件发送成功!")
         else:
-            print(f"邮件发送失败: {e}")
+            print(f"{L()}邮件发送失败: {e}")
 
     except Exception as e:
-        print(f"邮件系统故障: {e}")
+        print(f"{L()}邮件系统故障: {e}")
 
 
 class Monitor:
@@ -224,7 +226,7 @@ class BiliMon(Monitor):
                     print(f"无需刷新 {self.name} Cookie...")
 
         except Exception as e:
-            print(f"刷新 {self.name} Cookie 出错: {e}")
+            print(f"{L()}刷新 {self.name} Cookie 出错: {e}")
 
     def _get_fans(self, pn, retry=3):
         try:
@@ -244,7 +246,7 @@ class BiliMon(Monitor):
 
             else:
                 raise PermissionError(
-                    f"{json_data['message']}, 错误代码: {json_data['code']}"
+                    f"{L()}{json_data['message']}, 错误代码: {json_data['code']}"
                 )
 
         except requests.exceptions.RequestException as e:
@@ -254,7 +256,7 @@ class BiliMon(Monitor):
                 return self._get_fans(pn, retry - 1)
 
             else:
-                raise ConnectionError("获取B站粉丝失败过多次!")
+                raise ConnectionError(f"{L()}获取B站粉丝失败过多次!")
 
     def _get_followers(self):
         fans, pages = self._get_fans(pn=1)
@@ -276,7 +278,7 @@ class BiliMon(Monitor):
             if e.code == -404:
                 return True
             else:
-                raise ResponseCodeException(f"{e}")
+                raise ResponseCodeException(f"{L()}{e}")
 
     def _is_fans(self, uid):
         relation = sync(self.me.get_relation(uid))
@@ -339,7 +341,7 @@ class BiliMon(Monitor):
             if e.code == 22001:
                 return True
             else:
-                raise ResponseCodeException(f"{e}")
+                raise ResponseCodeException(f"{L()}{e}")
 
     def _recurse_following(self, pn: int):
         print(f"递归至用户 {self.uid} 第 {pn} 页 {self.name} 关注列表...")
@@ -377,7 +379,7 @@ class BiliMon(Monitor):
             headers=self.header,
         ).json()
         if response["code"] != 0:
-            raise ConnectionError(response["message"])
+            raise ConnectionError(L() + response["message"])
 
         return response["data"]["list"]
 
@@ -451,7 +453,7 @@ class BiliMon(Monitor):
             return True
 
         except Exception as e:
-            print(f"❌ 分享 {self.name} 视频失败: {e}")
+            print(f"{L()}❌ 分享 {self.name} 视频失败: {e}")
             return False
 
     def _rand_video(self, region=1010):
@@ -470,7 +472,7 @@ class BiliMon(Monitor):
         coins = sync(self.me.get_user_info())["coins"]
         to_add = min(5, coins)
         if to_add < 1:
-            print(f"⚠️ 硬币已空, 跳过 {self.name} 投币")
+            print(f"⚠️ 硬币已空, 跳过 {self.name} 投币...")
             return
 
         print(f"💰 剩余 {self.name} 硬币: {coins} → 将投: {to_add}")
@@ -522,13 +524,13 @@ class BiliMon(Monitor):
 
         except Exception as e:
             if retry > 0:
-                print(f"完成 {self.name} 每日任务出错: {e}, 剩余 {retry} 次重试...")
+                print(f"完成 {self.name} 每日任务出错: {e}, 剩 {retry} 次重试...")
                 time.sleep(random.uniform(3, 3.5))
                 self.daily_tasks(retry - 1)
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] {e}",
+                    f"{L()}{e}",
                     "[WeMediaMon 插件] 自动完成B站每日任务出错",
                     "已重试过多次",
                 )
@@ -641,7 +643,7 @@ class BiliMon(Monitor):
             )
             url = f"https://space.{self.endpoint}/{self.uid}/favlist?fid={fid}"
             if retcode != 0:
-                print(f"清理 {self.name} 收藏夹 {url} 已失效视频出错: {retcode}")
+                print(f"{L()}清理 {self.name} 收藏夹 {url} 已失效视频出错: {retcode}")
 
     def trigger(self, retry=3):
         try:
@@ -658,7 +660,7 @@ class BiliMon(Monitor):
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] {e}",
+                    f"{L()}{e}",
                     "[WeMediaMon 插件] B站监控器触发出错",
                     "已重试过多次",
                 )
@@ -761,7 +763,7 @@ class HFMon(Monitor):
                     return self._get(url, headers, params, retry - 1)
 
                 else:
-                    raise ConnectionError("调用 HfApi 失败过多次!")
+                    raise ConnectionError(f"{L()}调用 HfApi 失败过多次!")
 
     def __init__(self):
         super().__init__()
@@ -809,7 +811,7 @@ class HFMon(Monitor):
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] {e}",
+                    f"{L()}{e}",
                     "[WeMediaMon 插件] 抱脸空间重命名出错",
                     "已重试过多次",
                 )
@@ -923,6 +925,7 @@ class HFMon(Monitor):
 
     def _activate_space(self, space_id: str, token: str):
         try:
+            response = None
             status = self.api.get_space_runtime(space_id, token)["stage"]
             requirestart = (status == "SLEEPING") or ("ERROR" in status)
             static = self.api.space_info(space_id, token)["sdk"] == "static"
@@ -934,14 +937,14 @@ class HFMon(Monitor):
                 response.raise_for_status()
                 if static and response.text.strip() == "This Space has been paused.":
                     send_email(
-                        f"[{sys._getframe(1).f_lineno}] 激活 {space_id} 出错: {response.text}",
+                        f"{L()}激活 {space_id} 出错: {response.text}",
                         "[WeMediaMon 插件] 抱脸空间激活出错",
                         "请手动修复空间",
                     )
                     requirestart = False
 
         except Exception as e:
-            retcode = response.status_code
+            retcode = response.status_code if response else 0
             if retcode == 412 or retcode == 500 or retcode == 503:
                 tmp_repo = f"{space_id}_{int(time.time())}"
                 self._move_repo(space_id, tmp_repo, token)
@@ -951,7 +954,7 @@ class HFMon(Monitor):
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] 激活 {space_id} 出错: {e}",
+                    f"{L()}激活 {space_id} 出错: {e}",
                     "[WeMediaMon 插件] 抱脸空间激活出错",
                     "已排除 412 / 500 / 503 网络错误",
                 )
@@ -1022,7 +1025,7 @@ class HFMon(Monitor):
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] {e}",
+                    f"{L()}{e}",
                     "[WeMediaMon 插件] 抱脸监控器触发失败",
                     "已重试过多次",
                 )
@@ -1050,7 +1053,7 @@ class GitHubMon(Monitor):
             return data.get("type")
 
         except Exception as e:
-            print(f"获取 {self.name} 目标类型出错: {e}")
+            print(f"{L()}获取 {self.name} 目标类型出错: {e}")
 
         return None
 
@@ -1071,7 +1074,7 @@ class GitHubMon(Monitor):
                 return self._recurse_followers(name, pn, step, retry - 1)
 
             else:
-                raise ConnectionError(f"重试获取 {name} 的粉丝列表过多次!")
+                raise ConnectionError(f"{L()}重试获取 {name} 的粉丝列表过多次!")
 
     def _list_followers(self, username: str):
         pn = 1
@@ -1105,7 +1108,7 @@ class GitHubMon(Monitor):
                 return self._recurse_repos(name, pn, step, retry - 1)
 
             else:
-                raise ConnectionError(f"重试获取 {name} 仓库列表过多次!")
+                raise ConnectionError(f"{L()}重试获取 {name} 仓库列表过多次!")
 
     # 获取用户/组织所有仓库
     def _list_repos(self, username):
@@ -1138,7 +1141,7 @@ class GitHubMon(Monitor):
                 return self._recurse_repo_stargazers(repo, pn, step, retry - 1)
 
             else:
-                raise ConnectionError(f"重试获取 {repo} 收藏者列表过多次!")
+                raise ConnectionError(f"{L()}重试获取 {repo} 收藏者列表过多次!")
 
     # 获取仓库收藏者
     def _list_repo_stargazers(self, repo):
@@ -1169,7 +1172,7 @@ class GitHubMon(Monitor):
                 ids.append(member["id"])
 
         except Exception as e:
-            print(f"获取 {name} 的 {self.name} 组织成员列表出错: {e}")
+            print(f"{L()}获取 {name} 的 {self.name} 组织成员列表出错: {e}")
 
         return ids
 
@@ -1246,7 +1249,7 @@ class GitHubMon(Monitor):
                 return self._get_latest_data(self.tags, retry - 1)
 
             else:
-                raise ConnectionError("重试获取最新 GitHub 数据过多次!")
+                raise ConnectionError(f"{L()}重试获取最新 GitHub 数据过多次!")
 
         return data
 
@@ -1295,7 +1298,7 @@ class GitHubMon(Monitor):
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] {e}",
+                    f"{L()}{e}",
                     "[WeMediaMon 插件] GitHub 监控器触发出错",
                     "已重试过多次",
                 )
@@ -1368,7 +1371,7 @@ class CnblogsMon(Monitor):
             if " 用户不存在, 单击" in err_div:
                 return True
             else:
-                raise LookupError(f"{err_div}")
+                raise LookupError(f"{L()}{err_div}")
 
         return False
 
@@ -1419,7 +1422,7 @@ class CnblogsMon(Monitor):
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] {e}",
+                    f"{L()}{e}",
                     "[WeMediaMon 插件] 博客园监控器触发出错",
                     "已重试过多次",
                 )
@@ -1533,7 +1536,7 @@ class ItchMon(Monitor):
 
             else:
                 send_email(
-                    f"[{sys._getframe(1).f_lineno}] {e}",
+                    f"{L()}{e}",
                     "[WeMediaMon 插件] itch.io 监控器触发出错",
                     "已重试过多次",
                 )
@@ -1571,7 +1574,7 @@ def drop_caches(value=1, cache="/proc/sys/vm/drop_caches"):
         print("缓存已清空!")
 
     except Exception as e:
-        print(f"[{sys._getframe(1).f_lineno}] 清理缓存出错: {e}")
+        print(f"{L()}清理缓存出错: {e}")
 
 
 def update():
@@ -1608,7 +1611,7 @@ def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
 
     except Exception as e:
         send_email(
-            f"[{sys._getframe(1).f_lineno}] {e}",
+            f"{L()}{e}",
             "[WeMediaMon 插件] 运行错误",
             "请手动排查",
         )
@@ -1672,4 +1675,4 @@ if __name__ == "__main__":
                 print(f"未知指令: {args.cmd}")
 
     except Exception as e:
-        print(f"插件故障: {e}")
+        print(f"{L()}插件故障: {e}")
