@@ -925,7 +925,6 @@ class HFMon(Monitor):
 
     def _activate_space(self, space_id: str, token: str):
         try:
-            response = None
             status = self.api.get_space_runtime(space_id, token)["stage"]
             requirestart = (status == "SLEEPING") or ("ERROR" in status)
             static = self.api.space_info(space_id, token)["sdk"] == "static"
@@ -944,8 +943,7 @@ class HFMon(Monitor):
                     requirestart = False
 
         except Exception as e:
-            retcode = response.status_code if response else 0
-            if retcode == 412 or retcode == 500 or retcode == 503:
+            if ("412" in f"{e}") or ("500" in f"{e}") or ("503" in f"{e}"):
                 tmp_repo = f"{space_id}_{int(time.time())}"
                 self._move_repo(space_id, tmp_repo, token)
                 time.sleep(random.uniform(3, 5))
@@ -1610,11 +1608,7 @@ def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
             time.sleep(1)
 
     except Exception as e:
-        send_email(
-            f"{L()}{e}",
-            "[WeMediaMon 插件] 运行错误",
-            "请手动排查",
-        )
+        send_email(f"{L()}{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
 
 
 if __name__ == "__main__":
