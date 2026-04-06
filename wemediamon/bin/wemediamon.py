@@ -1563,15 +1563,17 @@ def check_ss_ver(
         )
 
 
-def drop_caches(value=1):
-    """
-    清空 Linux 页面缓存。
-    value: 1 清空页缓存, 2 清空目录项和 inode 缓存, 3 清空所有。
-    """
-    with open("/proc/sys/vm/drop_caches", "w") as f:
-        f.write(str(value))
+def drop_caches(value=1, cache="/proc/sys/vm/drop_caches"):
+    try:
+        with open(cache, "w") as f:
+            f.write(str(value))
 
-    print("已一键释放内存!")
+        print("缓存已清空!")
+
+    except FileNotFoundError:
+        print(f"当前系统不支持 {cache}，可能不是 Linux 或内核未开启该功能")
+    except PermissionError:
+        print("权限不足，请使用 root 权限运行脚本")
 
 
 def update():
@@ -1596,12 +1598,12 @@ def update():
 
 def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
     try:
+        print(f"监控开启中...每 {period} 小时触发一次")
+        schedule.every(period).hours.do(update)
         if taskon:
             print(f"B站每日自动签到开启中...每天 {taskat} 触发一次")
             schedule.every().day.at(taskat).do(BiliMon().daily_tasks)
 
-        print(f"监控开启中...每 {period} 小时触发一次")
-        schedule.every(period).hours.do(update)
         while True:
             schedule.run_pending()
             time.sleep(1)
