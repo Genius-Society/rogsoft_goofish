@@ -246,7 +246,7 @@ class BiliMon(Monitor):
 
             else:
                 raise PermissionError(
-                    f"{L()}{json_data['message']}, 错误代码: {json_data['code']}"
+                    f"{L() + json_data['message']}, 错误代码: {json_data['code']}"
                 )
 
         except requests.exceptions.RequestException as e:
