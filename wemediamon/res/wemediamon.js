@@ -12,7 +12,6 @@ function init() {
 	get_dbus_data();
 	register_event();
 	import_cfg();
-	show_hide_el($("#btskon"));
 }
 
 function import_cfg() { // 导入配置
@@ -37,7 +36,7 @@ function load_cfg(obj) { // 加载配置
 		if (k in obj) $(`#${k}`).val(obj[k]);
 	});
 	chks.forEach(k => {
-		if (k in obj) $(`#${k}`).prop('checked', !!obj[k]).trigger('change');
+		if (k in obj) $(`#${k}`).prop('checked', obj[k] == "on").trigger('change');
 	});
 }
 
@@ -68,20 +67,21 @@ function register_event() {
 }
 
 function show_hide(w) { // 各面板开关显隐连动
-	if ($('.check_' + w).is(':checked')) {
-		$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
+	if (w < 5) {
+		if ($('.check_' + w).is(':checked')) {
+			$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
+		}
+		else {
+			$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
+		}
 	}
 	else {
-		$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
-	}
-}
-
-function show_hide_el(el) {
-	if ($(el).is(':checked')) {
-		$(el).next('div').show();
-	}
-	else {
-		$(el).next('div').hide();
+		if ($('.check_' + w).is(':checked')) {
+			$('.check_' + w).next('div').show();
+		}
+		else {
+			$('.check_' + w).next('div').hide();
+		}
 	}
 }
 
