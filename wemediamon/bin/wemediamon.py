@@ -211,25 +211,6 @@ class BiliMon(Monitor):
                 check=True,
             )
 
-    # def _refresh_ck(self):
-        try:
-            if self.act:
-                sync(self.credential.refresh())
-                if self.act != self.credential.ac_time_value:
-                    self.act = self.credential.ac_time_value
-                    subprocess.run(
-                        ["dbus", "set", f"wemediamon_btskon={self.act}"],
-                        check=True,
-                    )
-                    self._upd_ck(self.credential)
-                    print(f"刷新 {self.name} Cookie 成功!")
-
-                else:
-                    print(f"无需刷新 {self.name} Cookie...")
-
-        except Exception as e:
-            print(f"{L()}刷新 {self.name} Cookie 出错: {e}")
-
     def _get_fans(self, pn, retry=3):
         try:
             response = requests.get(
@@ -507,7 +488,7 @@ class BiliMon(Monitor):
 
     def daily_tasks(self, retry=3):
         try:
-            # self._refresh_ck()
+            time.sleep(random.randint(0, 59))
             watched, shared, _ = self._daily_sign()
             if watched:
                 print(f"每日观看 {self.name} 视频已完成!")
@@ -534,7 +515,7 @@ class BiliMon(Monitor):
 
     def auto_coin(self, retry=3):
         try:
-            # self._refresh_ck()
+            time.sleep(random.randint(0, 59))
             _, _, coined = self._daily_sign()
             if coined:
                 print(f"每日 {self.name} 视频投币已完成!")
