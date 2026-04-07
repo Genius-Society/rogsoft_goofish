@@ -32,7 +32,7 @@ parser.add_argument("--email", type=str, required=True)
 parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
-parser.add_argument("--btskon", type=bool, default=False)
+parser.add_argument("--btskon", type=str, default="0")
 parser.add_argument("--btskat", type=str, default="01:00")
 parser.add_argument("--bcoinon", type=int, default=0)
 parser.add_argument("--bcoinat", type=str, default="01:30")
@@ -175,23 +175,21 @@ class BiliMon(Monitor):
     def __init__(self):
         super().__init__()
         self.endpoint = "bilibili.com"
-        self._parse_cookie(args.bilick, args.btskon)
+        self._parse_cookie(args.bilick)
         self._upd_ck(self.credential)
         self.header = {"User-Agent": self.ua, "Cookie": self.ck}
 
-    def _parse_cookie(self, ck: str, ac_time: str):
+    def _parse_cookie(self, ck: str):
         self.uid = ck.split("DedeUserID=")[1].split(";")[0]
         self.sessdata = ck.split("SESSDATA=")[1].split(";")[0]
         self.bili_jct = ck.split("bili_jct=")[1].split(";")[0]
         self.buvid3 = ck.split("buvid3=")[1].split(";")[0]
         self.ck = ck
-        self.act = ac_time if ac_time else None
         self.credential = Credential(
             sessdata=self.sessdata,
             bili_jct=self.bili_jct,
             buvid3=self.buvid3,
             dedeuserid=self.uid,
-            ac_time_value=self.act,
         )
         self.me = user.User(uid=self.uid, credential=self.credential)
 
@@ -1597,7 +1595,7 @@ def update():
 
 def start_monitor(
     period=args.period,
-    taskon=args.btskon,
+    taskon=args.btskon == "1",
     taskat=args.btskat,
     coinon=args.bcoinon,
     coinat=args.bcoinat,
