@@ -391,11 +391,11 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 1.3) {
 		_caption = "B站自动完成每日任务功能";
-		statusmenu = "左侧 checkbox 未选中则不开启; 右侧时间选择框内为每日签到的触发时间。<br>";
+		statusmenu = "左侧 checkbox 未选中则不开启; 右侧时间选择框内为每日签到的触发时间, 每次触发完成每日看视频和分享任务。<br>";
 	}
 	else if (itemNum == 1.4) {
 		_caption = "B站自动完成每日投币功能";
-		statusmenu = "左侧输入框填入触发周期天数才可开启, 置 0 则不开启; 右侧时间选择框内为投币的触发时间。<br>";
+		statusmenu = "左侧输入框填入触发周期天数才可开启, 置0则不开启; 右侧时间选择框内为投币的触发时间, 每次触发随机挑选5个视频各投1个硬币。<br>";
 	}
 	else if (itemNum == 2.1) {
 		_caption = "HuggingFace 自媒体面板总开关";

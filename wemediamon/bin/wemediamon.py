@@ -1645,6 +1645,9 @@ if __name__ == "__main__":
             case "TEST_BILI_TASKS":
                 BiliMon().daily_tasks()
 
+            case "TEST_BILI_COIN":
+                BiliMon().auto_coin()
+
             case "UPD_HF_FANS":
                 HFMon().upd_fans()
 

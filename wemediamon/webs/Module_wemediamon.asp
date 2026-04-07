@@ -247,231 +247,233 @@
                                                     <td>
                                                         <input type="checkbox" id="btskon"
                                                             onchange="show_hide_el(this)">
-                                                        <div>每天 <input type="time" class="input_ss_table" id="btskat"
-                                                                value="01:00"> 触发</div>
+                                                        <div class="biliauto">每天 <input type="time"
+                                                                class="input_ss_table" id="btskat" value="01:00"> 触发
+                                                        </div>
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('TEST_BILI_TASKS')">测试签到</a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th><a onclick="hint(1.4)" class="hintstyle"
                                                             href="javascript:void(0);">周期自动投币</a></th>
                                                     <td>
-                                                        <div>每 <input type="number" class="input_ss_table" id="bcoinon"
-                                                                min="0" max="366" value="0"> 天 <input type="time"
-                                                                class="input_ss_table" id="bcoinat" value="01:30"> 触发
+                                                        <div class="biliauto">每 <input type="number"
+                                                                class="input_ss_table" id="bcoinon" min="0" max="366"
+                                                                value="0"> 天 <input type="time" class="input_ss_table"
+                                                                id="bcoinat" value="01:30"> 触发
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>手动触发</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('TEST_BILI_CK')">Cookie有效测试</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_BILI_FANS')">单轮粉丝扫描</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('TEST_BILI_TASKS')">测试一键签到</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>管理取关狗</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('SEE_BILI_BLACKS')">查看取关狗名单</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_BILI_BLACKS')">清理已注销狗</a>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div id="tablet_1" style="display: none;">
-                                            <table id="table_1" width="100%" border="0" align="center" cellpadding="4"
-                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
-                                                <tr>
-                                                    <th><a onclick="hint(2.1)" class="hintstyle"
-                                                            href="javascript:void(0);">抱脸监控开关</a></th>
-                                                    <td>
-                                                        <input type="checkbox" class="check_1" id="hfmon"
-                                                            onchange="show_hide(1)">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><a onclick="hint(2.2)" class="hintstyle"
-                                                            href="javascript:void(0);">Token(s)<span
-                                                                style="color: red;"> * </span></a></th>
-                                                    <td>
-                                                        <input type="password" class="input_ss_table" id="hftks"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off" readonly
-                                                            onblur="switchType(this, false);"
-                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            placeholder="若多个则用;隔开">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><a onclick="hint(2.3)" class="hintstyle"
-                                                            href="javascript:void(0);">监控论文<span style="color: red;"> *
-                                                            </span></a></th>
-                                                    <td>
-                                                        <input type="text" class="input_ss_table" id="papers"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off" placeholder="若多个则用;隔开">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>手动触发</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_HF_FANS')">单轮粉丝扫描</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('ACTIVATE_HF_REPOS')">单轮激活空间</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>管理取关狗</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('SEE_HF_BLACKS')">查看取关狗名单</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_HF_BLACKS')">清理已注销狗</a>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div id="tablet_2" style="display: none;">
-                                            <table id="table_2" width="100%" border="0" align="center" cellpadding="4"
-                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
-                                                <tr>
-                                                    <th><a onclick="hint(3.1)" class="hintstyle"
-                                                            href="javascript:void(0);">GitHub监控开关</a></th>
-                                                    <td>
-                                                        <input type="checkbox" class="check_2" id="gitmon"
-                                                            onchange="show_hide(2)">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><a onclick="hint(3.2)" class="hintstyle"
-                                                            href="javascript:void(0);">监控目标<span style="color: red;"> *
-                                                            </span></a></th>
-                                                    <td>
-                                                        <input type="text" class="input_ss_table" id="gitags"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off" placeholder="target1;target2;...">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>手动触发</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_GIT_FANS')">单轮粉丝扫描</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>管理取关狗</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('SEE_GIT_BLACKS')">查看取关狗名单</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_GIT_BLACKS')">清理已注销狗</a>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div id="tablet_3" style="display: none;">
-                                            <table id="table_3" width="100%" border="0" align="center" cellpadding="4"
-                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
-                                                <tr>
-                                                    <th><a onclick="hint(4.1)" class="hintstyle"
-                                                            href="javascript:void(0);">博客园监控开关</a></th>
-                                                    <td>
-                                                        <input type="checkbox" class="check_3" id="cnblon"
-                                                            onchange="show_hide(3)">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><a onclick="hint(4.2)" class="hintstyle"
-                                                            href="javascript:void(0);">博客园Cookie<span
-                                                                style="color: red;"> * </span></a></th>
-                                                    <td>
-                                                        <textarea class="input_ss_table" id="cnblokie" maxlength="2048"
-                                                            rows="22" autocorrect="off" autocapitalize="off"
-                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态博客园主页请求标头, 拷贝 Cookie 值至此"></textarea>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>手动触发</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('TEST_CNBLOGS_CK')">Cookie有效测试</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_CNBLOGS_FANS')">单轮粉丝扫描</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>管理取关狗</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('SEE_CNBLOGS_BLACKS')">查看取关狗名单</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_CNBLOGS_BLACKS')">清理已注销狗</a>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div id="tablet_4" style="display: none;">
-                                            <table id="table_4" width="100%" border="0" align="center" cellpadding="4"
-                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
-                                                <tr>
-                                                    <th><a onclick="hint(5.1)" class="hintstyle"
-                                                            href="javascript:void(0);">itch.io监控开关</a></th>
-                                                    <td>
-                                                        <input type="checkbox" class="check_4" id="itchion"
-                                                            onchange="show_hide(4)">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><a onclick="hint(5.2)" class="hintstyle"
-                                                            href="javascript:void(0);">itch.io cookie<span
-                                                                style="color: red;"> * </span></a></th>
-                                                    <td>
-                                                        <textarea class="input_ss_table" id="itck" maxlength="2048"
-                                                            rows="14" autocorrect="off" autocapitalize="off"
-                                                            placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此"></textarea>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>手动触发</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('TEST_ITCH_CK')">Cookie有效测试</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_ITCH_FANS')">单轮粉丝扫描</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>管理取关狗</th>
-                                                    <td>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('SEE_ITCH_BLACKS')">查看取关狗名单</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('UPD_ITCH_BLACKS')">清理已注销狗</a>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-
-                                        <div class="apply_gen">
-                                            <input class="button_gen" id="apply" onclick="trigger('WEB_SUBMIT')"
-                                                type="button" value="提交" />
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('TEST_BILI_COIN')">测试投币</a>
+                                                        </div>
                                         </div>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <th>手动触发</th>
+                                    <td>
+                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                            onclick="trigger('TEST_BILI_CK')">Cookie有效测试</a>
+                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                            onclick="trigger('UPD_BILI_FANS')">单轮粉丝扫描</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>管理取关狗</th>
+                                    <td>
+                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                            onclick="trigger('SEE_BILI_BLACKS')">查看取关狗名单</a>
+                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                            onclick="trigger('UPD_BILI_BLACKS')">清理已注销狗</a>
+                                    </td>
+                                </tr>
                             </table>
+                            </div>
+                            <div id="tablet_1" style="display: none;">
+                                <table id="table_1" width="100%" border="0" align="center" cellpadding="4"
+                                    cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                    <tr>
+                                        <th><a onclick="hint(2.1)" class="hintstyle"
+                                                href="javascript:void(0);">抱脸监控开关</a></th>
+                                        <td>
+                                            <input type="checkbox" class="check_1" id="hfmon" onchange="show_hide(1)">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><a onclick="hint(2.2)" class="hintstyle"
+                                                href="javascript:void(0);">Token(s)<span style="color: red;"> *
+                                                </span></a></th>
+                                        <td>
+                                            <input type="password" class="input_ss_table" id="hftks" maxlength="100"
+                                                value="" autocorrect="off" autocapitalize="off" readonly
+                                                onblur="switchType(this, false);"
+                                                onfocus="switchType(this, true);this.removeAttribute('readonly');"
+                                                placeholder="若多个则用;隔开">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><a onclick="hint(2.3)" class="hintstyle"
+                                                href="javascript:void(0);">监控论文<span style="color: red;"> *
+                                                </span></a></th>
+                                        <td>
+                                            <input type="text" class="input_ss_table" id="papers" maxlength="100"
+                                                value="" autocorrect="off" autocapitalize="off" placeholder="若多个则用;隔开">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>手动触发</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_HF_FANS')">单轮粉丝扫描</a>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('ACTIVATE_HF_REPOS')">单轮激活空间</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>管理取关狗</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('SEE_HF_BLACKS')">查看取关狗名单</a>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_HF_BLACKS')">清理已注销狗</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="tablet_2" style="display: none;">
+                                <table id="table_2" width="100%" border="0" align="center" cellpadding="4"
+                                    cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                    <tr>
+                                        <th><a onclick="hint(3.1)" class="hintstyle"
+                                                href="javascript:void(0);">GitHub监控开关</a></th>
+                                        <td>
+                                            <input type="checkbox" class="check_2" id="gitmon" onchange="show_hide(2)">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><a onclick="hint(3.2)" class="hintstyle"
+                                                href="javascript:void(0);">监控目标<span style="color: red;"> *
+                                                </span></a></th>
+                                        <td>
+                                            <input type="text" class="input_ss_table" id="gitags" maxlength="100"
+                                                value="" autocorrect="off" autocapitalize="off"
+                                                placeholder="target1;target2;...">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>手动触发</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_GIT_FANS')">单轮粉丝扫描</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>管理取关狗</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('SEE_GIT_BLACKS')">查看取关狗名单</a>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_GIT_BLACKS')">清理已注销狗</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="tablet_3" style="display: none;">
+                                <table id="table_3" width="100%" border="0" align="center" cellpadding="4"
+                                    cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                    <tr>
+                                        <th><a onclick="hint(4.1)" class="hintstyle"
+                                                href="javascript:void(0);">博客园监控开关</a></th>
+                                        <td>
+                                            <input type="checkbox" class="check_3" id="cnblon" onchange="show_hide(3)">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><a onclick="hint(4.2)" class="hintstyle"
+                                                href="javascript:void(0);">博客园Cookie<span style="color: red;"> *
+                                                </span></a></th>
+                                        <td>
+                                            <textarea class="input_ss_table" id="cnblokie" maxlength="2048" rows="22"
+                                                autocorrect="off" autocapitalize="off"
+                                                placeholder="浏览器-开发者工具-网络, 查看已登陆状态博客园主页请求标头, 拷贝 Cookie 值至此"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>手动触发</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('TEST_CNBLOGS_CK')">Cookie有效测试</a>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_CNBLOGS_FANS')">单轮粉丝扫描</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>管理取关狗</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('SEE_CNBLOGS_BLACKS')">查看取关狗名单</a>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_CNBLOGS_BLACKS')">清理已注销狗</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="tablet_4" style="display: none;">
+                                <table id="table_4" width="100%" border="0" align="center" cellpadding="4"
+                                    cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                    <tr>
+                                        <th><a onclick="hint(5.1)" class="hintstyle"
+                                                href="javascript:void(0);">itch.io监控开关</a></th>
+                                        <td>
+                                            <input type="checkbox" class="check_4" id="itchion" onchange="show_hide(4)">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><a onclick="hint(5.2)" class="hintstyle" href="javascript:void(0);">itch.io
+                                                cookie<span style="color: red;"> * </span></a></th>
+                                        <td>
+                                            <textarea class="input_ss_table" id="itck" maxlength="2048" rows="14"
+                                                autocorrect="off" autocapitalize="off"
+                                                placeholder="浏览器-开发者工具-网络, 查看已登陆状态itch.io主页请求标头, 拷贝 Cookie 值至此"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>手动触发</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('TEST_ITCH_CK')">Cookie有效测试</a>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_ITCH_FANS')">单轮粉丝扫描</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>管理取关狗</th>
+                                        <td>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('SEE_ITCH_BLACKS')">查看取关狗名单</a>
+                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                onclick="trigger('UPD_ITCH_BLACKS')">清理已注销狗</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="apply_gen">
+                                <input class="button_gen" id="apply" onclick="trigger('WEB_SUBMIT')" type="button"
+                                    value="提交" />
+                            </div>
                         </td>
                     </tr>
                 </table>
             </td>
-            <td width="10" align="center" valign="top"></td>
         </tr>
+    </table>
+    </td>
+    <td width="10" align="center" valign="top"></td>
+    </tr>
     </table>
     <div id="footer"></div>
 </body>

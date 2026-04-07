@@ -169,7 +169,8 @@ input[type="checkbox"] {
 	width: max-content;
 }
 
-#btskon {
+#btskon,
+.biliauto {
 	float: inline-start;
 }
 
