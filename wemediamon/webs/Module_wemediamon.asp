@@ -245,14 +245,20 @@
                                                     <th><a onclick="hint(1.3)" class="hintstyle"
                                                             href="javascript:void(0);">每日自动签到</a></th>
                                                     <td>
-                                                        <input type="password" class="input_ss_table" id="btskon"
-                                                            maxlength="32" value="" autocorrect="off"
-                                                            autocapitalize="off" readonly
-                                                            onblur="switchType(this, false);"
-                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            placeholder="ac_time_value 留空则不开启">
-                                                        <input type="time" class="input_ss_table" id="btskat"
-                                                            value="00:01">
+                                                        <input type="checkbox" class="check_5" id="btskon"
+                                                            onchange="show_hide_el(this)">
+                                                        <div>每天 <input type="time" class="input_ss_table" id="btskat"
+                                                                value="01:30"> 触发</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><a onclick="hint(1.3)" class="hintstyle"
+                                                            href="javascript:void(0);">周期自动投币</a></th>
+                                                    <td>
+                                                        <div>每 <input type="number" class="input_ss_table" id="bcoinon"
+                                                                min="0" max="366" value="0"> 天 <input type="time"
+                                                                class="input_ss_table" id="bcoinat" value="01:30"> 触发
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>

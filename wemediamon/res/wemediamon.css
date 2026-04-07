@@ -165,6 +165,14 @@ input[type="checkbox"] {
 	width: 62px;
 }
 
+#bcoinon {
+	width: max-content;
+}
+
+#btskon {
+	float: inline-start;
+}
+
 #tablets table {
 	margin: 10px 0px 0px 0px;
 	border-collapse: collapse;

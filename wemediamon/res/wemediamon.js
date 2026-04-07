@@ -75,6 +75,15 @@ function show_hide(w) { // 各面板开关显隐连动
 	}
 }
 
+function show_hide_el(el) {
+	if ($(el).is(':checked')) {
+		$(el).next('div').show();
+	}
+	else {
+		$(el).next('div').hide();
+	}
+}
+
 function filter_bili_ck(cookie) {
 	let ck = cookie.trim();
 	if (!ck) return "";
