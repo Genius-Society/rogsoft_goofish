@@ -3,8 +3,8 @@ var count_down;
 var _responseLen;
 var _show_mon_log;
 
-const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"];
-const keys = ["email", "smtp", "cache", "period", "bilick", "btskon", "btskat", "bcoinon", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck"];
+const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion", "btskon"];
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinon", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck"];
 
 function init() {
 	show_menu(menu_hook);
@@ -12,6 +12,7 @@ function init() {
 	get_dbus_data();
 	register_event();
 	import_cfg();
+	show_hide_el($("#btskon"));
 }
 
 function import_cfg() { // 导入配置
@@ -36,7 +37,7 @@ function load_cfg(obj) { // 加载配置
 		if (k in obj) $(`#${k}`).val(obj[k]);
 	});
 	chks.forEach(k => {
-		if (k in obj) $(`#${k}`).prop('checked', obj[k] == "on").trigger('change');
+		if (k in obj) $(`#${k}`).prop('checked', !!obj[k]).trigger('change');
 	});
 }
 
