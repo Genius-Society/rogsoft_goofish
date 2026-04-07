@@ -252,7 +252,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onclick="hint(1.3)" class="hintstyle"
+                                                    <th><a onclick="hint(1.4)" class="hintstyle"
                                                             href="javascript:void(0);">周期自动投币</a></th>
                                                     <td>
                                                         <div>每 <input type="number" class="input_ss_table" id="bcoinon"

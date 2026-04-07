@@ -391,7 +391,11 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 1.3) {
 		_caption = "B站自动完成每日任务功能";
-		statusmenu = "左侧输入框填入与上述 Cookie 对应的有效 AC 时间值才可开启, 留空则不开启, 可通过浏览器访问上述 Cookie 已登录状态下的B站主页控制台输入 window.localStorage.ac_time_value 获取; 右侧时间选择框内为每日签到的触发时间。<br>";
+		statusmenu = "左侧 checkbox 未选中则不开启; 右侧时间选择框内为每日签到的触发时间。<br>";
+	}
+	else if (itemNum == 1.4) {
+		_caption = "B站自动完成每日投币功能";
+		statusmenu = "左侧输入框填入触发周期天数才可开启, 置 0 则不开启; 右侧时间选择框内为投币的触发时间。<br>";
 	}
 	else if (itemNum == 2.1) {
 		_caption = "HuggingFace 自媒体面板总开关";
