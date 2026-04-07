@@ -1620,6 +1620,9 @@ if __name__ == "__main__":
             case "TEST_SMTP":
                 send_email()
 
+            case "TEST_MONITOR":
+                update()
+
             case "TEST_BILI_CK":
                 BiliMon().check_login()
 

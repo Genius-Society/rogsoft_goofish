@@ -182,6 +182,10 @@
                                                     <td>
                                                         <input type="number" class="input_ss_table" id="period" min="1"
                                                             max="8765" value="2">
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('TEST_MONITOR')">触发测试</a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
