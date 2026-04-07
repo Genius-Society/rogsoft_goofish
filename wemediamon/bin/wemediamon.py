@@ -135,7 +135,7 @@ class Monitor:
 
     def _txt2lst(self):
         if not os.path.exists(self.blacks):
-            return []
+            return set()
 
         with open(self.blacks, "r", encoding="utf-8") as file:
             lines = file.readlines()
@@ -260,7 +260,7 @@ class BiliMon(Monitor):
 
     def _get_followers(self):
         fans, pages = self._get_fans(pn=1)
-        for i in self._tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} B站粉丝中"):
+        for i in self._tqdm(range(2, pages + 1), desc=f"扫描 {self.uid} 的B站粉丝中"):
             time.sleep(random.uniform(0.5, 1))
             followers, _ = self._get_fans(pn=i)
             if followers:
@@ -344,7 +344,7 @@ class BiliMon(Monitor):
                 raise ResponseCodeException(f"{L()}{e}")
 
     def _recurse_following(self, pn: int):
-        print(f"递归至用户 {self.uid} 第 {pn} 页 {self.name} 关注列表...")
+        print(f"递归至 {self.name} 用户 {self.uid} 第 {pn} 页关注列表...")
         time.sleep(random.uniform(0.5, 1))
         return sync(self.me.get_followings(pn=pn))["list"]
 
@@ -552,7 +552,7 @@ class BiliMon(Monitor):
 
         new_fans: dict = self._get_followers()
         while not new_fans:
-            print(f"获取 {self.uid} B站粉丝列表失败, 重试中...")
+            print(f"获取 {self.uid} 的B站粉丝列表失败, 重试中...")
             new_fans = self._get_followers()
 
         if new_fans != old_fans:
@@ -875,7 +875,7 @@ class HFMon(Monitor):
         traitors = set()
         for tag in prev_data:
             if tag in data:
-                diff = set(prev_data[tag].keys()) - set(data[tag].keys())
+                diff = set(dict(prev_data[tag]).keys()) - set(dict(data[tag]).keys())
                 for id in diff:
                     if not id in f"{data}":
                         dog = prev_data[tag][id]
