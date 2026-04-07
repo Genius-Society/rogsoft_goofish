@@ -245,10 +245,10 @@
                                                     <th><a onclick="hint(1.3)" class="hintstyle"
                                                             href="javascript:void(0);">每日自动签到</a></th>
                                                     <td>
-                                                        <input type="checkbox" class="check_5" id="btskon"
+                                                        <input type="checkbox" id="btskon"
                                                             onchange="show_hide_el(this)">
                                                         <div>每天 <input type="time" class="input_ss_table" id="btskat"
-                                                                value="01:30"> 触发</div>
+                                                                value="01:00"> 触发</div>
                                                     </td>
                                                 </tr>
                                                 <tr>
