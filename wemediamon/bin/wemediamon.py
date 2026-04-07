@@ -1611,7 +1611,7 @@ def start_monitor(
 
         if coinon > 0:
             print(f"B站周期自动投币开启中...每 {coinon} 天 {coinat} 触发一次")
-            schedule.every(coinon).day.at(coinat).do(BiliMon().auto_coin)
+            schedule.every(coinon).days.at(coinat).do(BiliMon().auto_coin)
 
         while True:
             schedule.run_pending()
