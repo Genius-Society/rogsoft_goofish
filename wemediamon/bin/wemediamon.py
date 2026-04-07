@@ -32,8 +32,10 @@ parser.add_argument("--email", type=str, required=True)
 parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
-parser.add_argument("--btskon", type=str, default="")
-parser.add_argument("--btskat", type=str, default="00:01")
+parser.add_argument("--btskon", type=bool, default=False)
+parser.add_argument("--btskat", type=str, default="01:00")
+parser.add_argument("--bcoinon", type=int, default=0)
+parser.add_argument("--bcoinat", type=str, default="01:30")
 parser.add_argument("--hftks", type=str, default="")
 parser.add_argument("--papers", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
@@ -209,7 +211,7 @@ class BiliMon(Monitor):
                 check=True,
             )
 
-    def _refresh_ck(self):
+    # def _refresh_ck(self):
         try:
             if self.act:
                 sync(self.credential.refresh())
@@ -505,8 +507,8 @@ class BiliMon(Monitor):
 
     def daily_tasks(self, retry=3):
         try:
-            self._refresh_ck()
-            watched, shared, coined = self._daily_sign()
+            # self._refresh_ck()
+            watched, shared, _ = self._daily_sign()
             if watched:
                 print(f"每日观看 {self.name} 视频已完成!")
             else:
@@ -516,11 +518,6 @@ class BiliMon(Monitor):
                 print(f"每日分享 {self.name} 视频已完成!")
             else:
                 self._daily_share()
-
-            if coined:
-                print(f"每日 {self.name} 视频投币已完成!")
-            else:
-                self._daily_coin()
 
         except Exception as e:
             if retry > 0:
@@ -532,6 +529,28 @@ class BiliMon(Monitor):
                 send_email(
                     f"{L()}{e}",
                     "[WeMediaMon 插件] 自动完成B站每日任务出错",
+                    "已重试过多次",
+                )
+
+    def auto_coin(self, retry=3):
+        try:
+            # self._refresh_ck()
+            _, _, coined = self._daily_sign()
+            if coined:
+                print(f"每日 {self.name} 视频投币已完成!")
+            else:
+                self._daily_coin()
+
+        except Exception as e:
+            if retry > 0:
+                print(f"完成 {self.name} 周期投币出错: {e}, 剩 {retry} 次重试...")
+                time.sleep(random.uniform(3, 3.5))
+                self.auto_coin(retry - 1)
+
+            else:
+                send_email(
+                    f"{L()}{e}",
+                    "[WeMediaMon 插件] 自动完成B站周期投币出错",
                     "已重试过多次",
                 )
 
@@ -1595,13 +1614,23 @@ def update():
     drop_caches()
 
 
-def start_monitor(period=args.period, taskon=args.btskon, taskat=args.btskat):
+def start_monitor(
+    period=args.period,
+    taskon=args.btskon,
+    taskat=args.btskat,
+    coinon=args.bcoinon,
+    coinat=args.bcoinat,
+):
     try:
         print(f"监控开启中...每 {period} 小时触发一次")
         schedule.every(period).hours.do(update)
         if taskon:
             print(f"B站每日自动签到开启中...每天 {taskat} 触发一次")
             schedule.every().day.at(taskat).do(BiliMon().daily_tasks)
+
+        if coinon > 0:
+            print(f"B站周期自动投币开启中...每 {coinon} 天 {coinat} 触发一次")
+            schedule.every(coinon).day.at(coinat).do(BiliMon().auto_coin)
 
         while True:
             schedule.run_pending()

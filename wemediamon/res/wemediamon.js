@@ -4,7 +4,7 @@ var _responseLen;
 var _show_mon_log;
 
 const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"]
-const keys = ["email", "smtp", "cache", "period", "bilick", "btskon", "btskat", "hftks", "papers", "gitags", "cnblokie", "itck"];
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskon", "btskat", "bcoinon", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck"];
 
 function init() {
 	show_menu(menu_hook);

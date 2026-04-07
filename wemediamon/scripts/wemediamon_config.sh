@@ -83,6 +83,8 @@ load_params() {
 	wemediamon_bilick=$(dbus get wemediamon_bilick)
 	wemediamon_btskon=$(dbus get wemediamon_btskon)
 	wemediamon_btskat=$(dbus get wemediamon_btskat)
+	wemediamon_bcoinon=$(dbus get wemediamon_bcoinon)
+	wemediamon_bcoinat=$(dbus get wemediamon_bcoinat)
 	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
 	wemediamon_hftks=$(dbus get wemediamon_hftks)
 	wemediamon_papers=$(dbus get wemediamon_papers)
@@ -123,7 +125,7 @@ check_params() {
 		fi
 	else
 		wemediamon_bilick=''
-		wemediamon_btskon=''
+		wemediamon_btskon='0'
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
 		if [[ -z "${wemediamon_hftks}" ]]; then
@@ -182,6 +184,8 @@ start_wemediamon() {
 		--bilick "${wemediamon_bilick}" \
 		--btskon "${wemediamon_btskon}" \
 		--btskat "${wemediamon_btskat}" \
+		--bcoinon "${wemediamon_bcoinon}" \
+		--bcoinat "${wemediamon_bcoinat}" \
 		--hftks "${wemediamon_hftks}" \
 		--papers "${wemediamon_papers}" \
 		--gitags "${wemediamon_gitags}" \
@@ -205,6 +209,8 @@ trigger_once() {
 		--bilick "${wemediamon_bilick}" \
 		--btskon "${wemediamon_btskon}" \
 		--btskat "${wemediamon_btskat}" \
+		--bcoinon "${wemediamon_bcoinon}" \
+		--bcoinat "${wemediamon_bcoinat}" \
 		--hftks "${wemediamon_hftks}" \
 		--papers "${wemediamon_papers}" \
 		--gitags "${wemediamon_gitags}" \
