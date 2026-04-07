@@ -3,7 +3,7 @@ var count_down;
 var _responseLen;
 var _show_mon_log;
 
-const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"]
+const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion"];
 const keys = ["email", "smtp", "cache", "period", "bilick", "btskon", "btskat", "bcoinon", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck"];
 
 function init() {
@@ -371,7 +371,7 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 0.5) {
 		_caption = "插件产生的缓存文件在路由器本地的储存路径";
-		statusmenu = "请填写路由器本地存在且容量足够可写入的路径; 点击“环境修复”按钮可修复 pip 依赖环境。<br>"
+		statusmenu = "请填写路由器本地存在且容量足够可写入的路径; 点击“环境修复”按钮可修复 pip 依赖环境。<br>";
 	}
 	else if (itemNum == 0.6) {
 		_caption = "插件监控器的刷新周期";
