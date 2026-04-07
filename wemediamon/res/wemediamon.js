@@ -66,22 +66,13 @@ function register_event() {
 	});
 }
 
-function show_hide(w) { // 各面板开关显隐连动
+function show_hide(el) { // 各面板开关显隐连动
+	var w = $(el).attr('class').split("_")[1];
 	if (w < 5) {
-		if ($('.check_' + w).is(':checked')) {
-			$('#table_' + w + ' tr:eq(0)').nextAll('tr').show();
-		}
-		else {
-			$('#table_' + w + ' tr:eq(0)').nextAll('tr').hide();
-		}
+		$('#table_' + w + ' tr:eq(0)').nextAll('tr').toggle($('.check_' + w).is(':checked'));
 	}
 	else {
-		if ($('.check_' + w).is(':checked')) {
-			$('.check_' + w).next('div').show();
-		}
-		else {
-			$('.check_' + w).next('div').hide();
-		}
+		$('.check_' + w).next('div').toggle($('.check_' + w).is(':checked'));
 	}
 }
 
@@ -102,16 +93,14 @@ function filter_bili_ck(cookie) {
 		.join("; ");
 }
 
-function conf2obj() { // dbus 变量转控件值
-	var i = 0;
+function conf2obj() { // dbus 变量转控件值 
 	$('input[type="checkbox"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["wemediamon_" + id]) {
 			E(id).checked = (dbus["wemediamon_" + id] == "1");
 		}
 		if ($(el).attr("onchange")) {
-			show_hide(i);
-			i++;
+			show_hide(el);
 		}
 	});
 
@@ -342,7 +331,7 @@ function menu_hook(_, _) {
 }
 
 function tabSelect(w) {
-	for (var i = 0; i <= 4; i++) {
+	for (var i = 0; i < 6; i++) {
 		$('.show-btn' + i).removeClass('active');
 		$('#tablet_' + i).hide();
 	}
@@ -388,7 +377,7 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 1.2) {
 		_caption = "被监控B站账号的 Cookie 缓存值";
-		statusmenu = "获取方式：浏览器打开“开发者工具-网络”, 查看已登陆状态B站请求标头, 拷贝 Cookie 值至此。1年长生存期 Cookie 获取走 passport.bilibili.com 协议登录; 7天短生存期的走B站主页 Web 登录, 但需配合下面每日签到的 AC 时间值协同使用。<br>";
+		statusmenu = "获取方式：浏览器打开“开发者工具-网络”, 查看已登陆状态B站请求标头, 拷贝 Cookie 值至此。1年长生存期 Cookie 获取走 passport.bilibili.com 协议登录。<br>";
 	}
 	else if (itemNum == 1.3) {
 		_caption = "B站自动完成每日任务功能";

@@ -236,7 +236,7 @@
                                                     </th>
                                                     <td>
                                                         <input type="checkbox" class="check_0" id="bilimon"
-                                                            onchange="show_hide(0)">
+                                                            onchange="show_hide(this)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -255,8 +255,8 @@
                                                             href="javascript:void(0);">每日自动签到</a>
                                                     </th>
                                                     <td>
-                                                        <input type="checkbox" id="btskon"
-                                                            onchange="show_hide_el(this)">
+                                                        <input type="checkbox" class="check_5" id="btskon"
+                                                            onchange="show_hide(this)">
                                                         <div class="biliauto">每天 <input type="time"
                                                                 class="input_ss_table" id="btskat" value="01:00"> 触发
                                                         </div>
@@ -311,7 +311,7 @@
                                                     </th>
                                                     <td>
                                                         <input type="checkbox" class="check_1" id="hfmon"
-                                                            onchange="show_hide(1)">
+                                                            onchange="show_hide(this)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -369,7 +369,7 @@
                                                     </th>
                                                     <td>
                                                         <input type="checkbox" class="check_2" id="gitmon"
-                                                            onchange="show_hide(2)">
+                                                            onchange="show_hide(this)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -410,7 +410,7 @@
                                                     </th>
                                                     <td>
                                                         <input type="checkbox" class="check_3" id="cnblon"
-                                                            onchange="show_hide(3)">
+                                                            onchange="show_hide(this)">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -454,7 +454,7 @@
                                                     </th>
                                                     <td>
                                                         <input type="checkbox" class="check_4" id="itchion"
-                                                            onchange="show_hide(4)">
+                                                            onchange="show_hide(this)">
                                                     </td>
                                                 </tr>
                                                 <tr>
