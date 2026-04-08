@@ -941,14 +941,14 @@ class HFMon(Monitor):
                     requirestart = False
 
         except Exception as e:
-            if (" 412 " in f"{e}") or (" 500 " in f"{e}") or (" 503 " in f"{e}"):
+            if ("412 " in f"{e}") or ("500 " in f"{e}") or ("503 " in f"{e}"):
                 tmp_repo = f"{space_id}_{int(time.time())}"
                 self._move_repo(space_id, tmp_repo, token)
                 time.sleep(random.uniform(3, 5))
                 self._move_repo(tmp_repo, space_id, token)
                 requirestart = True
 
-            elif " 504 " in f"{e}":
+            elif "504 " in f"{e}":
                 requirestart = False
 
             else:
