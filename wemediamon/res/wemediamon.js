@@ -4,7 +4,7 @@ var _responseLen;
 var _show_mon_log;
 
 const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion", "btskon"];
-const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinon", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck"];
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinum", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck"];
 
 function init() {
 	show_menu(menu_hook);
@@ -385,7 +385,7 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 1.4) {
 		_caption = "B站自动完成每日投币功能";
-		statusmenu = "左侧输入框填入触发周期天数才可开启, 置0则不开启; 右侧时间选择框内为投币的触发时间, 每次触发随机挑选5个视频各投1个硬币。<br>";
+		statusmenu = "右侧输入框填入每次触发的投币数才可开启, 置0则不开启; 左侧时间选择框内为投币的触发时间, 每次触发随机挑选投币数个视频各投1个硬币。<br>";
 	}
 	else if (itemNum == 2.1) {
 		_caption = "HuggingFace 自媒体面板总开关";

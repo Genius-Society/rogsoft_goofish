@@ -258,7 +258,7 @@
                                                         <input type="checkbox" class="check_5" id="btskon"
                                                             onchange="show_hide(this)">
                                                         <div class="biliauto">每天 <input type="time"
-                                                                class="input_ss_table" id="btskat" value="01:00"> 触发
+                                                                class="input_ss_table" id="btskat" value="01:00"> 观看分享视频
                                                         </div>
                                                         <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
@@ -271,10 +271,10 @@
                                                             href="javascript:void(0);">周期自动投币</a>
                                                     </th>
                                                     <td>
-                                                        <div class="biliauto">每 <input type="number"
-                                                                class="input_ss_table" id="bcoinon" min="0" max="366"
-                                                                value="0"> 天 <input type="time" class="input_ss_table"
-                                                                id="bcoinat" value="01:30"> 触发
+                                                        <div class="biliauto">每天 <input type="time"
+                                                                class="input_ss_table" id="bcoinat" value="01:30"> 投
+                                                            <input type="number" class="input_ss_table" id="bcoinum"
+                                                                min="0" max="5" value="0"> 个硬币
                                                         </div>
                                                         <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"

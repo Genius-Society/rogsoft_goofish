@@ -34,7 +34,7 @@ parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--btskon", type=str, default="0")
 parser.add_argument("--btskat", type=str, default="01:00")
-parser.add_argument("--bcoinon", type=int, default=0)
+parser.add_argument("--bcoinum", type=int, default=0)
 parser.add_argument("--bcoinat", type=str, default="01:30")
 parser.add_argument("--hftks", type=str, default="")
 parser.add_argument("--papers", type=str, default="")
@@ -449,9 +449,9 @@ class BiliMon(Monitor):
         response.raise_for_status()
         return response.json()["data"]["archives"][0]["bvid"]
 
-    def _daily_coin(self, delay=2):
+    def _daily_coin(self, to_add=args.bcoinum, delay=2):
         coins = sync(self.me.get_user_info())["coins"]
-        to_add = min(5, coins)
+        to_add = min(to_add, coins)
         if to_add < 1:
             print(f"⚠️ 硬币已空, 跳过 {self.name} 投币...")
             return
@@ -1600,7 +1600,7 @@ def start_monitor(
     period=args.period,
     taskon=args.btskon == "1",
     taskat=args.btskat,
-    coinon=args.bcoinon,
+    coinum: int = args.bcoinum,
     coinat=args.bcoinat,
 ):
     try:
@@ -1610,9 +1610,9 @@ def start_monitor(
             print(f"B站每日自动签到开启中...每天 {taskat} 触发一次")
             schedule.every().day.at(taskat).do(BiliMon().daily_tasks)
 
-        if coinon > 0:
-            print(f"B站周期自动投币开启中...每 {coinon} 天 {coinat} 触发一次")
-            schedule.every(coinon).days.at(coinat).do(BiliMon().auto_coin)
+        if coinum > 0:
+            print(f"B站周期自动投币开启中...预定每天 {coinat} 投 {coinum} 币")
+            schedule.every().day.at(coinat).do(BiliMon().auto_coin)
 
         while True:
             schedule.run_pending()
