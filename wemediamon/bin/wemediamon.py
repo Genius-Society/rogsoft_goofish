@@ -514,11 +514,7 @@ class BiliMon(Monitor):
     def auto_coin(self, retry=3):
         try:
             time.sleep(random.randint(0, 59))
-            _, _, coined = self._daily_sign()
-            if coined:
-                print(f"每日 {self.name} 视频投币已完成!")
-            else:
-                self._daily_coin()
+            self._daily_coin()
 
         except Exception as e:
             if retry > 0:
