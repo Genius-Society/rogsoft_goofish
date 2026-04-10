@@ -484,9 +484,11 @@ class BiliMon(Monitor):
         response.raise_for_status()
         print(f"观看 {self.name} 视频结果: {response.text}")
 
-    def daily_tasks(self, retry=3):
+    def daily_tasks(self, retry=3, randelay=50, manual=False):
         try:
-            time.sleep(random.randint(0, 59))
+            if not manual:
+                time.sleep(random.randint(0, randelay))
+
             watched, shared, _ = self._daily_sign()
             if watched:
                 print(f"每日观看 {self.name} 视频已完成!")
@@ -511,9 +513,11 @@ class BiliMon(Monitor):
                     "已重试过多次",
                 )
 
-    def auto_coin(self, retry=3):
+    def auto_coin(self, retry=3, randelay=50, manual=False):
         try:
-            time.sleep(random.randint(0, 59))
+            if not manual:
+                time.sleep(random.randint(0, randelay))
+
             self._daily_coin()
 
         except Exception as e:
@@ -1640,10 +1644,10 @@ if __name__ == "__main__":
                 BiliMon().clean_traitors()
 
             case "TEST_BILI_TASKS":
-                BiliMon().daily_tasks()
+                BiliMon().daily_tasks(manual=True)
 
             case "TEST_BILI_COIN":
-                BiliMon().auto_coin()
+                BiliMon().auto_coin(manual=True)
 
             case "UPD_HF_FANS":
                 HFMon().upd_fans()
