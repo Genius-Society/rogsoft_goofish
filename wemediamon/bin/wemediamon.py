@@ -1523,7 +1523,7 @@ class ItchMon(Monitor):
 
             print("itch.io 数据已更新!")
 
-    def trigger(self, retry=10):
+    def trigger(self, retry=15):
         try:
             self.upd_fans()
 
