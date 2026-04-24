@@ -423,19 +423,14 @@ class BiliMon(Monitor):
         return data["watch"], data["share"], data["coins"] > 0
 
     def _daily_share(self):
-        try:
-            sync(
-                video.Video(
-                    bvid=self._rand_video(),
-                    credential=self.credential,
-                ).share()
-            )
-            print(f"✅ 分享 {self.name} 视频成功: +5 经验已到账!")
-            return True
-
-        except Exception as e:
-            print(f"{L()}❌ 分享 {self.name} 视频失败: {e}")
-            return False
+        time.sleep(random.uniform(3, 5))
+        sync(
+            video.Video(
+                bvid=self._rand_video(),
+                credential=self.credential,
+            ).share()
+        )
+        print(f"✅ 分享 {self.name} 视频成功: +5 经验已到账!")
 
     def _rand_video(self, region=1010):
         response = requests.get(
@@ -513,7 +508,7 @@ class BiliMon(Monitor):
                     "已重试过多次",
                 )
 
-    def auto_coin(self, retry=3, randelay=50, manual=False):
+    def auto_coin(self, retry=3, randelay=55, manual=False):
         try:
             if not manual:
                 time.sleep(random.randint(0, randelay))
@@ -1619,7 +1614,7 @@ def start_monitor(
             time.sleep(1)
 
     except Exception as e:
-        send_email(f"{L()}{e}", "[WeMediaMon 插件] 运行错误", "请手动排查")
+        send_email(f"{L()}{e}", "[WeMediaMon 插件] 运行错误", "请手动排查并重启!!!")
 
 
 if __name__ == "__main__":
