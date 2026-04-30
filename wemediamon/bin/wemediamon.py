@@ -936,7 +936,12 @@ class HFMon(Monitor):
                     requirestart = False
 
         except Exception as e:
-            if ("412 " in f"{e}") or ("500 " in f"{e}") or ("503 " in f"{e}"):
+            if (
+                ("403 " in f"{e}")
+                or ("412 " in f"{e}")
+                or ("500 " in f"{e}")
+                or ("503 " in f"{e}")
+            ):
                 tmp_repo = f"{space_id}_{int(time.time())}"
                 self._move_repo(space_id, tmp_repo, token)
                 time.sleep(random.uniform(3, 5))
@@ -950,7 +955,7 @@ class HFMon(Monitor):
                 send_email(
                     f"{L()}激活 {space_id} 出错: {e}",
                     "[WeMediaMon 插件] 抱脸空间激活出错",
-                    "已排除 412 / 500 / 503 网络错误",
+                    "已排除 403 / 412 / 500 / 503 / 504 网络错误",
                 )
                 requirestart = False
 
