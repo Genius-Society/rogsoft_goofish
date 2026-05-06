@@ -407,6 +407,18 @@ class BiliMon(Monitor):
         response.raise_for_status()
         return response.json()["code"] == 0
 
+    def _rand_video(self, region=1010):
+        response = requests.get(
+            f"https://api.{self.endpoint}/x/web-interface/region/feed/rcmd",
+            params={
+                "request_cnt": 1,
+                "from_region": region,  # 知识区
+            },
+            headers=self.header,
+        )
+        response.raise_for_status()
+        return response.json()["data"]["archives"][0]["bvid"]
+
     def _daily_sign(self, manual: bool, randelay=50):
         if not manual:
             time.sleep(random.randint(0, randelay))
@@ -420,51 +432,6 @@ class BiliMon(Monitor):
         coins = sync(self.me.get_user_info())["coins"]
         to_add = min(int(coins), 5 - data["coins"] // 10)
         return data["watch"], data["share"], to_add
-
-    def _daily_share(self, shared: bool):
-        if shared:
-            print(f"每日分享 {self.name} 视频已完成!")
-            return
-
-        time.sleep(random.uniform(3, 3.5))
-        sync(
-            video.Video(
-                bvid=self._rand_video(),
-                credential=self.credential,
-            ).share()
-        )
-        print(f"✅ 分享 {self.name} 视频成功: +5 经验已到账!")
-
-    def _rand_video(self, region=1010):
-        response = requests.get(
-            f"https://api.{self.endpoint}/x/web-interface/region/feed/rcmd",
-            params={
-                "request_cnt": 1,
-                "from_region": region,  # 知识区
-            },
-            headers=self.header,
-        )
-        response.raise_for_status()
-        return response.json()["data"]["archives"][0]["bvid"]
-
-    def _daily_coin(self, to_add: int, delay=2):
-        if to_add <= 0:
-            print(f"{self.name} 暂不投币!")
-            return
-
-        print(f"💰 {self.name} 将投 {to_add} 硬币...")
-        time.sleep(random.uniform(3, 3.5))
-        i = 0
-        while i < to_add:
-            bvid = self._rand_video()
-            v = video.Video(bvid=bvid, credential=self.credential)
-            if sync(v.get_pay_coins()) < 1:
-                status = sync(v.pay_coin())
-                i += 1
-                print(f"✅ {self.name} 投币 {i}/{to_add}: {status}")
-                time.sleep(delay)
-
-        print(f"✅ {self.name} 投币任务完成, +{to_add * 10} 经验到手!")
 
     def _daily_watch(self, watched: bool):
         if watched:
@@ -483,8 +450,48 @@ class BiliMon(Monitor):
                 "type": 3,
             },
         )
-        response.raise_for_status()
         print(f"观看 {self.name} 视频结果: {response.text}")
+
+    def _daily_share(self, shared: bool):
+        if shared:
+            print(f"每日分享 {self.name} 视频已完成!")
+            return
+
+        try:
+            time.sleep(random.uniform(3, 3.5))
+            sync(
+                video.Video(
+                    bvid=self._rand_video(),
+                    credential=self.credential,
+                ).share()
+            )
+            print(f"✅ 分享 {self.name} 视频成功: +5 经验已到账!")
+
+        except Exception as e:
+            print(f"❌️ 分享 {self.name} 视频出错: {e}")
+
+    def _daily_coin(self, to_add: int, delay=2):
+        if to_add <= 0:
+            print(f"{self.name} 暂不投币!")
+            return
+
+        print(f"💰 {self.name} 将投 {to_add} 硬币...")
+        try:
+            time.sleep(random.uniform(3, 3.5))
+            i = 0
+            while i < to_add:
+                bvid = self._rand_video()
+                v = video.Video(bvid=bvid, credential=self.credential)
+                if sync(v.get_pay_coins()) < 1:
+                    status = sync(v.pay_coin())
+                    i += 1
+                    print(f"✅ {self.name} 投币 {i}/{to_add}: {status}")
+                    time.sleep(delay)
+
+            print(f"✅ {self.name} 投币任务完成, +{to_add * 10} 经验到手!")
+
+        except Exception as e:
+            print(f"❌️ {self.name} 投币任务出错: {e}")
 
     def daily_tasks(self, retry=3, manual=False):
         try:
