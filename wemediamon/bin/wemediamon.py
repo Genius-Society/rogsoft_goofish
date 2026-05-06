@@ -33,9 +33,6 @@ parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--btskon", type=str, default="0")
-parser.add_argument("--btskat", type=str, default="01:00")
-parser.add_argument("--bcoinum", type=int, default=0)
-parser.add_argument("--bcoinat", type=str, default="01:30")
 parser.add_argument("--hftks", type=str, default="")
 parser.add_argument("--papers", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
@@ -204,10 +201,7 @@ class BiliMon(Monitor):
         pure_ck = ";".join(ck_set)
         if self.ck != pure_ck:
             self.ck = pure_ck
-            subprocess.run(
-                ["dbus", "set", f"wemediamon_bilick={self.ck}"],
-                check=True,
-            )
+            subprocess.run(["dbus", "set", f"wemediamon_bilick={self.ck}"], check=True)
 
     def _get_fans(self, pn, retry=3):
         try:
@@ -413,17 +407,26 @@ class BiliMon(Monitor):
         response.raise_for_status()
         return response.json()["code"] == 0
 
-    def _daily_sign(self):
+    def _daily_sign(self, manual: bool, randelay=50):
+        if not manual:
+            time.sleep(random.randint(0, randelay))
+
         response = requests.get(
             f"https://api.{self.endpoint}/x/member/web/exp/reward",
             headers=self.header,
         )
         response.raise_for_status()
         data = response.json()["data"]
-        return data["watch"], data["share"], data["coins"] > 0
+        coins = sync(self.me.get_user_info())["coins"]
+        to_add = min(int(coins), 5 - data["coins"] // 10)
+        return data["watch"], data["share"], to_add
 
-    def _daily_share(self):
-        time.sleep(random.uniform(3, 5))
+    def _daily_share(self, shared: bool):
+        if shared:
+            print(f"每日分享 {self.name} 视频已完成!")
+            return
+
+        time.sleep(random.uniform(3, 3.5))
         sync(
             video.Video(
                 bvid=self._rand_video(),
@@ -444,14 +447,13 @@ class BiliMon(Monitor):
         response.raise_for_status()
         return response.json()["data"]["archives"][0]["bvid"]
 
-    def _daily_coin(self, to_add=args.bcoinum, delay=2):
-        coins = sync(self.me.get_user_info())["coins"]
-        to_add = min(to_add, coins)
-        if to_add < 1:
-            print(f"⚠️ 硬币已空, 跳过 {self.name} 投币...")
+    def _daily_coin(self, to_add: int, delay=2):
+        if to_add <= 0:
+            print(f"{self.name} 暂不投币!")
             return
 
-        print(f"💰 剩余 {self.name} 硬币: {coins} → 将投: {to_add}")
+        print(f"💰 {self.name} 将投 {to_add} 硬币...")
+        time.sleep(random.uniform(3, 3.5))
         i = 0
         while i < to_add:
             bvid = self._rand_video()
@@ -464,7 +466,12 @@ class BiliMon(Monitor):
 
         print(f"✅ {self.name} 投币任务完成, +{to_add * 10} 经验到手!")
 
-    def _daily_watch(self):
+    def _daily_watch(self, watched: bool):
+        if watched:
+            print(f"每日观看 {self.name} 视频已完成!")
+            return
+
+        time.sleep(random.uniform(3, 3.5))
         response = requests.post(
             f"https://api.{self.endpoint}/x/click-interface/web/heartbeat",
             headers=self.header,
@@ -479,21 +486,12 @@ class BiliMon(Monitor):
         response.raise_for_status()
         print(f"观看 {self.name} 视频结果: {response.text}")
 
-    def daily_tasks(self, retry=3, randelay=50, manual=False):
+    def daily_tasks(self, retry=3, manual=False):
         try:
-            if not manual:
-                time.sleep(random.randint(0, randelay))
-
-            watched, shared, _ = self._daily_sign()
-            if watched:
-                print(f"每日观看 {self.name} 视频已完成!")
-            else:
-                self._daily_watch()
-
-            if shared:
-                print(f"每日分享 {self.name} 视频已完成!")
-            else:
-                self._daily_share()
+            watched, shared, coins_to_add = self._daily_sign(manual)
+            self._daily_watch(watched)
+            self._daily_share(shared)
+            self._daily_coin(coins_to_add)
 
         except Exception as e:
             if retry > 0:
@@ -505,26 +503,6 @@ class BiliMon(Monitor):
                 send_email(
                     f"{L()}{e}",
                     "[WeMediaMon 插件] 自动完成B站每日任务出错",
-                    "已重试过多次",
-                )
-
-    def auto_coin(self, retry=3, randelay=55, manual=False):
-        try:
-            if not manual:
-                time.sleep(random.randint(0, randelay))
-
-            self._daily_coin()
-
-        except Exception as e:
-            if retry > 0:
-                print(f"完成 {self.name} 周期投币出错: {e}, 剩 {retry} 次重试...")
-                time.sleep(random.uniform(3, 3.5))
-                self.auto_coin(retry - 1)
-
-            else:
-                send_email(
-                    f"{L()}{e}",
-                    "[WeMediaMon 插件] 自动完成B站周期投币出错",
                     "已重试过多次",
                 )
 
@@ -644,6 +622,8 @@ class BiliMon(Monitor):
             self.clean_folders()
             self.clean_followings()
             self.clean_favlists()
+            if args.btskon == "1":
+                BiliMon().daily_tasks()
 
         except Exception as e:
             if retry > 0:
@@ -1596,24 +1576,10 @@ def update():
     drop_caches()
 
 
-def start_monitor(
-    period=args.period,
-    taskon=args.btskon == "1",
-    taskat=args.btskat,
-    coinum: int = args.bcoinum,
-    coinat=args.bcoinat,
-):
+def start_monitor(period=args.period):
     try:
         print(f"监控开启中...每 {period} 小时触发一次")
         schedule.every(period).hours.do(update)
-        if taskon:
-            print(f"B站每日自动签到开启中...每天 {taskat} 触发一次")
-            schedule.every().day.at(taskat).do(BiliMon().daily_tasks)
-
-        if coinum > 0:
-            print(f"B站周期自动投币开启中...预定每天 {coinat} 投 {coinum} 币")
-            schedule.every().day.at(coinat).do(BiliMon().auto_coin)
-
         while True:
             schedule.run_pending()
             time.sleep(1)
@@ -1645,9 +1611,6 @@ if __name__ == "__main__":
 
             case "TEST_BILI_TASKS":
                 BiliMon().daily_tasks(manual=True)
-
-            case "TEST_BILI_COIN":
-                BiliMon().auto_coin(manual=True)
 
             case "UPD_HF_FANS":
                 HFMon().upd_fans()

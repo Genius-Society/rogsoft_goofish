@@ -68,11 +68,8 @@ function register_event() {
 
 function show_hide(el) { // 各面板开关显隐连动
 	var w = $(el).attr('class').split("_")[1];
-	if (w < 5) {
+	if (w != 5) {
 		$('#table_' + w + ' tr:eq(0)').nextAll('tr').toggle($('.check_' + w).is(':checked'));
-	}
-	else {
-		$('.check_' + w).next('div').toggle($('.check_' + w).is(':checked'));
 	}
 }
 
