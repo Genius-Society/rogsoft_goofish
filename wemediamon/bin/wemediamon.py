@@ -470,8 +470,8 @@ class BiliMon(Monitor):
         except Exception as e:
             print(f"❌️ 分享 {self.name} 视频出错: {e}")
 
-    def _daily_coin(self, to_add: int, delay=2):
-        if to_add <= 0:
+    def _daily_coin(self, to_add: int, max_coins=5, delay=2):
+        if to_add < max_coins:
             print(f"{self.name} 暂不投币!")
             return
 
