@@ -470,8 +470,8 @@ class BiliMon(Monitor):
         except Exception as e:
             print(f"❌️ 分享 {self.name} 视频出错: {e}")
 
-    def _daily_coin(self, to_add: int, max_coins=5, delay=2):
-        if to_add < max_coins:
+    def _daily_coin(self, to_add: int, max_coins=5, delay=61, manual=False):
+        if to_add < max_coins or 0 <= datetime.now().hour < 6:
             print(f"{self.name} 暂不投币!")
             return
 
@@ -486,7 +486,7 @@ class BiliMon(Monitor):
                     status = sync(v.pay_coin())
                     i += 1
                     print(f"✅ {self.name} 投币 {i}/{to_add}: {status}")
-                    time.sleep(delay)
+                    time.sleep(2 if manual else delay)
 
             print(f"✅ {self.name} 投币任务完成, +{to_add * 10} 经验到手!")
 
@@ -498,7 +498,7 @@ class BiliMon(Monitor):
             watched, shared, coins_to_add = self._daily_sign(manual)
             self._daily_watch(watched)
             self._daily_share(shared)
-            self._daily_coin(coins_to_add)
+            self._daily_coin(coins_to_add, manual=manual)
 
         except Exception as e:
             if retry > 0:
