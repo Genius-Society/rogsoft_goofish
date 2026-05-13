@@ -936,9 +936,7 @@ class HFMon(Monitor):
                 requirestart = True
 
             else:
-                print(
-                    f"{L()}访问 {space_id} 出错: {e}, 已排除 403 / 412 / 500 / 503 网络错误"
-                )
+                print(f"访问 {space_id} 出错: {e}, 已排除 403/412/500/503 网络错误")
                 requirestart = False
 
         return f"{space_id} " if requirestart else ""
