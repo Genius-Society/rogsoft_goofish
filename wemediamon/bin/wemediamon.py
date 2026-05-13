@@ -118,7 +118,7 @@ def send_email(
 
 class Monitor:
     def __init__(self):
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
+        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
         self.proxy = {
             "http": "http://127.0.0.1:23456",
             "https": "http://127.0.0.1:23456",
@@ -1510,7 +1510,7 @@ class ItchMon(Monitor):
         except Exception as e:
             if retry > 0:
                 print(f"itch.io 监控器触发出错: {e}, 重试中...")
-                time.sleep(random.uniform(5, 10))
+                time.sleep(random.randint(5, 10))
                 self.trigger(retry - 1)
 
             else:
@@ -1524,25 +1524,29 @@ class ItchMon(Monitor):
 def check_ss_ver(
     url="https://raw.githubusercontent.com/hq450/fancyss/3.0/packages/version.json.js",
 ):
-    loc_ver = subprocess.run(
-        ["dbus", "get", "ss_basic_version_local"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
+    try:
+        loc_ver = subprocess.run(
+            ["dbus", "get", "ss_basic_version_local"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
 
-    response = requests.get(url)
-    response.raise_for_status()
-    txt = response.text.strip()
-    data: dict = json.loads(txt)
-    web_ver = data.get("version")
+        response = requests.get(url)
+        response.raise_for_status()
+        txt = response.text.strip()
+        data: dict = json.loads(txt)
+        web_ver = data.get("version")
 
-    if loc_ver != web_ver:
-        send_email(
-            f"当前版本: {loc_ver}, 更新版本: {web_ver}",
-            "[WeMediaMon 插件] 发现ss版本更新",
-            "请手动升级",
-        )
+        if loc_ver != web_ver:
+            send_email(
+                f"当前版本: {loc_ver}, 更新版本: {web_ver}",
+                "[WeMediaMon 插件] 发现ss版本更新",
+                "请手动升级",
+            )
+
+    except Exception as e:
+        send_email(f"{L()}{e}", "[WeMediaMon 插件] 检查ss版本出错", "请手动排查")
 
 
 def drop_caches(value=1, cache="/proc/sys/vm/drop_caches"):
@@ -1553,7 +1557,7 @@ def drop_caches(value=1, cache="/proc/sys/vm/drop_caches"):
         print("缓存已清空!")
 
     except Exception as e:
-        print(f"{L()}清理缓存出错: {e}")
+        send_email(f"{L()}{e}", "[WeMediaMon 插件] 清理缓存出错", "请手动排查")
 
 
 def update():
