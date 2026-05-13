@@ -935,14 +935,9 @@ class HFMon(Monitor):
                 self._move_repo(tmp_repo, space_id, token)
                 requirestart = True
 
-            elif "504 " in f"{e}":
-                requirestart = False
-
             else:
-                send_email(
-                    f"{L()}激活 {space_id} 出错: {e}",
-                    "[WeMediaMon 插件] 抱脸空间激活出错",
-                    "已排除 403 / 412 / 500 / 503 / 504 网络错误",
+                print(
+                    f"{L()}访问 {space_id} 出错: {e}, 已排除 403 / 412 / 500 / 503 网络错误"
                 )
                 requirestart = False
 
