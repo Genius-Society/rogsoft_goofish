@@ -223,6 +223,8 @@
                                                             value="cnblogs" />
                                                         <input onclick="tabSelect(4)" class="show-btn4" type="button"
                                                             value="itch.io" />
+                                                        <input onclick="tabSelect(5)" class="show-btn5" type="button"
+                                                            value="missevan" />
                                                     </td>
                                                 </tr>
                                             </table>
@@ -255,7 +257,7 @@
                                                             href="javascript:void(0);">每日自动签到</a>
                                                     </th>
                                                     <td>
-                                                        <input type="checkbox" class="check_5" id="btskon">
+                                                        <input type="checkbox" class="check_0.2" id="btskon">
                                                         <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="trigger('TEST_BILI_TASKS')">测试签到</a>
@@ -464,6 +466,47 @@
                                                             onclick="trigger('SEE_ITCH_BLACKS')">查看取关狗名单</a>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('UPD_ITCH_BLACKS')">清理已注销狗</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="tablet_5" style="display: none;">
+                                            <table id="table_5" width="100%" border="0" align="center" cellpadding="4"
+                                                cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                                <tr>
+                                                    <th><a onclick="hint(6.1)" class="hintstyle"
+                                                            href="javascript:void(0);">猫耳FM监控开关</a>
+                                                    </th>
+                                                    <td>
+                                                        <input type="checkbox" class="check_5" id="fmon"
+                                                            onchange="show_hide(this)">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><a onclick="hint(6.2)" class="hintstyle"
+                                                            href="javascript:void(0);">监控目标<span style="color: red;"> *
+                                                            </span></a>
+                                                    </th>
+                                                    <td>
+                                                        <input type="text" class="input_ss_table" id="fmtag"
+                                                            maxlength="100" value="" autocorrect="off"
+                                                            autocapitalize="off" placeholder="猫耳uid">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>手动触发</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_FM_FANS')">单轮粉丝扫描</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>管理取关狗</th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('SEE_FM_BLACKS')">查看取关狗名单</a>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('UPD_FM_BLACKS')">清理已注销狗</a>
                                                     </td>
                                                 </tr>
                                             </table>

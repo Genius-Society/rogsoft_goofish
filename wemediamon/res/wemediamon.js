@@ -3,8 +3,9 @@ var count_down;
 var _responseLen;
 var _show_mon_log;
 
-const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion", "btskon"];
-const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinum", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck"];
+const module_count = 6;
+const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion", "btskon", "fmon"];
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinum", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck", "fmtag"];
 
 function init() {
 	show_menu(menu_hook);
@@ -67,8 +68,8 @@ function register_event() {
 }
 
 function show_hide(el) { // 各面板开关显隐连动
-	var w = $(el).attr('class').split("_")[1];
-	if (w != 5) {
+	var w = Number($(el).attr('class').split("_")[1]);
+	if (Number.isInteger(w)) {
 		$('#table_' + w + ' tr:eq(0)').nextAll('tr').toggle($('.check_' + w).is(':checked'));
 	}
 }
@@ -328,7 +329,7 @@ function menu_hook(_, _) {
 }
 
 function tabSelect(w) {
-	for (var i = 0; i < 6; i++) {
+	for (var i = 0; i < module_count; i++) {
 		$('.show-btn' + i).removeClass('active');
 		$('#tablet_' + i).hide();
 	}

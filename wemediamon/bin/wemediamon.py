@@ -1300,7 +1300,7 @@ class CnblogsMon(Monitor):
         fans = {}
         if self.check_login(False):
             response = requests.get(
-                f"https://home.{self.endpoint}/u/{self.username}/followers",
+                f"https://home.{self.endpoint}/followers",
                 headers=self.header,
             )
             response.raise_for_status()
@@ -1517,6 +1517,86 @@ class ItchMon(Monitor):
                 send_email(
                     f"{L()}{e}",
                     "[WeMediaMon 插件] itch.io 监控器触发出错",
+                    "已重试过多次",
+                )
+
+
+class MissevanMon(Monitor):
+    def __init__(self):
+        super().__init__()
+        self.endpoint = "https://www.missevan.com"
+        self.header = {"user-agent": self.ua}
+        self.uid = args.fmuid
+
+    def _list_followers(self, pn=1, ps=20):
+        response = requests.get(
+            f"{self.endpoint}/person/getuserattention",
+            params={"type": 1, "user_id": self.uid, "p": pn, "page_size": ps},
+            headers=self.header,
+        )
+        response.raise_for_status()
+        fans = response.json()["info"]["Datas"]
+        return [{fan["id"]: fan["username"]} for fan in fans]
+
+    def _compare_data(self, prev_data: dict, data: dict):
+        logs = ""
+        traitors = set()
+        diff = set(prev_data.keys()) - set(data.keys())
+        for uid in diff:
+            dog = prev_data[uid]
+            traitors.add(uid)
+            logs += f"<br><a href='{self.endpoint}/{uid}'>{dog}</a><br>"
+
+        if traitors:
+            self._add_traitors(traitors)
+            send_email(
+                f"以下猫耳FM狗取关了我:{logs}",
+                "[WeMediaMon 插件] 按罪人名单降下终末",
+                "监测到取关狗",
+            )
+
+        print(logs)
+
+    def _is_deleted(self, uid):
+        response = requests.get(f"{self.endpoint}/{uid}", headers=self.header)
+        retcode = response.status_code
+        if retcode == 200:
+            return False
+        elif retcode == 404:
+            return True
+
+        response.raise_for_status()
+
+    def upd_fans(self):
+        prev_data = {}
+        if os.path.exists(self.fans):
+            with open(self.fans, "r") as json_file:
+                prev_data = json.load(json_file)
+
+        data = self._list_followers()
+        if data == prev_data:
+            print("猫耳FM数据无变化...")
+        else:
+            self._compare_data(prev_data, data)
+            with open(self.fans, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+
+            print("猫耳FM数据已更新!")
+
+    def trigger(self, retry=3):
+        try:
+            self.upd_fans()
+
+        except Exception as e:
+            if retry > 0:
+                print(f"猫耳FM监控器触发出错: {e}, 重试中...")
+                time.sleep(random.uniform(3.5, 4.5))
+                self.trigger(retry - 1)
+
+            else:
+                send_email(
+                    f"{L()}{e}",
+                    "[WeMediaMon 插件] 猫耳FM监控器触发出错",
                     "已重试过多次",
                 )
 
