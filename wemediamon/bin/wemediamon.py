@@ -157,7 +157,8 @@ class Monitor:
         cleaned_traitors = []
         traitors = self._txt2lst()
         if not traitors:
-            raise LookupError(f"当前 {self.name} 狗库为空!")
+            print(f"当前 {self.name} 狗库为空!")
+            return
 
         for traitor in self._tqdm(traitors, desc=f"清理已失效的 {self.name} 取关狗"):
             if self._is_deleted(traitor):
@@ -1538,7 +1539,7 @@ class MissevanMon(Monitor):
         fans = response.json()["info"]["Datas"]
         followers = {}
         for fan in fans:
-            followers[fan["id"]] = fan["username"]
+            followers[str(fan["id"])] = fan["username"]
 
         return followers
 
@@ -1582,8 +1583,8 @@ class MissevanMon(Monitor):
             print("猫耳FM数据无变化...")
         else:
             self._compare_data(prev_data, data)
-            with open(self.fans, "w") as json_file:
-                json.dump(data, json_file, indent=4)
+            with open(self.fans, "w", encoding="utf-8") as json_file:
+                json.dump(data, json_file, indent=4, ensure_ascii=False)
 
             print("猫耳FM数据已更新!")
 
