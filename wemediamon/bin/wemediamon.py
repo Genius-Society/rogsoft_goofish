@@ -38,6 +38,7 @@ parser.add_argument("--papers", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
 parser.add_argument("--cnblokie", type=str, default="")
 parser.add_argument("--itck", type=str, default="")
+parser.add_argument("--fmtag", type=str, default="")
 
 # 解析命令行参数
 args = parser.parse_args()
@@ -1526,17 +1527,20 @@ class MissevanMon(Monitor):
         super().__init__()
         self.endpoint = "https://www.missevan.com"
         self.header = {"user-agent": self.ua}
-        self.uid = args.fmuid
 
-    def _list_followers(self, pn=1, ps=20):
+    def _list_followers(self, uid=args.fmtag, pn=1, ps=20):
         response = requests.get(
             f"{self.endpoint}/person/getuserattention",
-            params={"type": 1, "user_id": self.uid, "p": pn, "page_size": ps},
+            params={"type": 1, "user_id": uid, "p": pn, "page_size": ps},
             headers=self.header,
         )
         response.raise_for_status()
         fans = response.json()["info"]["Datas"]
-        return [{fan["id"]: fan["username"]} for fan in fans]
+        followers = {}
+        for fan in fans:
+            followers[fan["id"]] = fan["username"]
+
+        return followers
 
     def _compare_data(self, prev_data: dict, data: dict):
         logs = ""
@@ -1657,6 +1661,9 @@ def update():
     if args.itck:
         ItchMon().trigger()
 
+    if args.fmtag:
+        MissevanMon().trigger()
+
     drop_caches()
 
 
@@ -1728,6 +1735,12 @@ if __name__ == "__main__":
 
             case "UPD_ITCH_BLACKS":
                 ItchMon().clean_traitors()
+
+            case "UPD_FM_FANS":
+                MissevanMon().upd_fans()
+
+            case "UPD_FM_BLACKS":
+                MissevanMon().clean_traitors()
 
             case _:
                 print(f"未知指令: {args.cmd}")

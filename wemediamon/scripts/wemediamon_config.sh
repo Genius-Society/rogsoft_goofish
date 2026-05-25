@@ -91,6 +91,8 @@ load_params() {
 	wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
 	wemediamon_itchion=$(dbus get wemediamon_itchion)
 	wemediamon_itck=$(dbus get wemediamon_itck)
+	wemediamon_fmon=$(dbus get wemediamon_fmon)
+	wemediamon_fmtag=$(dbus get wemediamon_fmtag)
 }
 
 # 检查入参
@@ -112,7 +114,8 @@ check_params() {
 		[ "${wemediamon_hfmon}" != '1' ] &&
 		[ "${wemediamon_gitmon}" != '1' ] &&
 		[ "${wemediamon_cnblon}" != '1' ] &&
-		[ "${wemediamon_itchion}" != '1' ]; then
+		[ "${wemediamon_itchion}" != '1' ] &&
+		[ "${wemediamon_fmon}" != '1' ]; then
 		close_with_echo "请至少开启一个监控器!"
 	fi
 	# 检查选填入参
@@ -153,6 +156,13 @@ check_params() {
 	else
 		wemediamon_itck=''
 	fi
+	if [ "${wemediamon_fmon}" == "1" ]; then
+		if [[ -z "${wemediamon_fmtag}" ]]; then
+			close_with_echo "请输入有效猫耳uid!"
+		fi
+	else
+		wemediamon_fmtag=''
+	fi
 }
 
 # 检查运行环境
@@ -185,6 +195,7 @@ start_wemediamon() {
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
+		--fmtag "${wemediamon_fmtag}" \
 		>>/dev/null 2>&1 &
 }
 
@@ -206,7 +217,8 @@ trigger_once() {
 		--papers "${wemediamon_papers}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
-		--itck "${wemediamon_itck}"
+		--itck "${wemediamon_itck}" \
+		--fmtag "${wemediamon_fmtag}"
 }
 
 # 查看取关狗
@@ -249,6 +261,14 @@ watch_dog() {
 			awk '{print "https://itch.io/profile/" $0}' "${wemediamon_cache}/itch_blacklist.txt"
 		else
 			echo_date "当前itch.io狗库为空!"
+		fi
+		;;
+
+	SEE_FM_BLACKS)
+		if [[ -s "${wemediamon_cache}/missevan_blacklist.txt" ]]; then
+			awk '{print "https://www.missevan.com/" $0}' "${wemediamon_cache}/missevan_blacklist.txt"
+		else
+			echo_date "当前猫耳FM狗库为空!"
 		fi
 		;;
 
