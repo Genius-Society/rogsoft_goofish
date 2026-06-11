@@ -27,16 +27,5 @@ jobs:
           GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
         run: |
           python ./build.py
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Files are different, committing changes..."
-            git config --global user.name "$GIT_NAME"
-            git config --global user.email "$GIT_EMAIL"
-            git add .
-            git commit -m "Update package at $(date '+%Y-%m-%d %H:%M:%S')"
-            git push
-          else
-            echo "Files are the same, no changes."
-          fi
           VERSION=$(cat ./wemediamon/version)
-          python ./.github/delete.py --token "$GIT_TOKEN" --ver "$VERSION" 
           python ./.github/release.py --token "$GIT_TOKEN" --ver "$VERSION"
