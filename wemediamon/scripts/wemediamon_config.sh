@@ -317,19 +317,23 @@ check_proxy() {
 }
 
 update() {
+	echo_date "WeMediaMon 正在检查更新..."
 	local local_md5=$(dbus get wemediamon_md5)
-	local latest_md5=$(curl -s -H "Authorization: token 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" "https://api.github.com/repos/Genius-Society/WeMediaMon/releases/tags/1.1" | python3 -c "import sys, json; print(json.load(sys.stdin).get('body', ''))")
+	local gitoken="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"
+	local git_api="https://api.github.com/repos/Genius-Society/WeMediaMon/releases/tags/1.1"
+	local latest_md5=$(curl -s -H "Authorization: token ${gitoken}" "${git_api}" | python3 -c "import sys, json; print(json.load(sys.stdin).get('body', ''))")
 	if [ "${local_md5}" == "${latest_md5}" ]; then
 		echo_date "WeMediaMon 已是最新版本, 无需更新!"
 	else
 		local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
+		local asset_url=$(curl -s -H "Authorization: token ${gitoken}" "${git_api}" | python3 -c "import sys, json; data=json.load(sys.stdin); [print(a['url']) for a in data['assets'] if a['name']=='wemediamon.tar.gz']")
 		if [ "${status}" == "200" ]; then
-			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 -O /tmp/upload/wemediamon.tar.gz "https://github.com/Genius-Society/WeMediaMon/releases/download/1.1/wemediamon.tar.gz" 2>&1
+			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 --header="Authorization: token ${gitoken}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
 		else
-			wget --no-hsts -c -t 0 -T 30 -O /tmp/upload/wemediamon.tar.gz "https://github.com/Genius-Society/WeMediaMon/releases/download/1.1/wemediamon.tar.gz" 2>&1
+			wget --no-hsts -c -t 0 -T 30 --header="Authorization: token ${gitoken}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
 		fi
 		dbus set soft_name=wemediamon.tar.gz
-		sh /koolshare/scripts/ks_tar_install.sh >/dev/null 2>&1
+		sh /koolshare/scripts/ks_tar_install.sh 2>&1
 		echo_date "WeMediaMon 插件已更新!"
 	fi
 }

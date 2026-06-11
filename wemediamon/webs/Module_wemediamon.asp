@@ -93,12 +93,6 @@
                                         <div class="SimpleNote">
                                             <li>自媒体监控工具 WeMediaMon</li>
                                             <li style="color: #FC0;">请设置虚拟内存后再使用</li>
-                                            <div style="float: right;">
-                                                <span>
-                                                    <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                        onclick="trigger('CHK_UPD')">检查更新</a>
-                                                </span>
-                                            </div>
                                         </div>
                                         <div id="wemediamon_main">
                                             <table width="100%" border="1" align="center" cellpadding="4"
@@ -151,6 +145,10 @@
                                                         <input type="text" class="input_ss_table" id="email"
                                                             maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off">
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('CHK_UPD')">检查更新</a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
