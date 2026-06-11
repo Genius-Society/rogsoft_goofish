@@ -23,9 +23,6 @@ jobs:
       - name: Update Release
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-          GIT_NAME: ${{ secrets.GIT_NAME }}
-          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
         run: |
           python ./build.py
-          VERSION=$(cat ./wemediamon/version)
-          python ./.github/release.py --token "$GIT_TOKEN" --ver "$VERSION"
+          python ./.github/release.py --token "$GIT_TOKEN" --ver "$(cat ./wemediamon/version)"
