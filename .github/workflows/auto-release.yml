@@ -5,12 +5,43 @@ on:
     branches:
       - main
 
+  schedule:
+    - cron: "0 19 * * *" # 每天 UTC 时间 19:00 (北京时间 3:00~4:15) 触发一次
+
   workflow_dispatch: # 允许手动触发
 
 permissions:
   contents: write
 
 jobs:
+  job-on-schedule:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: 检出当前仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Step 2: 发布至 GitHub
+      - name: Check Binary Update
+        env:
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_NAME: ${{ secrets.GIT_NAME }}
+          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+        run: |
+          python ./build.py
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Files are different, committing changes..."
+            git config --global user.name "$GIT_NAME"
+            git config --global user.email "$GIT_EMAIL"
+            git add .
+            git commit -m "Upd ver at $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+            python ./.github/release.py --ver "$(cat ./*/version)" --token "$GIT_TOKEN"
+          else
+            echo "Files are the same, no changes."
+          fi
+
   job-on-push:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -23,6 +54,18 @@ jobs:
       - name: Update Release
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_NAME: ${{ secrets.GIT_NAME }}
+          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
         run: |
           python ./build.py
-          python ./.github/release.py --token "$GIT_TOKEN" --ver "$(cat ./wemediamon/version)"
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Files are different, committing changes..."
+            git config --global user.name "$GIT_NAME"
+            git config --global user.email "$GIT_EMAIL"
+            git add .
+            git commit -m "Upd ver at $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+          else
+            echo "Files are the same, no changes."
+          fi
+          python ./.github/release.py --ver "$(cat ./*/version)" --token "$GIT_TOKEN"
