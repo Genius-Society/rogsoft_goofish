@@ -7,7 +7,7 @@ import requests
 class GitHubReleaseManager:
     def __init__(self, version: str, token: str):
         self.repo = os.getenv("GITHUB_REPOSITORY")
-        self.name = self.repo.split("_")[-1].capitalize()
+        self.name = self.repo.split("/")[-1]
         self.pkg = f"{self.name.lower()}.tar.gz"
         self.endpoint = f"https://api.github.com/repos/{self.repo}"
         self.ver = version
