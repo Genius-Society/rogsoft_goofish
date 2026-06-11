@@ -121,6 +121,7 @@ chmod +x /koolshare/scripts/wemediamon_status.sh
 chmod +x /koolshare/scripts/uninstall_wemediamon.sh
 
 # 离线安装用
+dbus set wemediamon_md5="$(md5sum /tmp/wemediamon.tar.gz | awk '{print $1}')"
 dbus set wemediamon_version="$(cat $DIR/version)"
 dbus set softcenter_module_wemediamon_version="$(cat $DIR/version)"
 dbus set softcenter_module_wemediamon_description="自媒体监控工具"

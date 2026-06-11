@@ -317,7 +317,7 @@ check_proxy() {
 }
 
 update() {
-	echo_date "WeMediaMon 正在检查更新..."
+	echo_date "正在检查更新..."
 	local local_md5=$(dbus get wemediamon_md5)
 	local gitoken="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"
 	local git_api="https://api.github.com/repos/Genius-Society/WeMediaMon/releases/tags/1.1"
@@ -325,6 +325,7 @@ update() {
 	if [ "${local_md5}" == "${latest_md5}" ]; then
 		echo_date "WeMediaMon 已是最新版本, 无需更新!"
 	else
+		echo_date "发现新版本, 更新中..."
 		local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
 		local asset_url=$(curl -s -H "Authorization: token ${gitoken}" "${git_api}" | python3 -c "import sys, json; data=json.load(sys.stdin); [print(a['url']) for a in data['assets'] if a['name']=='wemediamon.tar.gz']")
 		if [ "${status}" == "200" ]; then
@@ -336,7 +337,6 @@ update() {
 		sh /koolshare/scripts/ks_tar_install.sh 2>&1
 		echo_date "WeMediaMon 插件已更新!"
 	fi
-	echo XU6J03M6
 }
 
 # 自启/重启时触发开启 WeMediaMon
