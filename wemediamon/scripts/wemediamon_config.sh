@@ -336,6 +336,7 @@ update() {
 		sh /koolshare/scripts/ks_tar_install.sh 2>&1
 		echo_date "WeMediaMon 插件已更新!"
 	fi
+	echo XU6J03M6
 }
 
 # 自启/重启时触发开启 WeMediaMon
