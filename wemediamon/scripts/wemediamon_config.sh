@@ -316,6 +316,24 @@ check_proxy() {
 	echo_date "已 ping 通, 继续执行后续命令"
 }
 
+update() {
+	local local_md5=$(dbus get wemediamon_md5)
+	local latest_md5=$(curl -s -H "Authorization: token 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" "https://api.github.com/repos/Genius-Society/WeMediaMon/releases/tags/1.1" | python3 -c "import sys, json; print(json.load(sys.stdin).get('body', ''))")
+	if [ "${local_md5}" == "${latest_md5}" ]; then
+		echo_date "WeMediaMon 已是最新版本, 无需更新!"
+	else
+		local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
+		if [ "${status}" == "200" ]; then
+			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 -O /tmp/upload/wemediamon.tar.gz "https://github.com/Genius-Society/WeMediaMon/releases/download/1.1/wemediamon.tar.gz" 2>&1
+		else
+			wget --no-hsts -c -t 0 -T 30 -O /tmp/upload/wemediamon.tar.gz "https://github.com/Genius-Society/WeMediaMon/releases/download/1.1/wemediamon.tar.gz" 2>&1
+		fi
+		dbus set soft_name=wemediamon.tar.gz
+		sh /koolshare/scripts/ks_tar_install.sh >/dev/null 2>&1
+		echo_date "WeMediaMon 插件已更新!"
+	fi
+}
+
 # 自启/重启时触发开启 WeMediaMon
 if [[ $# -eq 0 || $# -eq 1 ]]; then
 	set_lock
@@ -338,6 +356,10 @@ elif [ $# -eq 2 ]; then
 
 	FIX_ENV)
 		fix_env | tee -a $RUN_LOG
+		;;
+
+	CHK_UPD)
+		update | tee -a $RUN_LOG
 		;;
 
 	SEE_*_BLACKS)

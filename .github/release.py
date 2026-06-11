@@ -62,14 +62,14 @@ class GitHubReleaseManager:
 
         return release_url
 
-    def create_release(self, release_url: str, md5_txt="md5.txt") -> str:
+    def create_release(self, release_url: str) -> str:
         response = requests.post(
             release_url,
             headers=self.header,
             json={
                 "tag_name": self.ver,
                 "name": f"v{self.ver}",
-                "body": f"Update {self.name} binary to verion {self.ver}",
+                "body": "",
                 "draft": True,
                 "prerelease": False,
             },
@@ -87,34 +87,21 @@ class GitHubReleaseManager:
                 headers=self.headers,
                 data=f,
             )
-            md5 = hashlib.md5(f.read()).hexdigest()
-
-        if response.status_code != 201:
-            response.raise_for_status()
-
-        with open(md5_txt, "w", encoding="utf-8") as f:
-            f.write(md5)
-
-        with open(md5_txt, "rb") as f:
-            response = requests.post(
-                f"{upl_url}?name={md5_txt}",
-                headers=self.headers,
-                data=f,
-            )
+            md5sum = hashlib.md5(f.read()).hexdigest()
 
         if response.status_code == 201:
             print(f"{self.pkg} with md5 has successfully been uploaded!")
         else:
             response.raise_for_status()
 
-        return release_id
+        return release_id, md5sum
 
     def publish_release(self):
         release_url = self.clean_release()
-        release_id = self.create_release(release_url)
+        release_id, md5sum = self.create_release(release_url)
         response = requests.patch(
             f"{release_url}/{release_id}",
-            json={"draft": False},
+            json={"body": md5sum, "draft": False},
             headers=self.header,
         )
         response.raise_for_status()
