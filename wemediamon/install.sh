@@ -87,7 +87,7 @@ if [ "${MODEL}" == "TUF-AX3000" ]; then
 fi
 
 # 关闭进程
-pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
+pids=$(ps | grep 'wemediamon' | grep -v -E 'grep|install' | awk '{print $1}')
 if [ ! -z $pids ]; then
 	echo_date "关闭当前进程..."
 	for pid in $pids; do

@@ -282,7 +282,7 @@ watch_dog() {
 # 关闭监控进程
 stop() {
 	load_params
-	pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
+	pids=$(ps | grep 'wemediamon' | grep -v -E 'grep|install' | awk '{print $1}')
 	if [[ -n "$pids" ]]; then
 		echo_date "关闭监控进程..."
 		for pid in $pids; do
@@ -333,6 +333,7 @@ update() {
 		else
 			wget --no-hsts -c -t 0 -T 30 --header="Authorization: token ${gitoken}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
 		fi
+		unset_lock
 		dbus set soft_name=wemediamon.tar.gz
 		sh /koolshare/scripts/ks_tar_install.sh 2>&1
 		echo_date "WeMediaMon 插件已更新!"
