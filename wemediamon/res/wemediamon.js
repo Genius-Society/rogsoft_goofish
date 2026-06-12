@@ -341,6 +341,10 @@ function hint(itemNum) {
 	_caption = "";
 	statusmenu = "";
 	width = "350px";
+	if (itemNum == 0.0) {
+		_caption = "插件版本信息";
+		statusmenu = "点击“开发日志”按钮可查看当前插件在 GitHub 上的开发日志信息; 点击“检查更新”按钮可检查插件是否有更新, 若发现更新则自动更新插件。<br>";
+	}
 	if (itemNum == 0.1) {
 		_caption = "插件总开关";
 		statusmenu = "点击“监控日志”按钮可查看当前插件所有日志信息。<br>";

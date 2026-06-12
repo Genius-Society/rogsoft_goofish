@@ -102,6 +102,20 @@
                                                         <td colspan="2">WeMediaMon 设定</td>
                                                     </tr>
                                                 </thead>
+                                                <tr>
+                                                    <th><a onclick="hint(0.0)" class="hintstyle"
+                                                            href="javascript:void(0);">版本信息</a>
+                                                    </th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn"
+                                                            href="https://github.com/Genius-Society/WeMediaMon/releases"
+                                                            target="_blank">开发日志</a>
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('CHK_UPD')">检查更新</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                                 <tr id="switch_tr">
                                                     <th><a onclick="hint(0.1)" class="hintstyle"
                                                             href="javascript:void(0);">开关</a>
@@ -145,10 +159,6 @@
                                                         <input type="text" class="input_ss_table" id="email"
                                                             maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off">
-                                                        <div class="right_btn">
-                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="trigger('CHK_UPD')">检查更新</a>
-                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>

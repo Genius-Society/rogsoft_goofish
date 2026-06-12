@@ -335,6 +335,7 @@ update() {
 		fi
 		dbus set soft_name=wemediamon.tar.gz
 		unset_lock
+		echo_date "新插件安装中..."
 		sh /koolshare/scripts/ks_tar_install.sh >/dev/null 2>&1
 		echo_date "WeMediaMon 插件已更新!"
 	fi
