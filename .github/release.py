@@ -81,12 +81,13 @@ class GitHubReleaseManager:
         upload_url: str = response_dict["upload_url"]
         upl_url = upload_url.split("{")[0]
         with open(self.pkg, "rb") as f:
+            data = f.read()
+            md5sum = hashlib.md5(data).hexdigest()
             response = requests.post(
                 f"{upl_url}?name={self.pkg}",
                 headers=self.headers,
-                data=f,
+                data=data,
             )
-            md5sum = hashlib.md5(f.read()).hexdigest()
 
         if response.status_code == 201:
             print(f"{self.pkg} with md5 has successfully been uploaded!")
