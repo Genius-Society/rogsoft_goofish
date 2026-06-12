@@ -15,7 +15,6 @@ set_lock() {
 }
 
 unset_lock() {
-	echo XU6J03M6 | tee -a $RUN_LOG
 	flock -u 1000
 	rm -rf "${LOCK_FILE}"
 }
@@ -334,9 +333,9 @@ update() {
 		else
 			wget --no-hsts -c -t 0 -T 30 --header="Authorization: token ${gitoken}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
 		fi
-		unset_lock
 		dbus set soft_name=wemediamon.tar.gz
-		sh /koolshare/scripts/ks_tar_install.sh 2>&1
+		unset_lock
+		sh /koolshare/scripts/ks_tar_install.sh >/dev/null 2>&1
 		echo_date "WeMediaMon 插件已更新!"
 	fi
 }
@@ -380,4 +379,5 @@ elif [ $# -eq 2 ]; then
 	esac
 
 	unset_lock
+	echo XU6J03M6 | tee -a $RUN_LOG
 fi
