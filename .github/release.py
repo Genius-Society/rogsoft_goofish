@@ -62,7 +62,7 @@ class GitHubReleaseManager:
 
         return release_url
 
-    def create_release(self, release_url: str) -> str:
+    def create_release(self, release_url: str):
         response = requests.post(
             release_url,
             headers=self.header,
