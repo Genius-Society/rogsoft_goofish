@@ -1,6 +1,6 @@
 # WeMediaMon 自媒体监控插件
 [![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](./LICENSE)
-[![hf](https://img.shields.io/badge/huggingface-WeMediaTools-ffd21e.svg)](https://huggingface.co/collections/Genius-Society/wemediatools-6899cafefc947c81ff14ddde)
+[![hf](https://img.shields.io/badge/huggingface-WeMediaTools-ffd21e.svg)](https://huggingface.co/collections/kakamond/wemediatools)
 [![ms](https://img.shields.io/badge/modelscope-bili__dark__tools-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bili_dark_tools)
 
 主要用于监控自媒体粉丝动向: 取关狗死全家! 推荐B站的UP在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
@@ -71,7 +71,7 @@ python build.py
 | TUF-AX3000_V2    | 512MB | BCM6756 | armv7 |   4   | 1.7GHz  |
 | RT-AX57          | 256MB | BCM6756 | armv7 |   4   | 1.7GHz  |
 
-## 获取cookie工具
+## 获取 cookie 工具
 <https://www.modelscope.cn/studios/kakamond/cookies>
 
 ## 致谢
