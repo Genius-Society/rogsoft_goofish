@@ -15,6 +15,7 @@ set_lock() {
 }
 
 unset_lock() {
+	echo XU6J03M6 | tee -a $RUN_LOG
 	flock -u 1000
 	rm -rf "${LOCK_FILE}"
 }
@@ -282,7 +283,7 @@ watch_dog() {
 # 关闭监控进程
 stop() {
 	load_params
-	pids=$(ps | grep 'wemediamon' | grep -v -E 'grep|install' | awk '{print $1}')
+	pids=$(ps | grep "python" | grep "wemediamon.py" | awk '{print $1}')
 	if [[ -n "$pids" ]]; then
 		echo_date "关闭监控进程..."
 		for pid in $pids; do
@@ -378,6 +379,5 @@ elif [ $# -eq 2 ]; then
 
 	esac
 
-	echo XU6J03M6 | tee -a $RUN_LOG
 	unset_lock
 fi
