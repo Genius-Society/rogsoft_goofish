@@ -78,7 +78,6 @@ class GitHubReleaseManager:
             response.raise_for_status()
         # Get upload URL
         response_dict: dict = response.json()
-        release_id = response_dict["id"]
         upload_url: str = response_dict["upload_url"]
         upl_url = upload_url.split("{")[0]
         with open(self.pkg, "rb") as f:
@@ -94,7 +93,7 @@ class GitHubReleaseManager:
         else:
             response.raise_for_status()
 
-        return release_id, md5sum
+        return response_dict["id"], md5sum
 
     def publish_release(self):
         release_url = self.clean_release()
