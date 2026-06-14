@@ -266,7 +266,7 @@ function trigger(cmd) {
 			data: JSON.stringify(postData),
 			dataType: "json",
 			success: function (_) {
-				get_run_log(cmd != "WEB_SUBMIT");
+				get_run_log(!(cmd == "WEB_SUBMIT" || cmd == "CHK_UPD"));
 				E("apply").disabled = false;
 			}
 		});
