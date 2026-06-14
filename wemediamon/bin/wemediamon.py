@@ -33,8 +33,7 @@ parser.add_argument("--smtp", type=str, required=True)
 parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--btskon", type=str, default="0")
-parser.add_argument("--hftks", type=str, default="")
-parser.add_argument("--papers", type=str, default="")
+parser.add_argument("--hftags", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
 parser.add_argument("--cnblokie", type=str, default="")
 parser.add_argument("--itck", type=str, default="")
@@ -650,7 +649,7 @@ class BiliMon(Monitor):
 
 class HFMon(Monitor):
     class HfApi:
-        def __init__(self, token: str = None, user_agent: str = None, proxy=None):
+        def __init__(self, user_agent: str = None, proxy=None, token: str = None):
             self.endpoint = "https://huggingface.co/api"
             self.ua = user_agent
             self.proxy = proxy
@@ -750,53 +749,21 @@ class HFMon(Monitor):
     def __init__(self):
         super().__init__()
         self.endpoint = "https://huggingface.co"
-        self.papers = str(args.papers).replace(" ", "").split(";")
+        self.header = {"User-Agent": self.ua}
         self.api = self.HfApi(user_agent=self.ua, proxy=self.proxy)
-        self.targets = self._parse_tags(args.hftks)
+        self._parse_tags(args.hftags)
 
-    def _headers(self, token=None):
-        if token:
-            return {"User-Agent": self.ua, "Authorization": f"Bearer {token}"}
-        else:
-            return {"User-Agent": self.ua}
-
-    def _parse_tags(self, hftks: str):
-        tags = {}
-        tokens = hftks.replace(" ", "").split(";")
-        for tk in tokens:
-            tags[tk] = [self.api.whoami(token=tk)["name"]]
-            orgs = self.api.list_user_orgs(tags[tk][0])
-            for org in orgs:
-                tags[tk] += [org["name"]]
-
-        return tags
-
-    def _move_repo(self, from_repo, to_repo, token, type="space", retry=3):
-        try:
-            response = requests.post(
-                f"{self.endpoint}/api/repos/move",
-                headers=self._headers(token),
-                json={
-                    "fromRepo": from_repo,
-                    "toRepo": to_repo,
-                    "type": type,
-                },
-                proxies=self.proxy,
-            )
-            response.raise_for_status()
-
-        except Exception as e:
-            if retry > 0:
-                print(f"抱脸空间重命名出错: {e}, 重试中...")
-                time.sleep(random.uniform(3.5, 4.5))
-                self._move_repo(from_repo, to_repo, token, type, retry - 1)
-
+    def _parse_tags(self, hftags: str):
+        tags = hftags.replace(" ", "").split(";")
+        self.papers, self.users, self.orgs = [], [], []
+        for tag in tags:
+            if "." in tag:
+                self.papers.append(tag)
             else:
-                send_email(
-                    f"{L()}{e}",
-                    "[WeMediaMon 插件] 抱脸空间重命名出错",
-                    "已重试过多次",
-                )
+                self.users.append(tag)
+                orgs = self.api.list_user_orgs(tag)
+                for org in orgs:
+                    self.orgs.append(org["name"])
 
     def _get_followers(self, tag_type: str, tag: str):
         fans = self.api.list_followers(tag_type, tag)
@@ -882,79 +849,27 @@ class HFMon(Monitor):
 
     def _get_latest_data(self):
         data = {}
-        for token in self.targets:
-            admin = self.targets[token][0]
-            data[admin] = self._get_followers("user", admin)
-            repos = self._list_repos(admin)
-            for repo in self._tqdm(repos, desc=f"分析 {self.name} 用户 {admin} 仓库中"):
+        for user in self.users:
+            data[user] = self._get_followers("user", user)
+            repos = self._list_repos(user)
+            for repo in self._tqdm(repos, desc=f"分析 {self.name} 用户 {user} 仓库中"):
                 data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
-            if len(self.targets[token]) > 1:
-                orgs = self.targets[token][1:]
-                for org in orgs:
-                    data[org] = self._get_followers("organization", org)
-                    repos = self._list_repos(org)
-                    for repo in self._tqdm(
-                        repos,
-                        desc=f"分析 {self.name} 组织 {org} 仓库中",
-                    ):
-                        data[self._mapo(repo)] = self._list_repo_stargazers(repo)
+        for org in self.orgs:
+            data[org] = self._get_followers("organization", org)
+            repos = self._list_repos(org)
+            for repo in self._tqdm(repos, desc=f"分析 {self.name} 组织 {org} 仓库中"):
+                data[self._mapo(repo)] = self._list_repo_stargazers(repo)
 
         for paper in self.papers:
             data[f"papers/{paper}"] = self._list_upvoters("paper", paper)
 
         return data
 
-    def _activate_space(self, space_id: str, token: str):
-        try:
-            status = self.api.get_space_runtime(space_id, token)["stage"]
-            requirestart = (status == "SLEEPING") or ("ERROR" in status)
-            static = self.api.space_info(space_id, token)["sdk"] == "static"
-            if requirestart or (static and status == "RUNNING"):
-                response = requests.get(
-                    f"https://{space_id.replace('/', '-').replace('_', '-').lower()}.{'static.' if static else ''}hf.space",
-                    headers=self._headers(token),
-                )
-                response.raise_for_status()
-                if static and response.text.strip() == "This Space has been paused.":
-                    send_email(
-                        f"{L()}激活 {space_id} 出错: {response.text}",
-                        "[WeMediaMon 插件] 抱脸空间激活出错",
-                        "请手动修复空间",
-                    )
-                    requirestart = False
-
-        except Exception as e:
-            if (
-                ("403 " in f"{e}")
-                or ("412 " in f"{e}")
-                or ("500 " in f"{e}")
-                or ("503 " in f"{e}")
-            ):
-                tmp_repo = f"{space_id}_{int(time.time())}"
-                self._move_repo(space_id, tmp_repo, token)
-                time.sleep(random.uniform(3, 5))
-                self._move_repo(tmp_repo, space_id, token)
-                requirestart = True
-
-            else:
-                print(f"访问 {space_id} 出错: {e}, 已排除 403/412/500/503 网络错误")
-                requirestart = False
-
-        return f"{space_id} " if requirestart else ""
-
-    def _activate_spaces(self, name: str, token: str):
-        logs = ""
-        spaces = self.api.list_spaces(name, token)
-        for space in self._tqdm(spaces, desc=f"筛选激活 {name} 的抱脸空间"):
-            logs += self._activate_space(space["id"], token)
-
-        return logs
-
     def _is_deleted(self, uid):
         response = requests.get(
             f"{self.endpoint}/api/users/{uid}/overview",
-            headers=self._headers(),
+            headers=self.header,
             proxies=self.proxy,
         )
         retcode = response.status_code
@@ -964,18 +879,6 @@ class HFMon(Monitor):
             return True
 
         response.raise_for_status()
-
-    def activate(self):
-        logs = ""
-        for token in self.targets:
-            names = self.targets[token]
-            admin = names[0]
-            print(f"处理 {admin} 管理的抱脸空间...")
-            for name in names:
-                logs += self._activate_spaces(name, token)
-
-        if logs:
-            print(f"抱脸空间 {logs}激活完成!")
 
     def upd_fans(self):
         prev_data, data = {}, {}
@@ -995,7 +898,6 @@ class HFMon(Monitor):
 
     def trigger(self, retry=3):
         try:
-            self.activate()
             self.upd_fans()
 
         except Exception as e:
@@ -1650,7 +1552,7 @@ def update():
     if args.bilick:
         BiliMon().trigger()
 
-    if args.hftks:
+    if args.hftags:
         HFMon().trigger()
 
     if args.gitags:
@@ -1706,9 +1608,6 @@ if __name__ == "__main__":
 
             case "UPD_HF_FANS":
                 HFMon().upd_fans()
-
-            case "ACTIVATE_HF_REPOS":
-                HFMon().activate()
 
             case "UPD_HF_BLACKS":
                 HFMon().clean_traitors()

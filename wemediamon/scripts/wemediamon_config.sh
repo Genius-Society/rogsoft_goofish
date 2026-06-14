@@ -83,8 +83,7 @@ load_params() {
 	wemediamon_bilick=$(dbus get wemediamon_bilick)
 	wemediamon_btskon=$(dbus get wemediamon_btskon)
 	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
-	wemediamon_hftks=$(dbus get wemediamon_hftks)
-	wemediamon_papers=$(dbus get wemediamon_papers)
+	wemediamon_hftags=$(dbus get wemediamon_hftags)
 	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
 	wemediamon_gitags=$(dbus get wemediamon_gitags)
 	wemediamon_cnblon=$(dbus get wemediamon_cnblon)
@@ -128,12 +127,11 @@ check_params() {
 		wemediamon_btskon='0'
 	fi
 	if [ "${wemediamon_hfmon}" == "1" ]; then
-		if [[ -z "${wemediamon_hftks}" ]]; then
-			close_with_echo "请输入有效抱脸Token!"
+		if [[ -z "${wemediamon_hftags}" ]]; then
+			close_with_echo "请输入有效抱脸监控目标!"
 		fi
 	else
-		wemediamon_hftks=''
-		wemediamon_papers=''
+		wemediamon_hftags=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
 		if [[ -z "${wemediamon_gitags}" ]]; then
@@ -190,8 +188,7 @@ start_wemediamon() {
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
 		--btskon "${wemediamon_btskon}" \
-		--hftks "${wemediamon_hftks}" \
-		--papers "${wemediamon_papers}" \
+		--hftags "${wemediamon_hftags}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
@@ -213,8 +210,7 @@ trigger_once() {
 		--cache "${wemediamon_cache}" \
 		--bilick "${wemediamon_bilick}" \
 		--btskon "${wemediamon_btskon}" \
-		--hftks "${wemediamon_hftks}" \
-		--papers "${wemediamon_papers}" \
+		--hftags "${wemediamon_hftags}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \

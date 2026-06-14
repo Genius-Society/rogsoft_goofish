@@ -5,7 +5,7 @@ var _show_mon_log;
 
 const module_count = 6;
 const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion", "btskon", "fmon"];
-const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinum", "bcoinat", "hftks", "papers", "gitags", "cnblokie", "itck", "fmtag"];
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinum", "bcoinat", "hftags", "gitags", "cnblokie", "itck", "fmtag"];
 
 function init() {
 	show_menu(menu_hook);
@@ -394,19 +394,15 @@ function hint(itemNum) {
 		statusmenu = "选中后为打开状态, 且后续隐藏折叠内容会自动显示。<br>";
 	}
 	else if (itemNum == 2.2) {
-		_caption = "HuggingFace 组织管理员账号的 Token 密钥令牌";
-		statusmenu = "登录状态下可在 https://huggingface.co/settings/tokens 页面创建, 创建时一定要勾选个人和被管理组织的 Repositories 权限, 若填写多个账号 Token 需以;隔开。<br>";
-	}
-	else if (itemNum == 2.3) {
-		_caption = "HuggingFace 上被监控的 arXiv 论文编号";
-		statusmenu = "格式为 XXXX.XXXXX, 若填写多个需以;隔开。<br>";
+		_caption = "被监控的 HuggingFace 用户名或 arXiv 论文编号";
+		statusmenu = "多个用户名或 arXiv 论文编号需以;隔开。<br>";
 	}
 	else if (itemNum == 3.1) {
 		_caption = "GitHub 自媒体面板总开关";
 		statusmenu = "选中后为打开状态, 且后续隐藏折叠内容会自动显示。<br>";
 	}
 	else if (itemNum == 3.2) {
-		_caption = "被监控的 GitHub 用户名";
+		_caption = "被监控的 GitHub 用户名/仓库";
 		statusmenu = "多个'用户名'或'用户名/仓库名'(可共存)需以;隔开。<br>";
 	}
 	else if (itemNum == 4.1) {

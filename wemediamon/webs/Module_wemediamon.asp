@@ -312,28 +312,16 @@
                                                 </tr>
                                                 <tr>
                                                     <th><a onclick="hint(2.2)" class="hintstyle"
-                                                            href="javascript:void(0);">Token(s)<span
-                                                                style="color: red;"> *
+                                                            href="javascript:void(0);">监控目标<span style="color: red;"> *
                                                             </span></a>
                                                     </th>
                                                     <td>
-                                                        <input type="password" class="input_ss_table" id="hftks"
+                                                        <input type="password" class="input_ss_table" id="hftags"
                                                             maxlength="100" value="" autocorrect="off"
                                                             autocapitalize="off" readonly
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            placeholder="若多个则用;隔开">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><a onclick="hint(2.3)" class="hintstyle"
-                                                            href="javascript:void(0);">监控论文<span style="color: red;"> *
-                                                            </span></a>
-                                                    </th>
-                                                    <td>
-                                                        <input type="text" class="input_ss_table" id="papers"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off" placeholder="若多个则用;隔开">
+                                                            placeholder="target1;target2;...">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -341,8 +329,6 @@
                                                     <td>
                                                         <a type="button" class="ks_btn" href="javascript:void(0);"
                                                             onclick="trigger('UPD_HF_FANS')">单轮粉丝扫描</a>
-                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                            onclick="trigger('ACTIVATE_HF_REPOS')">单轮激活空间</a>
                                                     </td>
                                                 </tr>
                                                 <tr>
