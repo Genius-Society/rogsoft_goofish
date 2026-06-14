@@ -708,6 +708,33 @@ class HFMon(Monitor):
         def get_user_overview(self, username: str):
             return self._get(f"{self.endpoint}/users/{username}/overview")
 
+        def whatami(self, target: str, retry=3):
+            if "." in target:
+                return "paper"
+
+            try:
+                response = requests.get(
+                    f"{self.endpoint}/organizations/{target}/overview",
+                    headers=self.header,
+                    proxies=self.proxy,
+                )
+                retcode = response.status_code
+                if retcode == 200:
+                    return "organization"
+                elif retcode == 404:
+                    return "user"
+
+                response.raise_for_status()
+
+            except Exception as e:
+                if retry > 0:
+                    print(f"调用 HfApi.whatami 失败: {e}, 重试中...")
+                    time.sleep(random.uniform(14.5, 15))
+                    return self.whatami(target, retry - 1)
+
+                else:
+                    raise ConnectionError(f"{L()}调用 HfApi.whatami 失败过多次: {e}")
+
         def whoami(self, token: str = None):
             header = {"user-agent": self.ua}
             if token:
@@ -744,7 +771,7 @@ class HFMon(Monitor):
                     return self._get(url, headers, params, retry - 1)
 
                 else:
-                    raise ConnectionError(f"{L()}调用 HfApi 失败过多次!")
+                    raise ConnectionError(f"{L()}调用 HfApi 失败过多次: {e}")
 
     def __init__(self):
         super().__init__()
@@ -757,8 +784,11 @@ class HFMon(Monitor):
         tags = hftags.replace(" ", "").split(";")
         self.papers, self.users, self.orgs = [], [], []
         for tag in tags:
-            if "." in tag:
+            tag_type = self.api.whatami(tag)
+            if tag_type == "paper":
                 self.papers.append(tag)
+            elif tag_type == "organization":
+                self.orgs.append(tag)
             else:
                 self.users.append(tag)
                 orgs = self.api.list_user_orgs(tag)
