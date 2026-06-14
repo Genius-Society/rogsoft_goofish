@@ -1540,6 +1540,7 @@ class MissevanMon(Monitor):
 
 def check_ss_ver(
     url="https://raw.githubusercontent.com/hq450/fancyss/3.0/packages/version.json.js",
+    proxy=None,
 ):
     try:
         loc_ver = subprocess.run(
@@ -1549,7 +1550,7 @@ def check_ss_ver(
             check=True,
         ).stdout.strip()
 
-        response = requests.get(url)
+        response = requests.get(url, proxies=proxy)
         response.raise_for_status()
         txt = response.text.strip()
         data: dict = json.loads(txt)
@@ -1561,9 +1562,12 @@ def check_ss_ver(
                 "[WeMediaMon 插件] 发现ss版本更新",
                 "请手动升级",
             )
+        else:
+            print("ss 无需更新!")
 
     except Exception as e:
-        send_email(f"{L()}{e}", "[WeMediaMon 插件] 检查ss版本出错", "请手动排查")
+        print(f"检查ss版本出错: {e}, 使用代理重试...")
+        check_ss_ver(url, Monitor().proxy)
 
 
 def drop_caches(value=1, cache="/proc/sys/vm/drop_caches"):
