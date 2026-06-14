@@ -38,6 +38,8 @@ class HFActivator:
 
         if activated_spaces:
             print(", ".join(activated_spaces) + " activated!")
+        else:
+            print("No sleeping space found...")
 
 
 if __name__ == "__main__":
