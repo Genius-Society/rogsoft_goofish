@@ -1,4 +1,5 @@
 import argparse
+from tqdm import tqdm
 from huggingface_hub import HfApi
 
 
@@ -15,26 +16,26 @@ class HFActivator:
 
         return names
 
-    def _list_slept_spaces(self, token: str):
-        slept_spaces = []
+    def _list_sleeping_spaces(self, token: str):
+        sleeping_spaces = []
         authors = self._parse_authors(token)
         for author in authors:
             spaces = self.api.list_spaces(author=author, token=token)
-            for space in spaces:
+            for space in tqdm(spaces, desc=f"Filtering {author} spaces"):
                 space_stage = self.api.get_space_runtime(space.id, token=token).stage
                 if space.sdk == "gradio" and space_stage == "SLEEPING":
-                    slept_spaces.append(space.id)
+                    sleeping_spaces.append(space.id)
 
-        return slept_spaces
+        return sleeping_spaces
 
     def _activate_spaces(self):
         activated_spaces = []
         for token in self.tokens:
-            slept_spaces = self._list_slept_spaces(token)
-            for space_id in slept_spaces:
+            sleeping_spaces = self._list_sleeping_spaces(token)
+            for space_id in sleeping_spaces:
                 self.api.restart_space(space_id, token=token)
 
-            activated_spaces += slept_spaces
+            activated_spaces += sleeping_spaces
 
         if activated_spaces:
             print(", ".join(activated_spaces) + " activated!")
