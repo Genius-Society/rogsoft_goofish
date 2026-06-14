@@ -7,6 +7,9 @@ on:
 
   workflow_dispatch: # 允许手动触发
 
+  schedule:
+    - cron: "0 */2 * * *"
+
 permissions:
   contents: write
 
@@ -26,3 +29,19 @@ jobs:
         run: |
           python ./build.py
           python ./.github/release.py --ver "$(cat ./*/version)" --token "$GIT_TOKEN"
+
+  job-on-schedule:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: 检出当前仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Step 2: 激活 HuggingFace Spaces
+      - name: Activate HF Spaces
+        env:
+          HF_TOKENS: ${{ secrets.HF_TOKENS }}
+        run: |
+          pip install huggingface_hub
+          python ./.github/activate.py --tokens "$HF_TOKENS"
