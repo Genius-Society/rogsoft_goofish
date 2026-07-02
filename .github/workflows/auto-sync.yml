@@ -44,7 +44,7 @@ jobs:
           pip install huggingface_hub
           python ./.github/activate.py --tokens "$HF_TOKENS"
       # Step 3: 检查活跃度防 CI 休眠
-      - name: Activate HF Spaces
+      - name: Keep GitHub actions active
         run: |
           last_commit_ts=$(git log -1 --format=%ct 2>/dev/null)
           now_ts=$(date +%s)
@@ -53,5 +53,5 @@ jobs:
             git commit --allow-empty -m "chore: keep repo active [skip ci]"
             git push origin HEAD:main
           else
-            echo "Last activity at $last_commit_ts"
+            echo "Last activity at $(date -d "@$last_commit_ts" '+%Y-%m-%d %H:%M:%S')"
           fi
