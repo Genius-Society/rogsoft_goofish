@@ -1,4 +1,6 @@
 import os
+import time
+import random
 import hashlib
 import argparse
 import requests
@@ -105,10 +107,28 @@ class GitHubReleaseManager:
         response.raise_for_status()
         print(f"🎉 {self.name} release has been published!")
 
+    def check_release(self, tag="1.1"):
+        try:
+            response = requests.get(
+                f"{self.endpoint}/releases/tags/{tag}",
+                headers={"Authorization": f"token {self.token}"},
+            )
+            response.raise_for_status()
+            return True
+
+        except Exception:
+            return False
+
+    def release(self):
+        self.publish_release()
+        while not self.check_release():
+            self.publish_release()
+            time.sleep(random.randint(3, 7))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Auto GitHub release")
     parser.add_argument("--ver", required=True, help="Release version")
     parser.add_argument("--token", required=True, help="Your GitHub Access Token")
     args = parser.parse_args()
-    GitHubReleaseManager(args.ver, args.token).publish_release()
+    GitHubReleaseManager(args.ver, args.token).release()
