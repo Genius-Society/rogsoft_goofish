@@ -1349,7 +1349,7 @@ class ItchMon(Monitor):
             "accept-language": "zh-CN,zh;q=0.9",
             "connection": "keep-alive",
             "cookie": args.itck,
-            "host": "itch.io",
+            "host": self.endpoint,
             "referer": f"https://{self.endpoint}/dashboard",
             "user-agent": self.ua,
         }
@@ -1368,7 +1368,7 @@ class ItchMon(Monitor):
                 fans[uid] = username
 
         else:
-            raise PermissionError("itch.io登录状态失效, 请更新cookie!")
+            raise PermissionError(f"{self.endpoint}登录状态失效, 请更新cookie!")
 
         return fans
 
@@ -1384,7 +1384,7 @@ class ItchMon(Monitor):
         if traitors:
             self._add_traitors(traitors)
             send_email(
-                f"以下itch.io狗取关了我:{logs}",
+                f"以下 {self.endpoint} 狗取关了我:{logs}",
                 "[WeMediaMon 插件] 按罪人名单降下终末",
                 "监测到取关狗",
             )
@@ -1413,11 +1413,11 @@ class ItchMon(Monitor):
         )
         response.raise_for_status()
         if response.history:
-            print("未登录 itch.io")
+            print(f"未登录 {self.endpoint}")
             return False, ""
 
         if log:
-            print("已登录 itch.io")
+            print(f"已登录 {self.endpoint}")
 
         return True, response.text
 
@@ -1429,13 +1429,13 @@ class ItchMon(Monitor):
 
         data = self._list_followers()
         if data == prev_data:
-            print("itch.io 数据无变化...")
+            print(f"{self.endpoint} 数据无变化...")
         else:
             self._compare_data(prev_data, data)
             with open(self.fans, "w") as json_file:
                 json.dump(data, json_file, indent=4)
 
-            print("itch.io 数据已更新!")
+            print(f"{self.endpoint} 数据已更新!")
 
     def trigger(self, retry=15):
         try:
@@ -1443,14 +1443,14 @@ class ItchMon(Monitor):
 
         except Exception as e:
             if retry > 0:
-                print(f"itch.io 监控器触发出错: {e}, 重试中...")
+                print(f"{self.endpoint} 监控器触发出错: {e}, 重试中...")
                 time.sleep(random.randint(5, 10))
                 self.trigger(retry - 1)
 
             else:
                 send_email(
                     f"{L()}{e}",
-                    "[WeMediaMon 插件] itch.io 监控器触发出错",
+                    f"[WeMediaMon 插件] {self.endpoint} 监控器触发出错",
                     "已重试过多次",
                 )
 
@@ -1586,12 +1586,6 @@ def update():
     if args.bilick:
         BiliMon().trigger()
 
-    if args.hftags:
-        HFMon().trigger()
-
-    if args.gitags:
-        GitHubMon().trigger()
-
     if args.cnblokie:
         CnblogsMon().trigger()
 
@@ -1600,6 +1594,12 @@ def update():
 
     if args.fmtag:
         MissevanMon().trigger()
+
+    if args.gitags:
+        GitHubMon().trigger()
+
+    if args.hftags:
+        HFMon().trigger()
 
     drop_caches()
 
