@@ -107,10 +107,10 @@ class GitHubReleaseManager:
         response.raise_for_status()
         print(f"🎉 {self.name} release has been published!")
 
-    def check_release(self, tag="1.1"):
+    def check_release(self):
         try:
             response = requests.get(
-                f"{self.endpoint}/releases/tags/{tag}",
+                f"{self.endpoint}/releases/tags/{self.ver}",
                 headers={"Authorization": f"token {self.token}"},
             )
             response.raise_for_status()
