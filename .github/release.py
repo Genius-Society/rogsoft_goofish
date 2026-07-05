@@ -21,8 +21,7 @@ class GitHubReleaseManager:
             "Content-Type": "application/octet-stream",
         }
 
-    def clean_release(self) -> str:
-        # 1. 先判断 tag 是否存在
+    def clean_release(self) -> str:  # 1. 先判断 tag 是否存在
         release_url = f"{self.endpoint}/releases"
         tag_url = f"{self.endpoint}/git/refs/tags/{self.ver}"
         response = requests.get(tag_url, headers=self.header)
@@ -30,8 +29,7 @@ class GitHubReleaseManager:
             print(f"Tag {self.ver} not found, nothing to delete.")
             return release_url
 
-        response.raise_for_status()
-        # 2. 判断 release 是否存在
+        response.raise_for_status()  # 2. 判断 release 是否存在
         response = requests.get(release_url, headers=self.header)
         response.raise_for_status()
         tag_release = None
