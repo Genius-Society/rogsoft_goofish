@@ -132,8 +132,11 @@ class Monitor:
         kwargs.setdefault("ascii", False)
         return tqdm(*args, **kwargs)
 
-    def latest_chrome_ver(self):
-        response = requests.get("https://googlechromelabs.github.io/chrome-for-testing")
+    def latest_chrome_ver(
+        self,
+        url="https://googlechromelabs.github.io/chrome-for-testing",
+    ):
+        response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         stable_th = soup.find("a", href="#stable")
