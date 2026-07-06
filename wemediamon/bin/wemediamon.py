@@ -118,7 +118,6 @@ def send_email(
 
 class Monitor:
     def __init__(self):
-        self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
         self.proxy = {
             "http": "http://127.0.0.1:23456",
             "https": "http://127.0.0.1:23456",
@@ -127,10 +126,29 @@ class Monitor:
         self.name = self.__class__.__name__.lower().replace("mon", "")
         self.fans = f"{self.cache}/{self.name}_followers.json"
         self.blacks = f"{self.cache}/{self.name}_blacklist.txt"
+        self.ua = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{self.latest_chrome_ver()}.0.0.0 Safari/537.36"
 
     def _tqdm(self, *args, **kwargs):  # 强制使用 Unicode 样式
         kwargs.setdefault("ascii", False)
         return tqdm(*args, **kwargs)
+
+    def latest_chrome_ver(self):
+        response = requests.get("https://googlechromelabs.github.io/chrome-for-testing")
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        stable_th = soup.find("a", href="#stable")
+        if not stable_th:
+            raise LookupError("th not found!")
+        # 找到该 <th> 所在的 <tr>
+        tr = stable_th.find_parent("tr")
+        if not tr:
+            raise LookupError("tr not found!")
+        # 在该 <tr> 中获取第一个 <code> 的内容
+        code = tr.find("code")
+        if code:
+            return code.get_text(strip=True).split(".")[0]
+
+        raise LookupError("code not found!")
 
     def _txt2lst(self):
         if not os.path.exists(self.blacks):
@@ -1586,14 +1604,14 @@ def update():
     if args.bilick:
         BiliMon().trigger()
 
+    if args.fmtag:
+        MissevanMon().trigger()
+
     if args.cnblokie:
         CnblogsMon().trigger()
 
     if args.itck:
         ItchMon().trigger()
-
-    if args.fmtag:
-        MissevanMon().trigger()
 
     if args.gitags:
         GitHubMon().trigger()
