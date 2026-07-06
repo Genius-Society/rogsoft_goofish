@@ -23,11 +23,9 @@ jobs:
         uses: actions/checkout@v5
       # Step 2: 发布至 GitHub
       - name: Update Release
-        env:
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
           python ./build.py
-          python ./.github/release.py --ver "$(cat ./*/version)" --token "$GIT_TOKEN"
+          python ./.github/release.py --ver "$(cat ./*/version)" --token "${{ secrets.GIT_TOKEN }}"
 
   job-on-schedule:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -38,11 +36,9 @@ jobs:
         uses: actions/checkout@v5
       # Step 2: 激活 HuggingFace Spaces
       - name: Activate HF Spaces
-        env:
-          HF_TOKENS: ${{ secrets.HF_TOKENS }}
         run: |
           pip install huggingface_hub
-          python ./.github/activate.py --tokens "$HF_TOKENS"
+          python ./.github/activate.py --tokens "${{ secrets.HF_TOKENS }}"
       # Step 3: 检查活跃度防 CI 休眠
       - name: Keep GitHub actions active
         run: |
@@ -50,6 +46,8 @@ jobs:
           now_ts=$(date +%s)
           diff_days=$(((now_ts - last_commit_ts) / 86400))
           if [ $diff_days -gt 58 ]; then
+            git config --global user.name "${{ secrets.GIT_NAME }}"
+            git config --global user.email "${{ secrets.GIT_EMAIL }}"
             git commit --allow-empty -m "chore: keep repo active [skip ci]"
             git push origin HEAD:main
           else
