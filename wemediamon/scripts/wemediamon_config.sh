@@ -85,6 +85,7 @@ load_params() {
 	wemediamon_hfmon=$(dbus get wemediamon_hfmon)
 	wemediamon_hftags=$(dbus get wemediamon_hftags)
 	wemediamon_gitmon=$(dbus get wemediamon_gitmon)
+	wemediamon_gitk=$(dbus get wemediamon_gitk)
 	wemediamon_gitags=$(dbus get wemediamon_gitags)
 	wemediamon_cnblon=$(dbus get wemediamon_cnblon)
 	wemediamon_cnblokie=$(dbus get wemediamon_cnblokie)
@@ -134,10 +135,14 @@ check_params() {
 		wemediamon_hftags=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
+		if [[ -z "${wemediamon_gitk}" ]]; then
+			close_with_echo "请输入有效GitHub密钥!"
+		fi
 		if [[ -z "${wemediamon_gitags}" ]]; then
 			close_with_echo "请输入有效GitHub目标列表!"
 		fi
 	else
+		wemediamon_gitk=''
 		wemediamon_gitags=''
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then
@@ -189,6 +194,7 @@ start_wemediamon() {
 		--bilick "${wemediamon_bilick}" \
 		--btskon "${wemediamon_btskon}" \
 		--hftags "${wemediamon_hftags}" \
+		--gitk "${wemediamon_gitk}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
@@ -211,6 +217,7 @@ trigger_once() {
 		--bilick "${wemediamon_bilick}" \
 		--btskon "${wemediamon_btskon}" \
 		--hftags "${wemediamon_hftags}" \
+		--gitk "${wemediamon_gitk}" \
 		--gitags "${wemediamon_gitags}" \
 		--cnblokie "${wemediamon_cnblokie}" \
 		--itck "${wemediamon_itck}" \
@@ -315,19 +322,18 @@ check_proxy() {
 update() {
 	echo_date "正在检查更新..."
 	local local_md5=$(dbus get wemediamon_md5)
-	local gitoken="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"
 	local git_api="https://api.github.com/repos/Genius-Society/WeMediaMon/releases/tags/1.1"
-	local latest_md5=$(curl -s -H "Authorization: token ${gitoken}" "${git_api}" | python3 -c "import sys, json; print(json.load(sys.stdin).get('body', ''))")
+	local latest_md5=$(curl -s -H "Authorization: token ${wemediamon_gitk}" "${git_api}" | python3 -c "import sys, json; print(json.load(sys.stdin).get('body', ''))")
 	if [ "${local_md5}" == "${latest_md5}" ]; then
 		echo_date "WeMediaMon 已是最新版本, 无需更新!"
 	else
 		echo_date "发现新版本, 更新中..."
 		local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
-		local asset_url=$(curl -s -H "Authorization: token ${gitoken}" "${git_api}" | python3 -c "import sys, json; data=json.load(sys.stdin); [print(a['url']) for a in data['assets'] if a['name']=='wemediamon.tar.gz']")
+		local asset_url=$(curl -s -H "Authorization: token ${wemediamon_gitk}" "${git_api}" | python3 -c "import sys, json; data=json.load(sys.stdin); [print(a['url']) for a in data['assets'] if a['name']=='wemediamon.tar.gz']")
 		if [ "${status}" == "200" ]; then
-			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 --header="Authorization: token ${gitoken}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
+			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 --header="Authorization: token ${wemediamon_gitk}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
 		else
-			wget --no-hsts -c -t 0 -T 30 --header="Authorization: token ${gitoken}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
+			wget --no-hsts -c -t 0 -T 30 --header="Authorization: token ${wemediamon_gitk}" --header="Accept: application/octet-stream" -O /tmp/upload/wemediamon.tar.gz "${asset_url}" 2>&1
 		fi
 		dbus set soft_name=wemediamon.tar.gz
 		unset_lock

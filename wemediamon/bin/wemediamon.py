@@ -34,6 +34,7 @@ parser.add_argument("--cache", type=str, required=True)
 parser.add_argument("--bilick", type=str, default="")
 parser.add_argument("--btskon", type=str, default="0")
 parser.add_argument("--hftags", type=str, default="")
+parser.add_argument("--gitk", type=str, default="")
 parser.add_argument("--gitags", type=str, default="")
 parser.add_argument("--cnblokie", type=str, default="")
 parser.add_argument("--itck", type=str, default="")
@@ -970,7 +971,7 @@ class GitHubMon(Monitor):
         super().__init__()
         self.endpoint = "github.com"
         self.tags = str(args.gitags).split(";")
-        self.header = {"user-agent": self.ua}
+        self.header = {"user-agent": self.ua, "Authorization": f"token {args.gitk}"}
         self.whites = self._get_whitelist(f"{self.cache}/{self.name}_whitelist.txt")
 
     def _get_tag_type(self, name: str):

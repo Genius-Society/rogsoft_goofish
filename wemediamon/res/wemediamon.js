@@ -5,7 +5,7 @@ var _show_mon_log;
 
 const module_count = 6;
 const chks = ["bilimon", "hfmon", "gitmon", "cnblon", "itchion", "btskon", "fmon"];
-const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinum", "bcoinat", "hftags", "gitags", "cnblokie", "itck", "fmtag"];
+const keys = ["email", "smtp", "cache", "period", "bilick", "btskat", "bcoinum", "bcoinat", "hftags", "gitk", "gitags", "cnblokie", "itck", "fmtag"];
 
 function init() {
 	show_menu(menu_hook);
@@ -397,9 +397,13 @@ function hint(itemNum) {
 		_caption = "被监控的 HuggingFace 用户名或 arXiv 论文编号";
 		statusmenu = "多个用户名或 arXiv 论文编号需以;隔开。<br>";
 	}
-	else if (itemNum == 3.1) {
+	else if (itemNum == 3.0) {
 		_caption = "GitHub 自媒体面板总开关";
 		statusmenu = "选中后为打开状态, 且后续隐藏折叠内容会自动显示。<br>";
+	}
+	else if (itemNum == 3.1) {
+		_caption = "GitHub 私人密钥";
+		statusmenu = "必填项, 请在登录状态下访问 https://github.com/settings/tokens 生成 Personal access tokens (classic) 获取。<br>";
 	}
 	else if (itemNum == 3.2) {
 		_caption = "被监控的 GitHub 用户名/仓库";

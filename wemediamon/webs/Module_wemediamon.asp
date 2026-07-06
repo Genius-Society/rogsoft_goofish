@@ -346,12 +346,26 @@
                                             <table id="table_2" width="100%" border="0" align="center" cellpadding="4"
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
-                                                    <th><a onclick="hint(3.1)" class="hintstyle"
+                                                    <th><a onclick="hint(3.0)" class="hintstyle"
                                                             href="javascript:void(0);">GitHub监控开关</a>
                                                     </th>
                                                     <td>
                                                         <input type="checkbox" class="check_2" id="gitmon"
                                                             onchange="show_hide(this)">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><a onclick="hint(3.1)" class="hintstyle"
+                                                            href="javascript:void(0);">Token<span style="color: red;"> *
+                                                            </span></a>
+                                                    </th>
+                                                    <td>
+                                                        <input type="password" class="input_ss_table" id="gitk"
+                                                            maxlength="100" value="" autocorrect="off"
+                                                            autocapitalize="off" readonly
+                                                            onblur="switchType(this, false);"
+                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
+                                                            placeholder="Personal access tokens (classic)">
                                                     </td>
                                                 </tr>
                                                 <tr>
