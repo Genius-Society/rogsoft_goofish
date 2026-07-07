@@ -70,7 +70,7 @@ function register_event() {
 function show_hide(el) { // 各面板开关显隐连动
 	var w = Number($(el).attr('class').split("_")[1]);
 	if (Number.isInteger(w)) {
-		$('#table_' + w + ' tr:eq(0)').nextAll('tr').toggle($('.check_' + w).is(':checked'));
+		$('#table_' + w + ' tr:eq(' + Number(w == 2) + ')').nextAll('tr').toggle($('.check_' + w).is(':checked'));
 	}
 }
 
@@ -398,12 +398,12 @@ function hint(itemNum) {
 		statusmenu = "多个用户名或 arXiv 论文编号需以;隔开。<br>";
 	}
 	else if (itemNum == 3.0) {
-		_caption = "GitHub 自媒体面板总开关";
-		statusmenu = "选中后为打开状态, 且后续隐藏折叠内容会自动显示。<br>";
-	}
-	else if (itemNum == 3.1) {
 		_caption = "GitHub 私人密钥";
 		statusmenu = "必填项, 请在登录状态下访问 https://github.com/settings/tokens 生成 Personal access tokens (classic) 获取。<br>";
+	}
+	else if (itemNum == 3.1) {
+		_caption = "GitHub 自媒体面板总开关";
+		statusmenu = "选中后为打开状态, 且后续隐藏折叠内容会自动显示。<br>";
 	}
 	else if (itemNum == 3.2) {
 		_caption = "被监控的 GitHub 用户名/仓库";

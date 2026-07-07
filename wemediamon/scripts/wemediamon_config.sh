@@ -110,6 +110,9 @@ check_params() {
 	if [ -z "${wemediamon_cache}" ]; then
 		close_with_echo "请输入有效缓存路径!"
 	fi
+	if [[ -z "${wemediamon_gitk}" ]]; then
+		close_with_echo "请输入有效GitHub密钥!"
+	fi
 	if [ "${wemediamon_bilimon}" != '1' ] &&
 		[ "${wemediamon_hfmon}" != '1' ] &&
 		[ "${wemediamon_gitmon}" != '1' ] &&
@@ -135,14 +138,10 @@ check_params() {
 		wemediamon_hftags=''
 	fi
 	if [ "${wemediamon_gitmon}" == "1" ]; then
-		if [[ -z "${wemediamon_gitk}" ]]; then
-			close_with_echo "请输入有效GitHub密钥!"
-		fi
 		if [[ -z "${wemediamon_gitags}" ]]; then
 			close_with_echo "请输入有效GitHub目标列表!"
 		fi
 	else
-		wemediamon_gitk=''
 		wemediamon_gitags=''
 	fi
 	if [ "${wemediamon_cnblon}" == "1" ]; then

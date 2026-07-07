@@ -227,12 +227,12 @@
                                             <table width="100%" height="37px">
                                                 <tr>
                                                     <td cellpadding="0" cellspacing="0" border="1" bordercolor="#222">
-                                                        <input onclick="tabSelect(0)" class="show-btn0 active"
-                                                            type="button" value="bilibili" />
+                                                        <input onclick="tabSelect(2)" class="show-btn2 active"
+                                                            type="button" value="GitHub" />
+                                                        <input onclick="tabSelect(0)" class="show-btn0" type="button"
+                                                            value="bilibili" />
                                                         <input onclick="tabSelect(1)" class="show-btn1" type="button"
                                                             value="HuggingFace" />
-                                                        <input onclick="tabSelect(2)" class="show-btn2" type="button"
-                                                            value="GitHub" />
                                                         <input onclick="tabSelect(3)" class="show-btn3" type="button"
                                                             value="cnblogs" />
                                                         <input onclick="tabSelect(4)" class="show-btn4" type="button"
@@ -347,15 +347,6 @@
                                                 cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
                                                     <th><a onclick="hint(3.0)" class="hintstyle"
-                                                            href="javascript:void(0);">GitHub监控开关</a>
-                                                    </th>
-                                                    <td>
-                                                        <input type="checkbox" class="check_2" id="gitmon"
-                                                            onchange="show_hide(this)">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th><a onclick="hint(3.1)" class="hintstyle"
                                                             href="javascript:void(0);">Token<span style="color: red;"> *
                                                             </span></a>
                                                     </th>
@@ -366,6 +357,15 @@
                                                             onblur="switchType(this, false);"
                                                             onfocus="switchType(this, true);this.removeAttribute('readonly');"
                                                             placeholder="Personal access tokens (classic)">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><a onclick="hint(3.1)" class="hintstyle"
+                                                            href="javascript:void(0);">GitHub监控开关</a>
+                                                    </th>
+                                                    <td>
+                                                        <input type="checkbox" class="check_2" id="gitmon"
+                                                            onchange="show_hide(this)">
                                                     </td>
                                                 </tr>
                                                 <tr>
