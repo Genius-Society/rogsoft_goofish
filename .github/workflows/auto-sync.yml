@@ -23,9 +23,13 @@ jobs:
         uses: actions/checkout@v5
       # Step 2: 发布至 GitHub
       - name: Update Release
+        env:
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          BASE_URL: ${{ secrets.BASE_URL }}
         run: |
           python ./build.py
-          python ./.github/release.py --ver "$(cat ./*/version)" --token "${{ secrets.GIT_TOKEN }}"
+          wget --header="Authorization: token $GIT_TOKEN" $BASE_URL/release.py
+          python ./release.py --ver "$(cat ./*/version)" --token "$GIT_TOKEN"
 
   job-on-schedule:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
