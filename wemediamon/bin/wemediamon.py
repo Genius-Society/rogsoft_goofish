@@ -133,26 +133,10 @@ class Monitor:
         kwargs.setdefault("ascii", False)
         return tqdm(*args, **kwargs)
 
-    def latest_chrome_ver(
-        self,
-        url="https://googlechromelabs.github.io/chrome-for-testing",
-    ):
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-        stable_th = soup.find("a", href="#stable")
-        if not stable_th:
-            raise LookupError("th not found!")
-        # 找到该 <th> 所在的 <tr>
-        tr = stable_th.find_parent("tr")
-        if not tr:
-            raise LookupError("tr not found!")
-        # 在该 <tr> 中获取第一个 <code> 的内容
-        code = tr.find("code")
-        if code:
-            return code.get_text(strip=True).split(".")[0]
-
-        raise LookupError("code not found!")
+    def latest_chrome_ver(self):
+        return requests.get(
+            "https://www.modelscope.cn/models/Genius-Society/latest_mirrors/resolve/master/chrome/version"
+        ).text.split(".")[0]
 
     def _txt2lst(self):
         if not os.path.exists(self.blacks):
