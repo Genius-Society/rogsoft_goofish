@@ -9,6 +9,7 @@ import argparse
 import requests
 import schedule
 import subprocess
+import chrome_version
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -127,16 +128,11 @@ class Monitor:
         self.name = self.__class__.__name__.lower().replace("mon", "")
         self.fans = f"{self.cache}/{self.name}_followers.json"
         self.blacks = f"{self.cache}/{self.name}_blacklist.txt"
-        self.ua = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{self.latest_chrome_ver()}.0.0.0 Safari/537.36"
+        self.ua = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version.get_chrome_version().split('.')[0]}.0.0.0 Safari/537.36"
 
     def _tqdm(self, *args, **kwargs):  # 强制使用 Unicode 样式
         kwargs.setdefault("ascii", False)
         return tqdm(*args, **kwargs)
-
-    def latest_chrome_ver(self):
-        return requests.get(
-            "https://www.modelscope.cn/models/Genius-Society/latest_mirrors/resolve/master/chrome/version"
-        ).text.split(".")[0]
 
     def _txt2lst(self):
         if not os.path.exists(self.blacks):

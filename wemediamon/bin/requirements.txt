@@ -1,3 +1,4 @@
 bilibili-api-python==16.3
+chrome-version
 requests
 schedule
