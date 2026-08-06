@@ -1,5 +1,6 @@
 # WeMediaMon 自媒体监控插件
 [![license](https://img.shields.io/badge/license-Apache--2.0-99c711)](./LICENSE)
+[![Auto Sync](https://github.com/Genius-Society/WeMediaMon/actions/workflows/auto-sync.yml/badge.svg)](https://github.com/Genius-Society/WeMediaMon/actions/workflows/auto-sync.yml)
 [![hf](https://img.shields.io/badge/huggingface-WeMediaTools-ffd21e.svg)](https://huggingface.co/collections/kakamond/wemediatools)
 [![ms](https://img.shields.io/badge/modelscope-bili__dark__tools-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bili_dark_tools)
 
