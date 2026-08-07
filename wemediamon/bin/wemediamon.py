@@ -12,7 +12,6 @@ import subprocess
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from datetime import datetime
-from get_chrome_driver import GetChromeDriver
 from email.header import Header
 from email.mime.text import MIMEText
 from bilibili_api import (
@@ -128,7 +127,16 @@ class Monitor:
         self.name = self.__class__.__name__.lower().replace("mon", "")
         self.fans = f"{self.cache}/{self.name}_followers.json"
         self.blacks = f"{self.cache}/{self.name}_blacklist.txt"
-        self.ua = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{GetChromeDriver().stable_version().split('.')[0]}.0.0.0 Safari/537.36"
+        self.ua = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{self._latest_chrome_ver()} Safari/537.36"
+
+    def _latest_chrome_ver(self, stable=True):
+        ver: str = requests.get("https://pypi.org/pypi/chromedriver-py/json").json()[
+            "info"
+        ]["version"]
+        if stable:
+            ver = ver.split(".")[0] + ".0.0.0"
+
+        return ver
 
     def _tqdm(self, *args, **kwargs):  # 强制使用 Unicode 样式
         kwargs.setdefault("ascii", False)
