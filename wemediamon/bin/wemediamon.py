@@ -130,9 +130,9 @@ class Monitor:
         self.ua = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{self._latest_chrome_ver()} Safari/537.36"
 
     def _latest_chrome_ver(self, stable=True):
-        ver: str = requests.get("https://pypi.org/pypi/chromedriver-py/json").json()[
-            "info"
-        ]["version"]
+        ver: str = requests.get(
+            "https://modelscope.cn/models/Genius-Society/syncers/resolve/master/chrome/version"
+        ).text.strip()
         if stable:
             ver = ver.split(".")[0] + ".0.0.0"
 
