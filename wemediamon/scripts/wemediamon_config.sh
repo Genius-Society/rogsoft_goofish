@@ -353,6 +353,13 @@ if [[ $# -eq 0 || $# -eq 1 ]]; then
 	unset_lock
 # 网页传参命令触发
 elif [ $# -eq 2 ]; then
+	if [ "$2" = "FORCE_STOP" ]; then
+		http_response "$1"
+		stop >/dev/null 2>&1
+		echo XU6J03M6
+		exit 0
+	fi
+
 	set_lock
 	true >$RUN_LOG
 	http_response "$1"

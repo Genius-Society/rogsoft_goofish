@@ -143,7 +143,10 @@
                                                     <th><a onclick="hint(0.2)" class="hintstyle"
                                                             href="javascript:void(0);">运行状态</a>
                                                     </th>
-                                                    <td><span id="status"></span>
+                                                    <td>
+                                                        <a type="button" id="kill" class="ks_btn"
+                                                            href="javascript:void(0);" onclick="kill()">强制结束</a>
+                                                        <span id="status"></span>
                                                         <div id="status_container">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
                                                                 onclick="get_run_log(1)">执行日志</a>

@@ -159,13 +159,17 @@ function get_status() {
 		dataType: "json",
 		success: function (response) {
 			if (response.result) {
+				E("kill").style.display = "none";
 				E("status").innerHTML = response.result;
 				setTimeout("get_status();", 5000);
+			} else {
+				E("kill").style.display = "unset";
 			}
 		},
 		error: function (xhr) {
 			console.log(xhr)
 			setTimeout("get_status();", 15000);
+			E("kill").style.display = "unset";
 		}
 	});
 }
@@ -271,6 +275,31 @@ function trigger(cmd) {
 			}
 		});
 	}
+}
+
+function kill() {
+	var id = parseInt(Math.random() * 100000000);
+	var postData = {
+		"id": id,
+		"method": "wemediamon_config.sh",
+		"params": ["FORCE_STOP"],
+		"fields": {}
+	};
+	$.ajax({
+		type: "POST",
+		url: "/_api/",
+		data: JSON.stringify(postData),
+		dataType: "json",
+		success: function (resp) {
+			E("apply").disabled = false;
+			console.log("FORCE_STOP done:", resp);
+			setTimeout("get_status();", 1000);// 只做静默刷新，不弹日志窗
+		},
+		error: function (err) {
+			E("apply").disabled = false;
+			console.log("FORCE_STOP failed:", err);
+		}
+	});
 }
 
 function showWBLoadingBar() {

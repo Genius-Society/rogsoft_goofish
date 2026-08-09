@@ -244,3 +244,7 @@ input[type="time"] {
 	float: right;
 	margin-right: 5px;
 }
+
+#kill {
+	display: none;
+}
