@@ -4,7 +4,7 @@
 [![hf](https://img.shields.io/badge/huggingface-WeMediaTools-ffd21e.svg)](https://huggingface.co/collections/kakamond/wemediatools)
 [![ms](https://img.shields.io/badge/modelscope-bili__dark__tools-624aff.svg)](https://www.modelscope.cn/studios/kakamond/bili_dark_tools)
 
-主要用于监控自媒体粉丝动向: 取关狗死全家! 推荐B站的UP在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
+主要用于监控自媒体粉丝动向: 取关狗死全家! 推荐各位B站的UP主在1K粉以内时就开始使用本插件, 这样能不放过任何一条取关狗
 
 <a href="https://github.com/Genius-Society/wemediamon" target="_blank">
     <img src="./wemediamon/res/icon-wemediamon.png" style="width: 160px;">
@@ -33,10 +33,11 @@ python build.py
 ## 依赖项
 | 前置插件 (安装顺序自上而下) | 安装来源                                                                                           | 备注                                     |
 | :-------------------------- | :------------------------------------------------------------------------------------------------- | :--------------------------------------- |
-| USB2JFFS                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |
-| 虚拟内存                    | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |
-| Entware                     | [KoolCenter 软件中心](http://192.168.50.1/Module_Softcenter.asp)                                   | 安装后需挂载                             |
+| USB2JFFS                    | [KoolCenter 软件中心](http://router.asus.com/Module_Softcenter.asp)                                | 安装后需挂载                             |
+| 虚拟内存                    | [KoolCenter 软件中心](http://router.asus.com/Module_Softcenter.asp)                                | 安装后需挂载                             |
+| Entware                     | [KoolCenter 软件中心](http://router.asus.com/Module_Softcenter.asp)                                | 安装后需挂载                             |
 | 科学上网                    | [GitHub](https://github.com/hq450/fancyss?tab=readme-ov-file#%E6%8F%92%E4%BB%B6%E4%B8%8B%E8%BD%BD) | 推荐下载 lite 版 tar.gz 包并离线安装开启 |
+| ROG 工具箱                  | [KoolCenter 软件中心](http://router.asus.com/Module_Softcenter.asp)                                | 可选安装                                 |
 
 ## 机型支持
 在 asuswrt 为基础的固件上, WeMediaMon 插件目前仅支持 aarch64 架构的路由器, 具体如下:
@@ -72,8 +73,8 @@ python build.py
 | TUF-AX3000_V2    | 512MB | BCM6756 | armv7 |   4   | 1.7GHz  |
 | RT-AX57          | 256MB | BCM6756 | armv7 |   4   | 1.7GHz  |
 
-## 获取 cookie 工具
-<https://www.modelscope.cn/studios/kakamond/cookies>
+## 自建科学上网节点推荐
+<https://github.com/Genius-Society/edt>
 
 ## 致谢
 - <https://github.com/koolshare/rogsoft>
