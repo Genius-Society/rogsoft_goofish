@@ -1576,8 +1576,15 @@ def check_ss_ver(
             print("ss 无需更新!")
 
     except Exception as e:
-        print(f"检查ss版本出错: {e}, 使用代理重试...")
-        check_ss_ver(url, Monitor().proxy)
+        if proxy:
+            send_email(
+                f"{L()}{e}",
+                "[WeMediaMon 插件] 检查ss版本出错",
+                "已重试过多次",
+            )
+        else:
+            print(f"检查ss版本出错: {e}, 使用代理重试...")
+            check_ss_ver(url, Monitor().proxy)
 
 
 def drop_caches(value=1, cache="/proc/sys/vm/drop_caches"):
