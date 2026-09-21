@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
+from real_useragent import UserAgent
 from bilibili_api import (
     ResponseCodeException,
     Credential,
@@ -185,7 +186,9 @@ class BiliMon(Monitor):
         self.endpoint = "bilibili.com"
         self._parse_cookie(args.bilick)
         self._upd_ck(self.credential)
-        self.header = {"User-Agent": self.ua, "Cookie": self.ck}
+
+    def _header(self):
+        return {"User-Agent": UserAgent().random_useragent(), "Cookie": self.ck}
 
     def _parse_cookie(self, ck: str):
         self.uid = ck.split("DedeUserID=")[1].split(";")[0]
@@ -218,7 +221,7 @@ class BiliMon(Monitor):
         try:
             response = requests.get(
                 f"https://api.{self.endpoint}/x/relation/followers?vmid={self.uid}&pn={pn}",
-                headers=self.header,
+                headers=self._header(),
             )  # 使用 requests 库下载 JSON 数据
             response.raise_for_status()  # 检查是否成功获取数据
             json_data = response.json()  # 使用 json 库解析 JSON 数据
@@ -238,7 +241,7 @@ class BiliMon(Monitor):
         except requests.exceptions.RequestException as e:
             if retry > 0:
                 print(f"获取B站粉丝失败: {e}, 重试中...")
-                time.sleep(random.uniform(4.5, 5))
+                time.sleep(random.uniform(4.5, 5) * (4 - retry))
                 return self._get_fans(pn, retry - 1)
 
             else:
@@ -351,7 +354,7 @@ class BiliMon(Monitor):
 
         response = requests.get(
             f"https://api.{self.endpoint}/x/v3/fav/folder/created/list-all?up_mid={uid}",
-            headers=self.header,
+            headers=self._header(),
         )
         response.raise_for_status()
         return response.json()["data"]["list"]
@@ -362,7 +365,7 @@ class BiliMon(Monitor):
         response = requests.get(
             f"https://api.{self.endpoint}/x/v3/fav/folder/collected/list",
             params={"pn": pn, "ps": step, "up_mid": uid, "platform": "web"},
-            headers=self.header,
+            headers=self._header(),
         ).json()
         if response["code"] != 0:
             raise ConnectionError(L() + response["message"])
@@ -403,7 +406,7 @@ class BiliMon(Monitor):
                     "platform": "web",
                     "csrf": self.bili_jct,
                 },
-                headers=self.header,
+                headers=self._header(),
             ).json()["code"]
             == 0
         )
@@ -413,7 +416,7 @@ class BiliMon(Monitor):
         response = requests.post(
             f"https://api.{self.endpoint}/x/v3/fav/folder/unfav",
             data={"media_id": media_id, "csrf": self.bili_jct},
-            headers=self.header,
+            headers=self._header(),
         )
         response.raise_for_status()
         return response.json()["code"] == 0
@@ -425,7 +428,7 @@ class BiliMon(Monitor):
                 "request_cnt": 1,
                 "from_region": region,  # 知识区
             },
-            headers=self.header,
+            headers=self._header(),
         )
         response.raise_for_status()
         return response.json()["data"]["archives"][0]["bvid"]
@@ -436,7 +439,7 @@ class BiliMon(Monitor):
 
         response = requests.get(
             f"https://api.{self.endpoint}/x/member/web/exp/reward",
-            headers=self.header,
+            headers=self._header(),
         )
         response.raise_for_status()
         data = response.json()["data"]
@@ -452,7 +455,7 @@ class BiliMon(Monitor):
         time.sleep(random.uniform(3, 3.5))
         response = requests.post(
             f"https://api.{self.endpoint}/x/click-interface/web/heartbeat",
-            headers=self.header,
+            headers=self._header(),
             data={
                 "bvid": self._rand_video(),
                 "played_time": random.randint(10, 90),
@@ -527,7 +530,7 @@ class BiliMon(Monitor):
     def check_login(self):
         response = requests.get(
             f"https://api.{self.endpoint}/x/web-interface/nav",
-            headers=self.header,
+            headers=self._header(),
         )
         response.raise_for_status()
         isLogin = response.json()["data"]["isLogin"]
