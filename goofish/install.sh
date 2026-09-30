@@ -58,12 +58,17 @@ install_env() {
 	export npm_config_cache=$HOME/.npm
 	export npm_config_prefix=$HOME/.npm-global
 	export PATH=$HOME/.npm-global/bin:/opt/bin:/opt/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+	export NODE_OPTIONS="--max-old-space-size=256"
 	mkdir -p $HOME/.npm $HOME/.npm-global
 	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 	opkg update
 	opkg install python3-pip node node-npm
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-	npm install -g pnpm --ignore-scripts --no-audit --no-fund
+	if [ ! -x /opt/bin/pnpm ]; then
+		npm install -g pnpm
+	else
+		echo_date "pnpm 已安装, 跳过安装!"
+	fi
 	local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
 	if [ "${status}" == "200" ]; then
 		wget -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 -P $HOME https://github.com/Mxucc/xianyu-super-butler/archive/refs/heads/main.zip

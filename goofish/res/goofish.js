@@ -2,10 +2,7 @@ var refresh_flag;
 var count_down;
 var _responseLen;
 var _show_mon_log;
-
-const module_count = 6;
-const chks = [];
-const keys = ["pass", "cache"];
+const keys = ["pass"];
 
 function init() {
 	show_menu(menu_hook);
@@ -36,19 +33,6 @@ function load_cfg(obj) { // 加载配置
 	keys.forEach(k => {
 		if (k in obj) $(`#${k}`).val(obj[k]);
 	});
-	chks.forEach(k => {
-		if (k in obj) $(`#${k}`).prop('checked', obj[k] == "on").trigger('change');
-	});
-}
-
-function export_cfg() { // 导出配置
-	const data = {};
-	for (const k of keys) data[k] = $(`#${k}`).val();
-	for (const k of chks) data[k] = $(`#${k}`).val();
-	const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-	const url = URL.createObjectURL(blob);
-	$('<a>').attr({ href: url, download: 'goofish_cfg.json' }).appendTo('body')[0].click();
-	URL.revokeObjectURL(url);
 }
 
 function register_event() {
@@ -67,38 +51,11 @@ function register_event() {
 	});
 }
 
-function show_hide(el) { // 各面板开关显隐连动
-	var w = Number($(el).attr('class').split("_")[1]);
-	if (Number.isInteger(w)) {
-		$('#table_' + w + ' tr:eq(' + Number(w == 2) + ')').nextAll('tr').toggle($('.check_' + w).is(':checked'));
-	}
-}
-
-function filter_bili_ck(cookie) {
-	let ck = cookie.trim();
-	if (!ck) return "";
-	const keepKeys = ["DedeUserID", "SESSDATA", "bili_jct", "buvid3"];
-	const map = {};
-	ck.split(";").forEach(item => {
-		let [key, value] = item.trim().split("=");
-		if (keepKeys.includes(key) && value) {
-			map[key] = value;
-		}
-	});
-	return keepKeys
-		.filter(k => map[k])
-		.map(k => `${k}=${map[k]}`)
-		.join("; ");
-}
-
 function conf2obj() { // dbus 变量转控件值 
 	$('input[type="checkbox"][id]').each(function (_, el) {
 		var id = $(el).attr("id");
 		if (id && dbus["goofish_" + id]) {
 			E(id).checked = (dbus["goofish_" + id] == "1");
-		}
-		if ($(el).attr("onchange")) {
-			show_hide(el);
 		}
 	});
 
@@ -355,15 +312,6 @@ function hide_log_pannel() {
 function menu_hook(_, _) {
 	tabtitle[tabtitle.length - 1] = new Array("", "goofish");
 	tablink[tablink.length - 1] = new Array("", "Module_goofish.asp");
-}
-
-function tabSelect(w) {
-	for (var i = 0; i < module_count; i++) {
-		$('.show-btn' + i).removeClass('active');
-		$('#tablet_' + i).hide();
-	}
-	$('.show-btn' + w).addClass('active');
-	$('#tablet_' + w).show();
 }
 
 function hint(itemNum) {

@@ -18,7 +18,7 @@
 
 ## 📸 界面预览
 
-### 插件图标
+### 插件图标 ICO
 
 ![](./goofish/res/icon-goofish.png)
 
@@ -117,13 +117,17 @@
 ---
 
 ## 🏗️ 技术栈
+**插件：** HTML · CSS · JavaScript · jQuery · Shell · Python 3.11
+
 **后端：** FastAPI · Python 3.11+ · SQLite · Playwright · WebSocket · Asyncio
+
 **前端：** React 18 · TypeScript · Vite · Tailwind CSS · Framer Motion · Zustand
+
 **性能优化：** 浏览器实例池 · 并发处理 · 智能缓存
 
 ---
 
-## 💻 开发
+## 💻 开发维护
 ### 代码下载
 ```bash
 git clone git@github.com:Genius-Society/rogsoft_goofish.git

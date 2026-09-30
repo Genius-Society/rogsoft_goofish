@@ -43,18 +43,6 @@ a:focus {
 	border-width: 0.5px;
 }
 
-#bilick,
-#cnblokie,
-#itck {
-	-webkit-text-security: disc;
-}
-
-#bilick:focus,
-#cnblokie:focus,
-#itck:focus {
-	-webkit-text-security: none;
-}
-
 input[type="checkbox"] {
 	vertical-align: middle;
 }
@@ -161,19 +149,6 @@ input[type="checkbox"] {
 	display: none;
 }
 
-#period {
-	width: 62px;
-}
-
-#bcoinum {
-	width: max-content;
-}
-
-#btskon,
-.biliauto {
-	float: inline-start;
-}
-
 #tablets table {
 	margin: 10px 0px 0px 0px;
 	border-collapse: collapse;
@@ -181,13 +156,6 @@ input[type="checkbox"] {
 
 #tablets td {
 	padding: 0;
-}
-
-#bilick,
-#cnblokie,
-#itck {
-	width: 453px;
-	height: auto;
 }
 
 input[type="password"],
