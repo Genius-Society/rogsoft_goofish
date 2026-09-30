@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta HTTP-EQUIV="Pragma" CONTENT="no-cache" />
+    <meta HTTP-EQUIV="Expires" CONTENT="-1" />
+    <link rel="shortcut icon" href="images/favicon.png" />
+    <title>软件中心 - goofish</title>
+    <link rel="stylesheet" type="text/css" href="index_style.css" />
+    <link rel="stylesheet" type="text/css" href="form_style.css" />
+    <link rel="stylesheet" type="text/css" href="css/element.css" />
+    <link rel="stylesheet" type="text/css" href="res/softcenter.css" />
+    <link rel="stylesheet" type="text/css" href="res/goofish.css" />
+    <link rel="stylesheet" type="text/css" href="res/layer/theme/default/layer.css" />
+    <script language="JavaScript" type="text/javascript" src="js/jquery.js"></script>
+    <script language="JavaScript" type="text/javascript" src="res/softcenter.js"></script>
+    <script language="JavaScript" type="text/javascript" src="state.js"></script>
+    <script language="JavaScript" type="text/javascript" src="popup.js"></script>
+    <script language="JavaScript" type="text/javascript" src="help.js"></script>
+    <script language="JavaScript" type="text/javascript" src="general.js"></script>
+    <script language="JavaScript" type="text/javascript" src="res/goofish.js"></script>
+</head>
+
+<body onload="init();">
+    <div id="TopBanner"></div>
+    <div id="Loading" class="popup_bg"></div>
+    <div id="LoadingBar" class="popup_bar_bg_ks">
+        <table cellpadding="5" cellspacing="0" id="loadingBarBlock" class="loadingBarBlock" align="center">
+            <tr>
+                <td height="100">
+                    <div id="loading_block_title"></div>
+                    <div id="loading_block_spilt" class="loading_block_spilt"></div>
+                    <div id="log_container">
+                        <textarea cols="50" rows="25" wrap="soft" readonly="readonly" id="run_log_content"
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                    </div>
+                    <div id="ok_button" class="apply_gen">
+                        <input id="ok_btn" class="button_gen" type="button" onclick="hideWBLoadingBar()" value="确定">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="log_pannel_div" class="popup_bar_bg_ks">
+        <table cellpadding="5" cellspacing="0" id="log_pannel_table" class="loadingBarBlock" align="center">
+            <tr>
+                <td height="100">
+                    <div id="log_info">goofish监控信息</div>
+                    <div style="margin-left:15px">🗒️<i id="log_pannel_title">此处展示goofish程序的监控日志...</i></div>
+                    <div id="running_log">
+                        <textarea cols="50" rows="32" wrap="soft" readonly="readonly" id="log_content"
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                    </div>
+                    <div id="mon_ok_button" class="apply_gen">
+                        <input class="button_gen" type="button" onclick="hide_log_pannel()" value="返回主界面">
+                        <input type="checkbox" class="stop_log">
+                        <lable>&nbsp;暂停日志刷新</lable>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table class="content" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="17">&nbsp;</td>
+            <td valign="top" width="202">
+                <div id="mainMenu"></div>
+                <div id="subMenu"></div>
+            </td>
+            <td valign="top">
+                <div id="tabMenu" class="submenuBlock"></div>
+                <table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="left" valign="top">
+                            <table width="760px" border="0" cellpadding="5" cellspacing="0" bordercolor="#6b8fa3"
+                                class="FormTitle" id="FormTitle">
+                                <tr>
+                                    <td bgcolor="#4D595D" colspan="3" valign="top">
+                                        <div>&nbsp;</div>
+                                        <div class="formfonttitle">Goofish<lable id="goofish_version">
+                                                <lable>
+                                        </div>
+                                        <div id="return_center">
+                                            <img id="return_btn" onclick="reload_Soft_Center();" align="right"
+                                                title="返回软件中心" src="images/backprev.png"
+                                                onMouseOver="this.src='/images/backprevclick.png'"
+                                                onMouseOut="this.src='/images/backprev.png'">
+                                        </div>
+                                        <div class="splitLine"></div>
+                                        <div class="SimpleNote">
+                                            <li>闲鱼超级管家 goofish</li>
+                                            <li style="color: #FC0;">请设置虚拟内存后再使用</li>
+                                        </div>
+                                        <div id="goofish_main">
+                                            <table width="100%" border="1" align="center" cellpadding="4"
+                                                cellspacing="0" class="FormTable">
+                                                <thead>
+                                                    <tr>
+                                                        <td colspan="2">goofish 设定</td>
+                                                    </tr>
+                                                </thead>
+                                                <tr>
+                                                    <th><a onclick="hint(1)" class="hintstyle"
+                                                            href="javascript:void(0);">版本信息</a>
+                                                    </th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                            onclick="trigger('CHK_UPD')">检查更新</a>
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn"
+                                                                href="https://github.com/Genius-Society/rogsoft_goofish/releases"
+                                                                target="_blank">开发日志</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr id="switch_tr">
+                                                    <th><a onclick="hint(2)" class="hintstyle"
+                                                            href="javascript:void(0);">开关</a>
+                                                    </th>
+                                                    <td colspan="2">
+                                                        <div class="switch_field">
+                                                            <label for="enable">
+                                                                <input id="enable" class="switch" type="checkbox">
+                                                                <div class="switch_container">
+                                                                    <div class="switch_bar"></div>
+                                                                    <div class="switch_circle transition_style">
+                                                                        <div></div>
+                                                                    </div>
+                                                                </div>
+                                                            </label>
+                                                        </div>
+                                                        <div id="switch_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="show_mon_log()"
+                                                                style="margin-left:5px">监控日志</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><a onclick="hint(3)" class="hintstyle"
+                                                            href="javascript:void(0);">运行状态</a>
+                                                    </th>
+                                                    <td>
+                                                        <a type="button" id="kill" class="ks_btn"
+                                                            href="javascript:void(0);" onclick="kill()">强制结束</a>
+                                                        <span id="status"></span>
+                                                        <div id="status_container">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="get_run_log(1)">执行日志</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><a onclick="hint(4)" class="hintstyle"
+                                                            href="javascript:void(0);">管理员密码<span style="color: red;">
+                                                                * </span></a>
+                                                    </th>
+                                                    <td>
+                                                        <input type="password" class="input_ss_table" id="pass"
+                                                            maxlength="100" value="" autocorrect="off"
+                                                            autocapitalize="off" readonly
+                                                            onblur="switchType(this, false);"
+                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
+                                                            value="">
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('RESET_PASS')">密码重置</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><a onclick="hint(5)" class="hintstyle"
+                                                            href="javascript:void(0);">控制台</a>
+                                                    </th>
+                                                    <td>
+                                                        <a type="button" class="ks_btn"
+                                                            href="http://router.asus.com:8080"
+                                                            target="_blank">访问闲鱼面板</a>
+                                                        <div class="right_btn">
+                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
+                                                                onclick="trigger('FIX_ENV')">环境修复</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="apply_gen">
+                                            <input class="button_gen" id="apply" onclick="trigger('WEB_SUBMIT')"
+                                                type="button" value="提交" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="10" align="center" valign="top"></td>
+        </tr>
+    </table>
+    <div id="footer"></div>
+</body>
+
+</html>

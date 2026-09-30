@@ -1,0 +1,31 @@
+name: Auto Sync
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch: # 允许手动触发
+
+  schedule:
+    - cron: "30 */1 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: 检出当前仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      # Step 2: 发布至 GitHub
+      - name: Update Release
+        env:
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+        run: |
+          python ./build.py
+          wget --header="Authorization: token $GIT_TOKEN" $BASE_URL/release.py
+          python ./release.py --ver "$(cat ./*/version)" --token "$GIT_TOKEN"

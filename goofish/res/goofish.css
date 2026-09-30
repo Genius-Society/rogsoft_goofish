@@ -1,0 +1,250 @@
+a:focus {
+	outline: none;
+}
+
+.FormTitle i {
+	color: #ff002f;
+	font-style: normal;
+}
+
+.SimpleNote {
+	padding: 5px 15px;
+}
+
+.popup_bar_bg_ks {
+	position: fixed;
+	margin: auto;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 99;
+	filter: alpha(opacity=90);
+	background-repeat: repeat;
+	visibility: hidden;
+	overflow: hidden;
+	background: rgba(68, 79, 83, 0.85) none repeat scroll 0 0 !important;
+	background-position: 0 0;
+	background-size: cover;
+	opacity: .94;
+}
+
+.loadingBarBlock {
+	width: 740px;
+}
+
+.loading_block_spilt {
+	background: #656565;
+	height: 1px;
+	width: 98%;
+}
+
+#goofish_main {
+	border-width: 0.5px;
+}
+
+#bilick,
+#cnblokie,
+#itck {
+	-webkit-text-security: disc;
+}
+
+#bilick:focus,
+#cnblokie:focus,
+#itck:focus {
+	-webkit-text-security: none;
+}
+
+input[type="checkbox"] {
+	vertical-align: middle;
+}
+
+#tablets input[type="button"] {
+	font-size: 10pt;
+	color: #fff;
+	padding: 10px 3.75px;
+	border-radius: 5px 5px 0px 0px;
+	width: 12%;
+	border: 1px solid #67767d;
+	border-bottom: none;
+	background: #67767d;
+	cursor: pointer;
+}
+
+#tablets input[type="button"]:hover,
+#tablets .active {
+	border-color: #2f3a3e;
+	background: #2f3a3e !important;
+}
+
+#LoadingBar {
+	z-index: 200;
+}
+
+#loading_block_title {
+	margin: 10px auto;
+	margin-left: 10px;
+	width: 85%;
+	font-size: 12pt;
+}
+
+#loading_block_spilt {
+	margin: 10px 0 10px 5px;
+}
+
+#log_content {
+	border: 1px solid #000;
+	width: 99%;
+	font-family: 'Lucida Console';
+	font-size: 11px;
+	background: transparent;
+	color: #FFFFFF;
+	outline: none;
+	padding-left: 3px;
+	padding-right: 22px;
+	overflow-x: hidden
+}
+
+#ok_button {
+	background: #000;
+	visibility: hidden;
+}
+
+#mon_ok_button {
+	background: #000;
+}
+
+#log_pannel_div {
+	z-index: 200;
+}
+
+#log_pannel_table {
+	width: 960px;
+}
+
+#run_log_content {
+	border: 1px solid #000;
+	width: 99%;
+	font-family: 'Lucida Console';
+	font-size: 11px;
+	background: transparent;
+	color: #FFFFFF;
+	outline: none;
+	padding-left: 5px;
+	padding-right: 22px;
+	line-height: 1.3;
+	overflow-x: hidden;
+	white-space: break-spaces;
+}
+
+.stop_log {
+	margin-left: 10px;
+}
+
+.splitLine {
+	margin: 10px 0 10px 5px;
+}
+
+#return_btn {
+	cursor: pointer;
+	position: absolute;
+	margin-left: -30px;
+	margin-top: -25px;
+}
+
+.switch_field {
+	display: table-cell;
+	float: left;
+}
+
+#enable {
+	display: none;
+}
+
+#period {
+	width: 62px;
+}
+
+#bcoinum {
+	width: max-content;
+}
+
+#btskon,
+.biliauto {
+	float: inline-start;
+}
+
+#tablets table {
+	margin: 10px 0px 0px 0px;
+	border-collapse: collapse;
+}
+
+#tablets td {
+	padding: 0;
+}
+
+#bilick,
+#cnblokie,
+#itck {
+	width: 453px;
+	height: auto;
+}
+
+input[type="password"],
+input[type="text"] {
+	width: 300px;
+}
+
+input[type="time"] {
+	width: fit-content !important;
+}
+
+#log_info {
+	text-align: center;
+	font-size: 18px;
+	color: #99FF00;
+	padding: 10px;
+	font-weight: bold;
+}
+
+#running_log {
+	margin-left: 15px;
+	margin-right: 15px;
+	margin-top: 10px;
+	outline: 1px solid #3c3c3c;
+	overflow: hidden;
+}
+
+#return_center {
+	float: right;
+	width: 15px;
+	height: 25px;
+	margin-top: -20px;
+}
+
+#switch_btn {
+	float: right;
+	margin-top: 5px;
+	margin-right: 5px;
+}
+
+.right_btn {
+	float: right;
+	margin-right: 5px;
+}
+
+#log_container {
+	margin-left: 15px;
+	margin-right: 15px;
+	margin-top: 10px;
+	overflow: hidden;
+}
+
+#status_container {
+	float: right;
+	margin-right: 5px;
+}
+
+#kill {
+	display: none;
+}
