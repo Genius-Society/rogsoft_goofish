@@ -6,7 +6,7 @@
 
 [![Auto Sync](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-sync.yml/badge.svg?branch=main)](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-sync.yml)
 [![GitHub](https://img.shields.io/badge/GitHub-Mxucc%2Fxianyu--super--butler-blue?logo=github)](https://github.com/Mxucc/xianyu-super-butler)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![license](https://img.shields.io/github/license/Genius-Society/rogsoft_goofish.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org)
 
