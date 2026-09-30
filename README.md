@@ -4,10 +4,11 @@
 
 **闲鱼超级管家 - Koolcenter 软件中心插件版本**
 
+[![Auto Sync](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-sync.yml/badge.svg?branch=main)](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-sync.yml)
 [![GitHub](https://img.shields.io/badge/GitHub-Mxucc%2Fxianyu--super--butler-blue?logo=github)](https://github.com/Mxucc/xianyu-super-butler)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
-[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org)
 
 基于 [Mxucc/xianyu-super-butler](https://github.com/Mxucc/xianyu-super-butler) 二次开发 · 路由部署 · 持续更新
 
