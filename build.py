@@ -2,7 +2,6 @@ import os
 import hashlib
 import requests
 import subprocess
-from tqdm import tqdm
 
 
 def rm_cr():
@@ -23,14 +22,13 @@ def download_file(
 ):
     r = requests.get(url, stream=True)
     total = int(r.headers.get("content-length", 0))
-    with open(save_path, "wb") as f, tqdm(
-        total=total,
-        unit="B",
-        unit_scale=True,
-    ) as bar:
+    done = 0
+    with open(save_path, "wb") as f:
         for chunk in r.iter_content(8192):
             f.write(chunk)
-            bar.update(len(chunk))
+            done += len(chunk)
+            if total:
+                print(f"\r{done/total*100:.1f}%", end="")
 
     return save_path
 
