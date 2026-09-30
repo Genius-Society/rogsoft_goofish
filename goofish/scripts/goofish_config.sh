@@ -145,24 +145,18 @@ check_proxy() {
 }
 
 update() {
-	echo_date "正在检查更新..."
-	local local_md5=$(dbus get goofish_md5)
-	local git_api="https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/tags/1.1"
-	local latest_md5=$(curl -s "${git_api}" | python3 -c "import sys, json; print(json.load(sys.stdin).get('body', ''))")
-	if [ "${local_md5}" == "${latest_md5}" ]; then
+	local local_ver=$(dbus get goofish_version)
+	local latest_ver=$(curl -s https://raw.githubusercontent.com/Genius-Society/rogsoft_goofish/refs/heads/main/goofish/version)
+	if [ "${local_ver}" == "${latest_ver}" ]; then
 		echo_date "goofish 已是最新版本, 无需更新!"
 	else
-		echo_date "发现新版本, 更新中..."
 		local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
-		local asset_url=$(curl -s "${git_api}" | python3 -c "import sys, json; data=json.load(sys.stdin); [print(a['url']) for a in data['assets'] if a['name']=='goofish.tar.gz']")
 		if [ "${status}" == "200" ]; then
-			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 --header="Accept: application/octet-stream" -O /tmp/upload/goofish.tar.gz "${asset_url}" 2>&1
+			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 -O /tmp/upload/goofish.tar.gz "https://github.com/Genius-Society/rogsoft_goofish/releases/download/${latest_ver}/goofish.tar.gz" 2>&1
 		else
-			wget --no-hsts -c -t 0 -T 30 --header="Accept: application/octet-stream" -O /tmp/upload/goofish.tar.gz "${asset_url}" 2>&1
+			wget --no-hsts -c -t 0 -T 30 -O /tmp/upload/goofish.tar.gz "https://github.com/Genius-Society/rogsoft_goofish/releases/download/${latest_ver}/goofish.tar.gz" 2>&1
 		fi
 		dbus set soft_name=goofish.tar.gz
-		unset_lock
-		echo_date "新插件安装中..."
 		sh /koolshare/scripts/ks_tar_install.sh >/dev/null 2>&1
 		echo_date "goofish 插件已更新!"
 	fi

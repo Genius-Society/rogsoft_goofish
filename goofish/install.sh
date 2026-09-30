@@ -58,7 +58,6 @@ install_env() {
 	export npm_config_cache=$HOME/.npm
 	export npm_config_prefix=$HOME/.npm-global
 	export PATH=$HOME/.npm-global/bin:/opt/bin:/opt/sbin:/usr/bin:/usr/sbin:/bin:/sbin
-	export NODE_OPTIONS="--max-old-space-size=256"
 	mkdir -p $HOME/.npm $HOME/.npm-global
 	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 	opkg update
@@ -69,13 +68,8 @@ install_env() {
 	else
 		echo_date "pnpm 已安装, 跳过安装!"
 	fi
-	local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
-	if [ "${status}" == "200" ]; then
-		wget -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 -P $HOME https://github.com/Mxucc/xianyu-super-butler/archive/refs/heads/main.zip
-	else
-		wget -P $HOME https://github.com/Mxucc/xianyu-super-butler/archive/refs/heads/main.zip
-	fi
-	unzip -o $HOME/main.zip -d /koolshare/goofish/
+	unzip -oq /tmp/goofish/bin/main.zip -d /koolshare/goofish/
+	cp -rf /tmp/goofish/bin/init_admin.py /koolshare/goofish/xianyu-super-butler-main/
 	cd /koolshare/goofish/xianyu-super-butler-main
 	pip install --cache-dir $HOME -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 	cd frontend
@@ -150,7 +144,6 @@ dbus set softcenter_module_goofish_title="Goofish"
 # 判断 Entware 是否已安装
 if [ -d "/opt" ]; then
 	install_env
-	cp -rf /tmp/goofish/bin/* /koolshare/goofish/xianyu-super-butler-main/
 	echo_date "goofish 插件安装完毕!"
 	sh /koolshare/scripts/goofish_config.sh
 else

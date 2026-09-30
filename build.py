@@ -1,5 +1,8 @@
 import os
+import hashlib
+import requests
 import subprocess
+from tqdm import tqdm
 
 
 def rm_cr():
@@ -12,6 +15,33 @@ def rm_cr():
         ],
         check=True,
     )
+
+
+def download_file(
+    url="https://github.com/Mxucc/xianyu-super-butler/archive/refs/heads/main.zip",
+    save_path="./goofish/bin/main.zip",
+):
+    r = requests.get(url, stream=True)
+    total = int(r.headers.get("content-length", 0))
+    with open(save_path, "wb") as f, tqdm(
+        total=total,
+        unit="B",
+        unit_scale=True,
+    ) as bar:
+        for chunk in r.iter_content(8192):
+            f.write(chunk)
+            bar.update(len(chunk))
+
+    return save_path
+
+
+def calculate_md5(file_path: str):
+    md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            md5.update(chunk)
+
+    return md5.hexdigest()
 
 
 def pack(module_name: str):
@@ -32,6 +62,11 @@ def pack(module_name: str):
 if __name__ == "__main__":
     try:
         rm_cr()
+        zipath = download_file()
+        md5 = calculate_md5(zipath)
+        with open("./goofish/version", "w") as f:
+            f.write(md5)
+
         pack("goofish")
 
     except Exception as e:
