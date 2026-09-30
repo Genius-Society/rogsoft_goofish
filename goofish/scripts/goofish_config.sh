@@ -84,6 +84,9 @@ check_params() {
 	# 检查必填入参
 	if [[ -z "${goofish_pass}" ]]; then
 		close_with_echo "请输入有效密码!"
+	else
+		cd /koolshare/goofish/xianyu-super-butler-main
+		python3 init_admin.py --pass "${goofish_pass}"
 	fi
 }
 

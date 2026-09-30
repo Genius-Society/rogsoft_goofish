@@ -101,6 +101,7 @@ function get_dbus_data() {
 			dbus = data.result[0];
 			conf2obj();
 			register_event();
+			E("fileb").href = window.location.protocol + "//" + document.domain + ":8080";
 		}
 	});
 }

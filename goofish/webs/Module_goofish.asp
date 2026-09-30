@@ -176,8 +176,7 @@
                                                             href="javascript:void(0);">控制台</a>
                                                     </th>
                                                     <td>
-                                                        <a type="button" class="ks_btn"
-                                                            href="http://router.asus.com:8080"
+                                                        <a type="button" class="ks_btn" id="fileb"
                                                             target="_blank">访问闲鱼面板</a>
                                                         <div class="right_btn">
                                                             <a type="button" class="ks_btn" href="javascript:void(0);"
