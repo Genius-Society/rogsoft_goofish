@@ -20,6 +20,10 @@ def download_file(
     url="https://github.com/Mxucc/xianyu-super-butler/archive/refs/heads/main.zip",
     save_path="./goofish/bin/main.zip",
 ):
+    if os.path.exists(save_path):
+        print(f"文件 {save_path} 已存在, 跳过下载")
+        return save_path
+
     response = requests.get(url, stream=True)
     response.raise_for_status()
     total = int(response.headers.get("content-length", 0))

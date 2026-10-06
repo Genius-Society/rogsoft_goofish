@@ -152,6 +152,7 @@ check_proxy() {
 }
 
 update() {
+	echo_date "检查 goofish 更新..."
 	local wget_proxy=""
 	local curl_proxy=""
 	local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
