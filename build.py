@@ -20,16 +20,33 @@ def download_file(
     url="https://github.com/Mxucc/xianyu-super-butler/archive/refs/heads/main.zip",
     save_path="./goofish/bin/main.zip",
 ):
-    r = requests.get(url, stream=True)
-    total = int(r.headers.get("content-length", 0))
-    done = 0
-    with open(save_path, "wb") as f:
-        for chunk in r.iter_content(8192):
-            f.write(chunk)
-            done += len(chunk)
-            if total:
-                print(f"\r{done/total*100:.1f}%", end="")
+    response = requests.get(url, stream=True)
+    response.raise_for_status()
+    total = int(response.headers.get("content-length", 0))
+    downloaded = 0
+    with open(save_path, "wb") as file:
+        for chunk in response.iter_content(chunk_size=8192):
+            if not chunk:
+                continue
 
+            file.write(chunk)
+            downloaded += len(chunk)
+            if total:
+                progress = downloaded / total * 100
+                print(
+                    f"\r下载进度: {progress:.1f}% "
+                    f"({downloaded / 1024:.1f}/{total / 1024:.1f} KB)",
+                    end="",
+                    flush=True,
+                )
+            else:
+                print(
+                    f"\r已下载: {downloaded / 1024:.1f} KB",
+                    end="",
+                    flush=True,
+                )
+
+    print("\n下载完成")
     return save_path
 
 
