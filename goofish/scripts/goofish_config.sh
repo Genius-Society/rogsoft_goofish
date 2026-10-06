@@ -55,8 +55,12 @@ fix_env() {
 	sed -i "s|^src/gz.*|src/gz entware https://mirrors.bfsu.edu.cn/entware/aarch64-k3.10|" /opt/etc/opkg.conf
 	opkg update
 	opkg install python3-pip node node-npm
-	npm install -g pnpm
 	python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+	if [ ! -x /opt/bin/pnpm ]; then
+		npm install -g pnpm
+	else
+		echo_date "pnpm 已安装, 跳过安装!"
+	fi
 	pip install --cache-dir /koolshare/goofish/.cache -r /koolshare/goofish/xianyu-super-butler-main/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 	echo "修复完毕! 当前 pypi 列表如下:"
 	pip list
