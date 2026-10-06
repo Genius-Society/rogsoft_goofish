@@ -148,19 +148,33 @@ check_proxy() {
 }
 
 update() {
-	if [ $(dbus get goofish_md5) == $(curl -s https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/latest | python3 -c "import sys,json;print(json.load(sys.stdin).get('body',''))") ]; then
+	local wget_proxy=""
+	local curl_proxy=""
+	local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
+	if [ "${status}" == "200" ]; then
+		wget_proxy="-e use_proxy=yes -e https_proxy=http://127.0.0.1:23456"
+		curl_proxy="-x http://127.0.0.1:23456"
+	fi
+	local latest_md5=$(curl ${curl_proxy} -s https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/latest | python3 -c "import sys,json;print(json.load(sys.stdin).get('body',''))")
+	if [ $(dbus get goofish_md5) == "${latest_md5}" ]; then
 		echo_date "goofish 已是最新版本, 无需更新!"
 	else
-		local latest_ver=$(curl -s https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/latest | python3 -c "import sys,json;print(json.load(sys.stdin).get('tag_name',''))")
-		local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
-		if [ "${status}" == "200" ]; then
-			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 -O /tmp/upload/goofish.tar.gz "https://github.com/Genius-Society/rogsoft_goofish/releases/download/${latest_ver}/goofish.tar.gz" 2>&1
+		local latest_ver=$(curl ${curl_proxy} -s https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/latest | python3 -c "import sys,json;print(json.load(sys.stdin).get('tag_name',''))")
+		if wget --no-hsts -c -t 0 -T 30 ${wget_proxy} \
+			-O /tmp/upload/goofish.tar.gz \
+			"https://github.com/Genius-Society/rogsoft_goofish/releases/download/${latest_ver}/goofish.tar.gz" 2>&1; then
+			if [ -s /tmp/upload/goofish.tar.gz ]; then
+				dbus set soft_name=goofish.tar.gz
+				unset_lock
+				echo_date "插件下载成功, 新插件安装中..."
+				sh /koolshare/scripts/ks_tar_install.sh >/dev/null 2>&1
+				echo_date "goofish 插件已更新!"
+			else
+				echo_date "下载文件为空, 更新失败!"
+			fi
 		else
-			wget --no-hsts -c -t 0 -T 30 -O /tmp/upload/goofish.tar.gz "https://github.com/Genius-Society/rogsoft_goofish/releases/download/${latest_ver}/goofish.tar.gz" 2>&1
+			echo_date "插件下载失败!"
 		fi
-		dbus set soft_name=goofish.tar.gz
-		sh /koolshare/scripts/ks_tar_install.sh >/dev/null 2>&1
-		echo_date "goofish 插件已更新!"
 	fi
 }
 
