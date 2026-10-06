@@ -80,9 +80,7 @@
                                 <tr>
                                     <td bgcolor="#4D595D" colspan="3" valign="top">
                                         <div>&nbsp;</div>
-                                        <div class="formfonttitle">Goofish<lable id="goofish_version">
-                                                <lable>
-                                        </div>
+                                        <div class="formfonttitle">Goofish</div>
                                         <div id="return_center">
                                             <img id="return_btn" onclick="reload_Soft_Center();" align="right"
                                                 title="返回软件中心" src="images/backprev.png"

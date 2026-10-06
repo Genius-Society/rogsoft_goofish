@@ -135,7 +135,6 @@ chmod +x /koolshare/scripts/uninstall_goofish.sh
 
 # 离线安装用
 dbus set goofish_md5="$(md5sum /tmp/goofish.tar.gz | awk '{print $1}')"
-dbus set goofish_version="$(cat $DIR/version)"
 dbus set softcenter_module_goofish_version="$(cat $DIR/version)"
 dbus set softcenter_module_goofish_description="闲鱼超级管家"
 dbus set softcenter_module_goofish_install="1"
