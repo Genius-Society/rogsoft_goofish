@@ -39,6 +39,7 @@ def download_file(
                     end="",
                     flush=True,
                 )
+
             else:
                 print(
                     f"\r已下载: {downloaded / 1024:.1f} KB",
