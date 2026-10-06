@@ -151,7 +151,7 @@ update() {
 	if [ $(dbus get goofish_md5) == $(curl -s https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/latest | python3 -c "import sys,json;print(json.load(sys.stdin).get('body',''))") ]; then
 		echo_date "goofish 已是最新版本, 无需更新!"
 	else
-		local latest_ver=$(curl -s https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/latest | python3 -c "import sys,json;print(json.load(sys.stdin).get('name',''))")
+		local latest_ver=$(curl -s https://api.github.com/repos/Genius-Society/rogsoft_goofish/releases/latest | python3 -c "import sys,json;print(json.load(sys.stdin).get('tag_name',''))")
 		local status=$(curl -x http://127.0.0.1:23456 -s -o /dev/null -w "%{http_code}" https://github.com)
 		if [ "${status}" == "200" ]; then
 			wget --no-hsts -c -t 0 -T 30 -e use_proxy=yes -e https_proxy=http://127.0.0.1:23456 -O /tmp/upload/goofish.tar.gz "https://github.com/Genius-Society/rogsoft_goofish/releases/download/${latest_ver}/goofish.tar.gz" 2>&1
