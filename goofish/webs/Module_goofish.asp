@@ -48,8 +48,8 @@
         <table cellpadding="5" cellspacing="0" id="log_pannel_table" class="loadingBarBlock" align="center">
             <tr>
                 <td height="100">
-                    <div id="log_info">goofish监控信息</div>
-                    <div style="margin-left:15px">🗒️<i id="log_pannel_title">此处展示goofish程序的监控日志...</i></div>
+                    <div id="log_info">goofish 监控信息</div>
+                    <div style="margin-left:15px">🗒️<i id="log_pannel_title">此处展示 goofish 程序的监控日志...</i></div>
                     <div id="running_log">
                         <textarea cols="50" rows="32" wrap="soft" readonly="readonly" id="log_content"
                             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
@@ -152,7 +152,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onclick="hint(5)" class="hintstyle"
+                                                    <th><a onclick="hint(4)" class="hintstyle"
                                                             href="javascript:void(0);">控制台</a>
                                                     </th>
                                                     <td>

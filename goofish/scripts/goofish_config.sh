@@ -207,10 +207,6 @@ elif [ $# -eq 2 ]; then
 		update | tee -a $RUN_LOG
 		;;
 
-	RESET_PASS)
-		reset_pass | tee -a $RUN_LOG
-		;;
-
 	esac
 
 	unset_lock

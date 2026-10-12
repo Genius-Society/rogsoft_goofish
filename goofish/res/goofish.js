@@ -2,37 +2,12 @@ var refresh_flag;
 var count_down;
 var _responseLen;
 var _show_mon_log;
-const keys = ["pass"];
 
 function init() {
 	show_menu(menu_hook);
 	get_status();
 	get_dbus_data();
 	register_event();
-	import_cfg();
-}
-
-function import_cfg() { // 导入配置
-	document.getElementById('config').addEventListener('change', function (e) {
-		const file = e.target.files[0];
-		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = evt => {
-			try {
-				const obj = JSON.parse(evt.target.result); // 解析成对象
-				load_cfg(obj);
-			} catch (err) {
-				alert('配置文件格式错误', err);
-			}
-		};
-		reader.readAsText(file); // 按文本读
-	});
-}
-
-function load_cfg(obj) { // 加载配置
-	keys.forEach(k => {
-		if (k in obj) $(`#${k}`).val(obj[k]);
-	});
 }
 
 function register_event() {
@@ -58,13 +33,6 @@ function conf2obj() { // dbus 变量转控件值
 			E(id).checked = (dbus["goofish_" + id] == "1");
 		}
 	});
-
-	$('textarea[class][id][placeholder], input[type="text"][id], input[type="password"][id], input[type="number"][id], input[type="time"][id]').each(function (_, el) {
-		var id = $(el).attr("id");
-		if (id && dbus["goofish_" + id]) {
-			E(id).value = dbus["goofish_" + id];
-		}
-	});
 }
 
 function obj2conf(cmd) { // 控件值转 dbus 变量
@@ -80,13 +48,6 @@ function obj2conf(cmd) { // 控件值转 dbus 变量
 	else {
 		get_run_log(1);
 	}
-
-	$('textarea[class][id][placeholder], input[type="text"][id], input[type="password"][id], input[type="number"][id], input[type="time"][id]').each(function (_, el) {
-		var id = $(el).attr("id");
-		if (id) {
-			dbus_new["goofish_" + id] = id != "bilick" ? E(id).value.trim() : filter_bili_ck(E(id).value);
-		}
-	});
 
 	return dbus_new;
 }
@@ -292,7 +253,7 @@ function count_down_close() {
 
 function show_mon_log() {
 	document.scrollingElement.scrollTop = 0;
-	E("log_pannel_title").innerHTML = "此处展示goofish程序的监控日志...";
+	E("log_pannel_title").innerHTML = "此处展示 goofish 程序的监控日志...";
 	E("log_pannel_div").style.visibility = "visible";
 	var page_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 	var page_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -332,10 +293,6 @@ function hint(itemNum) {
 		statusmenu = "点击“执行日志”按钮可查看最新手动单次触发执行指令的日志信息。<br>";
 	}
 	else if (itemNum == 4) {
-		_caption = "闲鱼智能自动发货与管家系统管理员密码";
-		statusmenu = "不要空着, 输入要修改的密码后, 点击“密码重置”即可生效。<br>";
-	}
-	else if (itemNum == 5) {
 		_caption = "访问闲鱼控制台";
 		statusmenu = "点击“访问闲鱼面板”按钮，将在新标签页中打开插件提供的 Web 控制台 (默认地址 http://router.asus.com:8090)。您可以在控制台中管理闲鱼账号、查看运行日志、调整各媒体面板设置以及执行其他高级操作。建议将地址保存为书签, 方便日后快速访问; 点击“环境修复”按钮可修复 pip 依赖环境。<br>";
 	}
