@@ -12,15 +12,15 @@
 
 ---
 
-## 📸 插件图标 ICO
-
-![](./goofish/res/icon-goofish.png)
-
 ## 📖 简介
 
-闲鱼超级管家 - Koolcenter 软件中心插件版本是在 [xianyu-auto-reply-fix](https://github.com/GuDong2003/xianyu-auto-reply-fix) 基础上的二次开发版本，部署到华硕路由器 Koolcenter 版 Merlin 固件，让闲鱼店铺管理更加高效便捷。
+闲鱼管理系统 - Koolcenter 软件中心插件版本是在 [xianyu-auto-reply-fix](https://github.com/GuDong2003/xianyu-auto-reply-fix) 基础上的二次开发版本，部署到华硕路由器 Koolcenter 版 Merlin 固件，让闲鱼店铺管理更加高效便捷。
 
 ---
+
+### 插件图标 ICO
+
+![](./goofish/res/icon-goofish.png)
 
 ### 前置插件
 在 KoolCenter 软件中心即可安装并挂载, 安装顺序自上而下:

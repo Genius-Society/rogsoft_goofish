@@ -89,7 +89,7 @@
                                         </div>
                                         <div class="splitLine"></div>
                                         <div class="SimpleNote">
-                                            <li>闲鱼超级管家 goofish</li>
+                                            <li>闲鱼管理系统 goofish</li>
                                             <li style="color: #FC0;">请设置虚拟内存后再使用</li>
                                         </div>
                                         <div id="goofish_main">
