@@ -83,17 +83,6 @@ load_params() {
 	goofish_pass=$(dbus get goofish_pass)
 }
 
-# 检查入参
-# check_params() {
-# 	# 检查必填入参
-# 	if [[ -z "${goofish_pass}" ]]; then
-# 		close_with_echo "请输入有效密码!"
-# 	else
-# 		cd /koolshare/goofish/xianyu-auto-reply-fix-main
-# 		python3 init_admin.py --pass "${goofish_pass}"
-# 	fi
-# }
-
 # 检查运行环境
 check_env() {
 	echo_date "检查 Entware 环境..."
@@ -106,7 +95,6 @@ check_env() {
 
 # 开启监控
 start_goofish() {
-	# check_params
 	sync_ntp
 	check_env
 	cd /koolshare/goofish/xianyu-auto-reply-fix-main
@@ -182,16 +170,6 @@ update() {
 		fi
 	fi
 }
-
-# reset_pass() {
-# 	echo_date "正在重置 admin 密码..."
-# 	if [[ -z "${goofish_pass}" ]]; then
-# 		echo_date "请输入有效密码!"
-# 	else
-# 		cd /koolshare/goofish/xianyu-auto-reply-fix-main
-# 		python3 init_admin.py --pass "${goofish_pass}"
-# 	fi
-# }
 
 # 自启/重启时触发开启 goofish
 if [[ $# -eq 0 || $# -eq 1 ]]; then
