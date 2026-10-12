@@ -70,9 +70,9 @@ install_env() {
 	fi
 	unzip -oq /tmp/goofish/bin/main.zip -d /koolshare/goofish/
 	cd /koolshare/goofish/xianyu-auto-reply-fix-main
-	sed -i 's|</head>|<style>span[class~="transition-transform"]{left:0!important}</style></head>|' ./static/index.html
 	pip install --cache-dir $HOME -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 	/opt/lib/ld-linux-aarch64.so.1 --library-path /opt/lib /opt/bin/pnpm install --node-linker=hoisted --allow-build=esbuild
+	/opt/lib/libdl.so.2 --library-path /opt/lib /opt/bin/npx playwright install --with-deps chromium --only-shell
 	rm -rf $HOME
 }
 
