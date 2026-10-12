@@ -1,7 +1,5 @@
 # 🐟 Goofish for asuswrt
 
-<div align="center">
-
 **闲鱼管理系统 - Koolcenter 软件中心插件版本**
 
 [![Auto Release](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-release.yml/badge.svg?branch=main)](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-release.yml)
@@ -11,8 +9,6 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 
 基于 [GuDong2003/xianyu-auto-reply-fix](https://github.com/GuDong2003/xianyu-auto-reply-fix) 二次开发 · 路由部署 · 持续更新
-
-</div>
 
 ---
 
@@ -77,6 +73,7 @@
 ---
 
 ## 🏗️ 技术栈
+
 - **插件**：HTML · CSS · JavaScript · jQuery · Shell · Python 3.11
 - **后端框架**：FastAPI + Uvicorn + Python 3.11+ 异步编程
 - **数据库**：SQLite 3 + 多用户数据隔离 + 自动迁移
@@ -116,6 +113,7 @@
 ---
 
 ## 💻 开发维护
+
 ### 代码下载
 ```bash
 git clone git@github.com:Genius-Society/rogsoft_goofish.git
