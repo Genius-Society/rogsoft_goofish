@@ -246,7 +246,7 @@ function count_down_close() {
 		E("ok_btn").value = "手动关闭";
 		return false;
 	}
-	E("ok_btn").value = "自动关闭(" + count_down + ")";
+	E("ok_btn").value = "自动关闭 (" + count_down + ")";
 	--count_down;
 	setTimeout("count_down_close();", 1000);
 }
