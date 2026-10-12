@@ -17,12 +17,15 @@ def rm_cr():
 
 
 def download_file(
-    url="https://github.com/Mxucc/xianyu-super-butler/archive/refs/heads/main.zip",
+    url="https://github.com/GuDong2003/xianyu-auto-reply-fix/archive/refs/heads/main.zip",
     save_path="./goofish/bin/main.zip",
 ):
     if os.path.exists(save_path):
         print(f"文件 {save_path} 已存在, 跳过下载")
         return save_path
+
+    else:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
     response = requests.get(url, stream=True)
     response.raise_for_status()

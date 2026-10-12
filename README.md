@@ -2,16 +2,16 @@
 
 <div align="center">
 
-**闲鱼超级管家 - Koolcenter 软件中心插件版本**
+**闲鱼管理系统 - Koolcenter 软件中心插件版本**
 
 [![Auto Release](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-release.yml/badge.svg?branch=main)](https://github.com/Genius-Society/rogsoft_goofish/actions/workflows/auto-release.yml)
 [![sf](https://img.shields.io/badge/archive-SourceForge-ff6600.svg)](https://sourceforge.net/projects/rogsoft-goofish/files)
-[![GitHub](https://img.shields.io/badge/GitHub-Mxucc%2Fxianyu--super--butler-blue?logo=github)](https://github.com/Mxucc/xianyu-super-butler)
+[![GitHub](https://img.shields.io/badge/GitHub-Mxucc%2Fxianyu--super--butler-blue?logo=github)](https://github.com/GuDong2003/xianyu-auto-reply-fix)
 [![license](https://img.shields.io/github/license/Genius-Society/rogsoft_goofish.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org)
 
-基于 [Mxucc/xianyu-super-butler](https://github.com/Mxucc/xianyu-super-butler) 二次开发 · 路由部署 · 持续更新
+基于 [GuDong2003/xianyu-auto-reply-fix](https://github.com/GuDong2003/xianyu-auto-reply-fix) 二次开发 · 路由部署 · 持续更新
 
 </div>
 
@@ -23,23 +23,9 @@
 
 ![](./goofish/res/icon-goofish.png)
 
-### 工作台 Dashboard
-
-![Dashboard 界面](https://github.com/Mxucc/xianyu-super-butler/raw/main/static/uploads/images/1.png)
-
-### 订单管理 Orders
-
-![订单管理](https://github.com/Mxucc/xianyu-super-butler/raw/main/static/uploads/images/2.png)
-
-### 补发功能 - 立即发货
-
-![补发功能-发货方式选择](https://github.com/Mxucc/xianyu-super-butler/raw/main/static/uploads/images/3.png) ![补发功能-发货中](https://github.com/Mxucc/xianyu-super-butler/raw/main/static/uploads/images/4.png)
-
----
-
 ## 📖 简介
 
-闲鱼超级管家 - Koolcenter 软件中心插件版本是在 [xianyu-auto-reply](https://github.com/Mxucc/xianyu-super-butler) 基础上的二次开发版本，部署到华硕路由器 Koolcenter 版 Merlin 固件，让闲鱼店铺管理更加高效便捷。
+闲鱼超级管家 - Koolcenter 软件中心插件版本是在 [xianyu-auto-reply](https://github.com/GuDong2003/xianyu-auto-reply-fix) 基础上的二次开发版本，部署到华硕路由器 Koolcenter 版 Merlin 固件，让闲鱼店铺管理更加高效便捷。
 
 ---
 
@@ -110,7 +96,7 @@
 
 ### 首次使用
 
-1. **登录账号** - 访问 http://router.asus.com:8080 登录管理员账号
+1. **登录账号** - 访问 http://router.asus.com:8090 登录管理员账号
 2. **添加闲鱼账号** - 支持扫码登录、密码登录、手动输入Cookie
 3. **配置关键词** - 为每个账号配置自动回复关键词和AI智能议价
 4. **开始使用** - 系统会自动监听闲鱼消息并自动回复、自动发货
@@ -146,17 +132,3 @@ conda activate py311
 # 要先将 git bash 和 7z 的环境变量配置好重启
 python build.py
 ```
-
----
-
-## 📄 开源协议
-
-[MIT License](https://opensource.org/licenses/MIT)
-
-> ⚠️ **免责声明**
->
-> 本项目仅供学习研究使用，严禁用于商业用途！
->
-> 使用本项目时请遵守相关法律法规，因使用本项目而产生的一切后果由使用者自行承担。
-
----

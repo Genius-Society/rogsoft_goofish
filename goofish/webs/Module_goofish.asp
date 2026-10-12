@@ -152,24 +152,6 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th><a onclick="hint(4)" class="hintstyle"
-                                                            href="javascript:void(0);">管理员密码<span style="color: red;">
-                                                                * </span></a>
-                                                    </th>
-                                                    <td>
-                                                        <input type="password" class="input_ss_table" id="pass"
-                                                            maxlength="100" value="" autocorrect="off"
-                                                            autocapitalize="off" readonly
-                                                            onblur="switchType(this, false);"
-                                                            onfocus="switchType(this, true);this.removeAttribute('readonly');"
-                                                            value="">
-                                                        <div class="right_btn">
-                                                            <a type="button" class="ks_btn" href="javascript:void(0);"
-                                                                onclick="trigger('RESET_PASS')">密码重置</a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
                                                     <th><a onclick="hint(5)" class="hintstyle"
                                                             href="javascript:void(0);">控制台</a>
                                                     </th>

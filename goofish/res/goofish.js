@@ -101,7 +101,7 @@ function get_dbus_data() {
 			dbus = data.result[0];
 			conf2obj();
 			register_event();
-			E("fileb").href = window.location.protocol + "//" + document.domain + ":8080";
+			E("fileb").href = window.location.protocol + "//" + document.domain + ":8090";
 		}
 	});
 }
@@ -337,7 +337,7 @@ function hint(itemNum) {
 	}
 	else if (itemNum == 5) {
 		_caption = "访问闲鱼控制台";
-		statusmenu = "点击“访问闲鱼面板”按钮，将在新标签页中打开插件提供的 Web 控制台 (默认地址 http://router.asus.com:8080)。您可以在控制台中管理闲鱼账号、查看运行日志、调整各媒体面板设置以及执行其他高级操作。建议将地址保存为书签, 方便日后快速访问; 点击“环境修复”按钮可修复 pip 依赖环境。<br>";
+		statusmenu = "点击“访问闲鱼面板”按钮，将在新标签页中打开插件提供的 Web 控制台 (默认地址 http://router.asus.com:8090)。您可以在控制台中管理闲鱼账号、查看运行日志、调整各媒体面板设置以及执行其他高级操作。建议将地址保存为书签, 方便日后快速访问; 点击“环境修复”按钮可修复 pip 依赖环境。<br>";
 	}
 
 	return overlib(statusmenu, OFFSETX, 10, OFFSETY, 10, RIGHT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');

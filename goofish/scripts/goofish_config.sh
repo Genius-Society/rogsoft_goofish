@@ -61,7 +61,7 @@ fix_env() {
 	else
 		echo_date "pnpm 已安装, 跳过安装!"
 	fi
-	pip install --cache-dir /koolshare/goofish/.cache -r /koolshare/goofish/xianyu-super-butler-main/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+	pip install --cache-dir /koolshare/goofish/.cache -r /koolshare/goofish/xianyu-auto-reply-fix-main/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 	echo "修复完毕! 当前 pypi 列表如下:"
 	pip list
 	rm -rf /koolshare/goofish/.cache
@@ -84,15 +84,15 @@ load_params() {
 }
 
 # 检查入参
-check_params() {
-	# 检查必填入参
-	if [[ -z "${goofish_pass}" ]]; then
-		close_with_echo "请输入有效密码!"
-	else
-		cd /koolshare/goofish/xianyu-super-butler-main
-		python3 init_admin.py --pass "${goofish_pass}"
-	fi
-}
+# check_params() {
+# 	# 检查必填入参
+# 	if [[ -z "${goofish_pass}" ]]; then
+# 		close_with_echo "请输入有效密码!"
+# 	else
+# 		cd /koolshare/goofish/xianyu-auto-reply-fix-main
+# 		python3 init_admin.py --pass "${goofish_pass}"
+# 	fi
+# }
 
 # 检查运行环境
 check_env() {
@@ -106,10 +106,10 @@ check_env() {
 
 # 开启监控
 start_goofish() {
-	check_params
+	# check_params
 	sync_ntp
 	check_env
-	cd /koolshare/goofish/xianyu-super-butler-main
+	cd /koolshare/goofish/xianyu-auto-reply-fix-main
 	# 开启周期监控
 	nohup python -u Start.py >>"$MON_LOG" 2>&1 &
 }
@@ -183,15 +183,15 @@ update() {
 	fi
 }
 
-reset_pass() {
-	echo_date "正在重置 admin 密码..."
-	if [[ -z "${goofish_pass}" ]]; then
-		echo_date "请输入有效密码!"
-	else
-		cd /koolshare/goofish/xianyu-super-butler-main
-		python3 init_admin.py --pass "${goofish_pass}"
-	fi
-}
+# reset_pass() {
+# 	echo_date "正在重置 admin 密码..."
+# 	if [[ -z "${goofish_pass}" ]]; then
+# 		echo_date "请输入有效密码!"
+# 	else
+# 		cd /koolshare/goofish/xianyu-auto-reply-fix-main
+# 		python3 init_admin.py --pass "${goofish_pass}"
+# 	fi
+# }
 
 # 自启/重启时触发开启 goofish
 if [[ $# -eq 0 || $# -eq 1 ]]; then

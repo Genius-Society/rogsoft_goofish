@@ -69,11 +69,11 @@ install_env() {
 		echo_date "pnpm 已安装, 跳过安装!"
 	fi
 	unzip -oq /tmp/goofish/bin/main.zip -d /koolshare/goofish/
-	cp -rf /tmp/goofish/bin/init_admin.py /koolshare/goofish/xianyu-super-butler-main/
-	cd /koolshare/goofish/xianyu-super-butler-main
+	# cp -rf /tmp/goofish/bin/init_admin.py /koolshare/goofish/xianyu-auto-reply-fix-main/
+	cd /koolshare/goofish/xianyu-auto-reply-fix-main
 	sed -i 's|</head>|<style>span[class~="transition-transform"]{left:0!important}</style></head>|' ./static/index.html
 	pip install --cache-dir $HOME -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-	cd frontend
+	# cd frontend
 	/opt/lib/ld-linux-aarch64.so.1 --library-path /opt/lib /opt/bin/pnpm install --node-linker=hoisted --allow-build=esbuild
 	rm -rf $HOME
 }
